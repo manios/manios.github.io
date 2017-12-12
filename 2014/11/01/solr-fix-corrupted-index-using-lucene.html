@@ -1,0 +1,805 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.2.2 by Michael Rose
+  Copyright 2017 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE.txt
+-->
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin SEO -->
+
+
+
+
+
+
+
+
+
+<title>Solr fix corrupted index using Lucene - cmanios</title>
+
+
+
+
+<meta name="description" content="A few days ago, a Solr server in our SolrCloud installation stopped unexpectedly. After examining solr.log file I spotted that it could not start again because index.20140510031827076 file was corrupted. After some searching I found this Lucidworks article which described how to deal with a corrupted index file. So I proceeded to the following steps:">
+
+
+
+
+<meta name="author" content="cmanios">
+
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="cmanios">
+<meta property="og:title" content="Solr fix corrupted index using Lucene">
+
+
+  <link rel="canonical" href="https://manios.org/2014/11/01/solr-fix-corrupted-index-using-lucene">
+  <meta property="og:url" content="https://manios.org/2014/11/01/solr-fix-corrupted-index-using-lucene">
+
+
+
+  <meta property="og:description" content="A few days ago, a Solr server in our SolrCloud installation stopped unexpectedly. After examining solr.log file I spotted that it could not start again because index.20140510031827076 file was corrupted. After some searching I found this Lucidworks article which described how to deal with a corrupted index file. So I proceeded to the following steps:">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+
+
+
+  <meta property="og:type" content="article">
+  <meta property="article:published_time" content="2014-11-01T16:40:40+02:00">
+
+
+
+
+
+
+
+
+  <script type="application/ld+json">
+    {
+      "@context" : "http://schema.org",
+      "@type" : "Person",
+      "name" : "Christos Manios",
+      "url" : "https://manios.org",
+      "sameAs" : null
+    }
+  </script>
+
+
+
+
+
+
+
+<!-- end SEO -->
+
+
+<link href="https://manios.org/feed.xml" type="application/atom+xml" rel="alternate" title="cmanios Feed">
+
+<!-- http://t.co/dKP3o1e -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="https://manios.org/assets/css/main.css">
+
+<!--[if lte IE 9]>
+  <style>
+    /* old IE unsupported flexbox fixes */
+    .greedy-nav .site-title {
+      padding-right: 3em;
+    }
+    .greedy-nav button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+    }
+  </style>
+<![endif]-->
+
+
+    <!-- start custom head snippets -->
+
+<!-- insert favicons. use http://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+  </head>
+
+  <body class="layout--single">
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+    <div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        <a class="site-title" href="https://manios.org/">cmanios</a>
+        <ul class="visible-links">
+          
+            
+            <li class="masthead__menu-item"><a href="https://manios.org/year-archive/">Posts archive</a></li>
+          
+            
+            <li class="masthead__menu-item"><a href="https://manios.org/categories/">Categories</a></li>
+          
+            
+            <li class="masthead__menu-item"><a href="https://manios.org/tags/">Tags</a></li>
+          
+            
+            <li class="masthead__menu-item"><a href="https://manios.org/about/">About</a></li>
+          
+        </ul>
+        <button type="button">
+          <span class="visually-hidden">Toggle Menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+    
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+<div itemscope itemtype="http://schema.org/Person">
+
+  
+
+  <div class="author__content">
+    <h3 class="author__name" itemprop="name">Christos Manios</h3>
+    
+      <p class="author__bio" itemprop="description">
+        Developer life is a NullPointerException
+      </p>
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+        <li itemprop="homeLocation" itemscope itemtype="http://schema.org/Place">
+          <i class="fa fa-fw fa-map-marker" aria-hidden="true"></i> <span itemprop="name">Thessaloniki, GR</span>
+        </li>
+      
+
+      
+
+      
+
+      
+
+      
+        <li>
+          <a href="https://twitter.com/maniosolr" itemprop="sameAs">
+            <i class="fa fa-fw fa-twitter-square" aria-hidden="true"></i> Twitter
+          </a>
+        </li>
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+        <li>
+          <a href="https://github.com/manios" itemprop="sameAs">
+            <i class="fa fa-fw fa-github" aria-hidden="true"></i> GitHub
+          </a>
+        </li>
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs">
+      <i class="fa fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+  <article class="page" itemscope itemtype="http://schema.org/CreativeWork">
+    <meta itemprop="headline" content="Solr fix corrupted index using Lucene">
+    <meta itemprop="description" content="A few days ago, a Solr server in our SolrCloud installation stopped unexpectedly. After examining solr.log file I spotted that it could not start again because index.20140510031827076 file was corrupted. After some searching I found this Lucidworks article which described how to deal with a corrupted index file. So I proceeded to the following steps:">
+    <meta itemprop="datePublished" content="November 01, 2014">
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 class="page__title" itemprop="headline">Solr fix corrupted index using Lucene
+</h1>
+          
+            <p class="page__meta"><i class="fa fa-clock-o" aria-hidden="true"></i> 
+
+
+
+
+  4 minute read
+</p>
+          
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+        <p>A few days ago, a Solr server in our SolrCloud installation stopped unexpectedly. After examining solr.log file I spotted that it could not start again because <strong>index.20140510031827076</strong> file was corrupted. After some searching I found this <a href="https://support.lucidworks.com/hc/en-us/articles/202091128-How-to-deal-with-Index-Corruption">Lucidworks article</a> which described how to deal with a corrupted index file. So I proceeded to the following steps:</p>
+
+<h3 id="warning">WARNING!!</h3>
+
+<p><strong>This procedure may result in unrecoverable data loss. <em>It is vital that you backup your index before performing index checking and repair</em>.</strong></p>
+
+<ol>
+  <li>Find the guilty index file containing the corrupted segment. For me it was located in:
+    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>C:/Program Files/apache-solr-4.6.0/example/solr/hellaserver_shard1_replica4/data/index.20140510031827076
+</code></pre></div>    </div>
+  </li>
+  <li>Find Lucene core .jar file. I work with Apache Solr 4.6.0 so it is a file named lucene-core-4.6.0.jar. It is usually in <code class="highlighter-rouge">$SOLR_HOME/example/solr-webapp/webapp/WEB-INF/lib/lucene-core-4.6.0.jar</code>. So, switch to the directory where it exists:
+    <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cd </span>C:/Program Files/apache-solr-4.6.0/example/solr-webapp/webapp/WEB-INF/lib
+</code></pre></div>    </div>
+  </li>
+  <li>Check the segments of the corrupted index file in order to identify the problematic segment. To accomplish that, run:
+    <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>java <span class="nt">-cp</span> lucene-core-4.6.0.jar <span class="nt">-ea</span>:org.apache.lucene... org.apache.lucene.index.CheckIndex <span class="s2">"C:/Program Files/apache-solr-4.6.0/example/solr/hellaserver_shard1_replica4/data/index.20140510031827076"</span>
+</code></pre></div>    </div>
+    <p>The check results for a <strong>healthy</strong> segment look like the following:</p>
+    <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>1 of 37: name=_48r7 docCount=3021717
+   codec=Lucene46
+   compound=false
+   numFiles=11
+   size (MB)=5,020.87
+   diagnostics = {timestamp=1403095380034, os=Windows Server 2012, os.version=6
+.2, mergeFactor=10, source=merge, lucene.version=4.6.0 1543363 - simon - 2013-11
+-19 11:05:50, os.arch=amd64, mergeMaxNumSegments=-1, java.version=1.7.0_51, java
+.vendor=Oracle Corporation}
+   has deletions [delGen=170]
+   test: open reader.........OK [196 deleted docs]
+   test: fields..............OK [135 fields]
+   test: field norms.........OK [52 fields]
+   test: terms, freq, prox...OK [16644025 terms; 441992389 terms/docs pairs; 39
+0271915 tokens]
+   test (ignoring deletes): terms, freq, prox...OK [16646658 terms; 442060892 t
+erms/docs pairs; 390381979 tokens]
+   test: stored fields.......OK [107214499 total field count; avg 35.484 fields
+per doc]
+   test: term vectors........OK [0 total vector count; avg 0 term/freq vector f
+ields per doc]
+   test: docvalues...........OK [0 docvalues fields; 0 BINARY; 0 NUMERIC; 0 SOR
+TED; 0 SORTED_SET]
+
+2 of 37: name=_3b16 docCount=2449309
+   codec=Lucene46
+   compound=false
+   numFiles=11
+   size (MB)=3,831.743
+   diagnostics = {timestamp=1402370404453, os=Windows Server 2012, os.version=6
+.2, mergeFactor=10, source=merge, lucene.version=4.6.0 1543363 - simon - 2013-11
+-19 11:05:50, os.arch=amd64, mergeMaxNumSegments=-1, java.version=1.7.0_51, java
+.vendor=Oracle Corporation}
+   has deletions [delGen=426]
+   test: open reader.........OK [20262 deleted docs]
+   test: fields..............OK [92 fields]
+   test: field norms.........OK [35 fields]
+</code></pre></div>    </div>
+    <p>When the index checker encounters a <strong>corrupted</strong> segment, the output looks like the following:</p>
+    <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>37 of 37: name=_4gxr docCount=11
+   codec=Lucene46
+   compound=false
+   numFiles=10
+   size (MB)=75.71
+   diagnostics = {timestamp=1403212995547, os=Windows Server 2012, os.version=6
+.2, source=flush, lucene.version=4.6.0 1543363 - simon - 2013-11-19 11:05:50, os
+.arch=amd64, java.version=1.7.0_51, java.vendor=Oracle Corporation}
+   no deletions
+   test: open reader.........FAILED
+   WARNING: fixIndex() would remove reference to this segment; full exception:
+org.apache.lucene.index.CorruptIndexException: invalid docCount: 48066 maxDoc: 1
+1 (resource=MMapIndexInput(path="C:\Program Files\apache-solr-4.6.0\example\solr
+\hellasever_shard1_replica4\data\index.20140510031827076\_4gxr_Lucene41_0.ti
+m"))
+      at org.apache.lucene.codecs.BlockTreeTermsReader.(BlockTreeTermsRe
+ader.java:166)
+      at org.apache.lucene.codecs.lucene41.Lucene41PostingsFormat.fieldsProduc
+er(Lucene41PostingsFormat.java:437)
+      at org.apache.lucene.codecs.perfield.PerFieldPostingsFormat$FieldsReader
+.(PerFieldPostingsFormat.java:195)
+      at org.apache.lucene.codecs.perfield.PerFieldPostingsFormat.fieldsProduc
+er(PerFieldPostingsFormat.java:244)
+      at org.apache.lucene.index.SegmentCoreReaders.(SegmentCoreReaders.
+java:115)
+      at org.apache.lucene.index.SegmentReader.(SegmentReader.java:95)
+      at org.apache.lucene.index.CheckIndex.checkIndex(CheckIndex.java:554)
+      at org.apache.lucene.index.CheckIndex.main(CheckIndex.java:1941)
+
+WARNING: 1 broken segments (containing 11 documents) detected
+WARNING: would write new segments file, and 11 documents would be lost, if -fix
+were specified
+</code></pre></div>    </div>
+  </li>
+  <li>After the reconnaissance of the corrupted segment, rerun the command with <strong>-fix</strong> parameter:
+    <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>java <span class="nt">-cp</span> lucene-core-4.6.0.jar <span class="nt">-ea</span>:org.apache.lucene... org.apache.lucene.index.CheckIndex <span class="s2">"C:/Program Files/apache-solr-4.6.0/example/solr/hellaserver_shard1_replica4/data/index.20140510031827076"</span> <span class="nt">-fix</span>
+</code></pre></div>    </div>
+    <p>When the checker fixes the segment, the output will look like the following:</p>
+    <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>37 of 37: name=_4gxr docCount=11
+   codec=Lucene46
+   compound=false
+   numFiles=10
+   size (MB)=75.71
+   diagnostics = {timestamp=1403212995547, os=Windows Server 2012, os.version=6
+.2, source=flush, lucene.version=4.6.0 1543363 - simon - 2013-11-19 11:05:50, os
+.arch=amd64, java.version=1.7.0_51, java.vendor=Oracle Corporation}
+   no deletions
+   test: open reader.........FAILED
+   WARNING: fixIndex() would remove reference to this segment; full exception:
+org.apache.lucene.index.CorruptIndexException: invalid docCount: 48066 maxDoc: 1
+1 (resource=MMapIndexInput(path="C:\Program Files\apache-solr-4.6.0\example\solr
+\hellasever_shard1_replica4\data\index.20140510031827076\_4gxr_Lucene41_0.ti
+m"))
+      at org.apache.lucene.codecs.BlockTreeTermsReader.&lt;init&gt;(BlockTreeTermsRe
+ader.java:166)
+      at org.apache.lucene.codecs.lucene41.Lucene41PostingsFormat.fieldsProduc
+er(Lucene41PostingsFormat.java:437)
+      at org.apache.lucene.codecs.perfield.PerFieldPostingsFormat$FieldsReader
+.&lt;init&gt;(PerFieldPostingsFormat.java:195)
+      at org.apache.lucene.codecs.perfield.PerFieldPostingsFormat.fieldsProduc
+er(PerFieldPostingsFormat.java:244)
+      at org.apache.lucene.index.SegmentCoreReaders.&lt;init&gt;(SegmentCoreReaders.
+java:115)
+      at org.apache.lucene.index.SegmentReader.&lt;init&gt;(SegmentReader.java:95)
+      at org.apache.lucene.index.CheckIndex.checkIndex(CheckIndex.java:554)
+      at org.apache.lucene.index.CheckIndex.main(CheckIndex.java:1941)
+
+WARNING: 1 broken segments (containing 11 documents) detected
+WARNING: 11 documents will be lost
+
+NOTE: will write new segments file in 5 seconds; this will remove 11 docs from t
+he index. THIS IS YOUR LAST CHANCE TO CTRL+C!
+5...
+4...
+3...
+2...
+1...
+Writing...
+OK
+Wrote new segments file "segments_y5e"
+</code></pre></div>    </div>
+  </li>
+  <li>Finally, restart Solr server in order to resynchronise with the shard leader.</li>
+</ol>
+
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+  
+
+
+  
+  
+  
+
+  <p class="page__taxonomy">
+    <strong><i class="fa fa-fw fa-tags" aria-hidden="true"></i> Tags: </strong>
+    <span itemprop="keywords">
+    
+      
+      
+      <a href="https://manios.org/tags/#apache" class="page__taxonomy-item" rel="tag">apache</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#check" class="page__taxonomy-item" rel="tag">check</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#core" class="page__taxonomy-item" rel="tag">core</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#corrupt" class="page__taxonomy-item" rel="tag">corrupt</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#fix" class="page__taxonomy-item" rel="tag">fix</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#index" class="page__taxonomy-item" rel="tag">index</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#java" class="page__taxonomy-item" rel="tag">java</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#linux" class="page__taxonomy-item" rel="tag">linux</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#lucene" class="page__taxonomy-item" rel="tag">lucene</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#repair" class="page__taxonomy-item" rel="tag">repair</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#segment" class="page__taxonomy-item" rel="tag">segment</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#solr" class="page__taxonomy-item" rel="tag">solr</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#windows" class="page__taxonomy-item" rel="tag">windows</a>
+    
+    </span>
+  </p>
+
+
+
+
+  
+
+
+  
+  
+  
+
+  <p class="page__taxonomy">
+    <strong><i class="fa fa-fw fa-folder-open" aria-hidden="true"></i> Categories: </strong>
+    <span itemprop="keywords">
+    
+      
+      
+      <a href="https://manios.org/categories/#apache" class="page__taxonomy-item" rel="tag">Apache</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/categories/#java" class="page__taxonomy-item" rel="tag">Java</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/categories/#linux" class="page__taxonomy-item" rel="tag">Linux</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/categories/#lucene" class="page__taxonomy-item" rel="tag">Lucene</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/categories/#solr" class="page__taxonomy-item" rel="tag">Solr</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/categories/#windows" class="page__taxonomy-item" rel="tag">Windows</a>
+    
+    </span>
+  </p>
+
+
+        
+          <p class="page__date"><strong><i class="fa fa-fw fa-calendar" aria-hidden="true"></i> Updated:</strong> <time datetime="2014-11-01T16:40:40+02:00">November 01, 2014</time></p>
+        
+      </footer>
+
+      <section class="page__share">
+  
+    <h4 class="page__share-title">Share on</h4>
+  
+
+  <a href="https://twitter.com/intent/tweet?text=Solr+fix+corrupted+index+using+Lucene%20https%3A%2F%2Fmanios.org%2F2014%2F11%2F01%2Fsolr-fix-corrupted-index-using-lucene" class="btn btn--twitter" title="Share on Twitter"><i class="fa fa-fw fa-twitter" aria-hidden="true"></i><span> Twitter</span></a>
+
+  <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fmanios.org%2F2014%2F11%2F01%2Fsolr-fix-corrupted-index-using-lucene" class="btn btn--facebook" title="Share on Facebook"><i class="fa fa-fw fa-facebook" aria-hidden="true"></i><span> Facebook</span></a>
+
+  <a href="https://plus.google.com/share?url=https%3A%2F%2Fmanios.org%2F2014%2F11%2F01%2Fsolr-fix-corrupted-index-using-lucene" class="btn btn--google-plus" title="Share on Google Plus"><i class="fa fa-fw fa-google-plus" aria-hidden="true"></i><span> Google+</span></a>
+
+  <a href="https://www.linkedin.com/shareArticle?mini=true&url=https%3A%2F%2Fmanios.org%2F2014%2F11%2F01%2Fsolr-fix-corrupted-index-using-lucene" class="btn btn--linkedin" title="Share on LinkedIn"><i class="fa fa-fw fa-linkedin" aria-hidden="true"></i><span> LinkedIn</span></a>
+</section>
+
+
+      
+  <nav class="pagination">
+    
+      <a href="https://manios.org/2014/07/28/linux-extract-audio-and-video-using-ffmpeg" class="pagination--pager" title="Linux: Extract audio and video using ffmpeg
+">Previous</a>
+    
+    
+      <a href="https://manios.org/2014/12/30/json-remove-new-lines-via-linux-and-use-it-as-string-variable-and-as-param-in-curl-post-request" class="pagination--pager" title="JSON remove new lines via Linux and use it as string variable and as param in cURL POST request
+">Next</a>
+    
+  </nav>
+
+    </div>
+
+    
+      <div class="page__comments">
+  
+  
+      <h4 class="page__comments-title">Leave a Comment</h4>
+      <section id="disqus_thread"></section>
+    
+</div>
+    
+  </article>
+
+  
+  
+    <div class="page__related">
+      <h4 class="page__related-title">You May Also Enjoy</h4>
+      <div class="grid__wrapper">
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="http://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="https://manios.org/2017/11/15/use-haproxy-and-docker-for-solr-load-balancing" rel="permalink">Use HAProxy and Docker to load balance requests to Solr and SolrCloud
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="fa fa-clock-o" aria-hidden="true"></i> 
+
+
+
+
+  2 minute read
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">We use Solr 4.6 with SolrCloud configuration in a production system. You may say: “It is hight time you upgraded to the latest version, isn’t it?”. And you w...</p>
+  </article>
+</div>
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="http://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="https://manios.org/2017/10/17/sublime-3-fix-greek-accented-characters" rel="permalink">SublimeText 3 Fix greek (and other languages) accented chars input
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="fa fa-clock-o" aria-hidden="true"></i> 
+
+
+
+
+  1 minute read
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Yesterday I installed SublimeText 3 editor (build 3143) in my PC and the first thing I realised was that I could not type any Greek accented characters. Thus...</p>
+  </article>
+</div>
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="http://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="https://manios.org/2017/08/09/configure-eclipse-in-order-to-build-mapstruct-in-java-projects" rel="permalink">Configure Eclipse in order to build MapStruct in Java projects
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="fa fa-clock-o" aria-hidden="true"></i> 
+
+
+
+
+  4 minute read
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Today I was working on a Java Spring MVC project which uses Maven. My editor was the Eclipse IDE, with the current version of the M2E plug-in. When I pulled ...</p>
+  </article>
+</div>
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="http://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="https://manios.org/2016/07/12/lets-encrypt-ssl-certificate-without-root-or-sudo-privileges" rel="permalink">Let’s Encrypt SSL certificate without root or sudo privileges
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="fa fa-clock-o" aria-hidden="true"></i> 
+
+
+
+
+  6 minute read
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Five days ago we had to renew a number of SSL certificates using free Let’s Encrypt SSL authority to a few Apache servers which were installed in Jelastic Pa...</p>
+  </article>
+</div>
+        
+      </div>
+    </div>
+  
+</div>
+
+
+	<!-- TODO add Google AdSense -->
+    <!--<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <div align="center" style="margin: 1em 0;">
+    <ins class="adsbygoogle"
+         style="display:block; border-bottom: initial;"
+         data-ad-client="ca-pub-7328585512091257"
+         data-ad-slot="3049671934"
+         data-ad-format="auto"></ins>
+    </div>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>-->
+
+    <div class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+      <li><strong>Follow:</strong></li>
+    
+    
+    
+    
+      <li><a href="http://github.com/manios"><i class="fa fa-fw fa-github" aria-hidden="true"></i> GitHub</a></li>
+    
+    
+    
+    <li><a href="https://manios.org/feed.xml"><i class="fa fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2017 Christos Manios. Powered by <a href="http://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="https://manios.org/assets/js/main.min.js"></script>
+
+
+
+
+
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-96500199-2', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+    
+  <script>
+    var disqus_config = function () {
+      this.page.url = "https://manios.org/2014/11/01/solr-fix-corrupted-index-using-lucene";  // Replace PAGE_URL with your page's canonical URL variable
+      this.page.identifier = "/2014/11/01/solr-fix-corrupted-index-using-lucene"; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+    (function() { // DON'T EDIT BELOW THIS LINE
+      var d = document, s = d.createElement('script');
+      s.src = 'https://manios.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  </script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+  
+
+
+
+  </body>
+</html>

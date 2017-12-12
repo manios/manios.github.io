@@ -1,0 +1,971 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="https://manios.org/feed.xml" rel="self" type="application/atom+xml" /><link href="https://manios.org/" rel="alternate" type="text/html" /><updated>2017-12-12T15:23:39+02:00</updated><id>https://manios.org/</id><title type="html">cmanios</title><subtitle>Developer life is a NullPointerException</subtitle><author><name>Christos Manios</name></author><entry><title type="html">Use HAProxy and Docker to load balance requests to Solr and SolrCloud</title><link href="https://manios.org/2017/11/15/use-haproxy-and-docker-for-solr-load-balancing" rel="alternate" type="text/html" title="Use HAProxy and Docker to load balance requests to Solr and SolrCloud" /><published>2017-11-15T12:14:00+02:00</published><updated>2017-11-15T12:14:00+02:00</updated><id>https://manios.org/2017/11/15/use-haproxy-and-docker-for-solr-load-balancing</id><content type="html" xml:base="https://manios.org/2017/11/15/use-haproxy-and-docker-for-solr-load-balancing">&lt;p&gt;We use Solr 4.6 with SolrCloud configuration in a production system. You may say: “It is hight time you upgraded to the latest version, isn’t it?”. And you will be absolute right! But currently this is not the case because full reindexing costs! Our SolrCloud consists of one shard and five replicas as seen in the screenshot bellow:&lt;/p&gt;
+
+&lt;figure&gt;
+    &lt;a href=&quot;/images/2017-11-15-haproxy-docker-and-solr/2017-11-15-solrcloud.png&quot;&gt;&lt;img src=&quot;/images/2017-11-15-haproxy-docker-and-solr/2017-11-15-solrcloud.png&quot; alt=&quot;SolrCloud with one shard and five replicas&quot; /&gt;&lt;/a&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;The problem we were facing was that SolrJ library does balance the requests using round robin algorithm when using class &lt;a href=&quot;https://lucene.apache.org/solr/4_6_0/solr-solrj/org/apache/solr/client/solrj/impl/LBHttpSolrServer.html&quot;&gt;LBHttpSolrServer&lt;/a&gt;. Furthermore, when a request to a node fails for any reason (timeout, http 403, http 404, etc), it &lt;a href=&quot;http://grepcode.com/file/repo1.maven.org/maven2/org.apache.solr/solr-solrj/4.6.0/org/apache/solr/client/solrj/impl/LBHttpSolrServer.java?av=f#265&quot;&gt;puts the node to a zombie list&lt;/a&gt; for 60 seconds. This can become a burden when the SolrCloud has heavy loads and you will start to see in your application logs:&lt;/p&gt;
+
+&lt;div class=&quot;language-text highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Exception in thread &quot;main&quot; org.apache.solr.client.solrj.SolrServerException: No live SolrServers available to handle this request
+	at org.apache.solr.client.solrj.impl.LBHttpSolrServer.request(LBHttpSolrServer.java:289)
+	at org.apache.solr.client.solrj.impl.CloudSolrServer.request(CloudSolrServer.java:310)
+	at org.apache.solr.client.solrj.request.AbstractUpdateRequest.process(AbstractUpdateRequest.java:117)
+	at org.apache.solr.client.solrj.SolrServer.add(SolrServer.java:116)
+	at org.apache.solr.client.solrj.SolrServer.add(SolrServer.java:102)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;So we decided to put a HAProxy instance to load balance the query requests to the SolrCloud using &lt;code class=&quot;highlighter-rouge&quot;&gt;leastconn&lt;/code&gt; (least connections) algorithm. After a lot of search and using a combination of &lt;a href=&quot;http://cbonte.github.io/haproxy-dconv/1.7/configuration.html&quot;&gt;official documentation&lt;/a&gt; and articles (&lt;a href=&quot;http://davehall.com.au/blog/dave/2010/03/13/solr-replication-load-balancing-haproxy-and-drupal&quot;&gt;link1&lt;/a&gt;, &lt;a href=&quot;https://gist.github.com/feniix/1974460&quot;&gt;link2&lt;/a&gt;) and the official HAProxy &lt;a href=&quot;https://hub.docker.com/_/haproxy/&quot;&gt;Docker image&lt;/a&gt; we created a container using the following configuration:&lt;/p&gt;
+
+&lt;div class=&quot;language-nginx highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;global&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;log&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;127&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;.0.0.1&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;local0&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;notice&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;maxconn&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2000&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;#user haproxy
+&lt;/span&gt;    &lt;span class=&quot;c1&quot;&gt;#group haproxy
+&lt;/span&gt;
+&lt;span class=&quot;s&quot;&gt;defaults&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;log&lt;/span&gt;     &lt;span class=&quot;s&quot;&gt;global&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;mode&lt;/span&gt;    &lt;span class=&quot;s&quot;&gt;http&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;option&lt;/span&gt;  &lt;span class=&quot;s&quot;&gt;httplog&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;option&lt;/span&gt;  &lt;span class=&quot;s&quot;&gt;dontlognull&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;retries&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;timeout&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;connect&lt;/span&gt;  &lt;span class=&quot;mi&quot;&gt;5000&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;timeout&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;client&lt;/span&gt;  &lt;span class=&quot;mi&quot;&gt;10000&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;timeout&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;server&lt;/span&gt;  &lt;span class=&quot;mi&quot;&gt;10000&lt;/span&gt;
+
+&lt;span class=&quot;s&quot;&gt;listen&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;solrcloud&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;bind&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;0.0.0.0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;8983&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;mode&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;http&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;stats&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;enable&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;stats&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;uri&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;/haproxy?stats&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;stats&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;realm&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Strictly&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;\&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Private&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;stats&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;auth&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;haproxyuser:haproxypassword&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;balance&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;leastconn&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;option&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;httpclose&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;option&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;forwardfor&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;option&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;httpchk&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;GET&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;/solr/paradise-papers/admin/ping?wt=json&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;server&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;search1&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;192.168.1.1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;8983&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;check&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;port&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;8983&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;inter&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;20s&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;fastinter&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;2s&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;server&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;search2&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;192.168.1.2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;8983&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;check&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;port&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;8983&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;inter&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;20s&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;fastinter&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;2s&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;server&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;search3&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;192.168.1.3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;8983&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;check&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;port&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;8983&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;inter&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;20s&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;fastinter&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;2s&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;server&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;search4&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;192.168.1.4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;8983&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;check&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;port&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;8983&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;inter&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;20s&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;fastinter&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;2s&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;server&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;search5&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;192.168.1.5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;8983&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;check&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;port&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;8983&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;inter&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;20s&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;fastinter&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;2s&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;notes-on-configuration&quot;&gt;Notes on configuration:&lt;/h3&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Our HAProxy runs in &lt;code class=&quot;highlighter-rouge&quot;&gt;192.168.1.10&lt;/code&gt; and all the queries are handled by port &lt;code class=&quot;highlighter-rouge&quot;&gt;8983&lt;/code&gt;.&lt;/li&gt;
+  &lt;li&gt;We can see statistics about the distribution of requests using HAProxy statistics page which is accessible in &lt;a href=&quot;http://192.168.1.10:8983/haproxy?stats&quot;&gt;http://192.168.1.10:8983/haproxy?stats&lt;/a&gt;. See:
+    &lt;div class=&quot;language-nginx highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;  &lt;span class=&quot;k&quot;&gt;stats&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;uri&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;/haproxy?stats&lt;/span&gt;
+  &lt;span class=&quot;s&quot;&gt;stats&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;realm&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Strictly&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;\&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Private&lt;/span&gt;
+  &lt;span class=&quot;s&quot;&gt;stats&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;auth&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;haproxyuser:haproxypassword&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
+  &lt;/li&gt;
+  &lt;li&gt;We check if every Solr node is alive by pinging it (see: &lt;code class=&quot;highlighter-rouge&quot;&gt;option httpchk GET /solr/paradise-papers/admin/ping?wt=json&lt;/code&gt;)&lt;/li&gt;
+  &lt;li&gt;Check interval is 20 seconds (see: &lt;code class=&quot;highlighter-rouge&quot;&gt;inter 20s&lt;/code&gt;)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Now our search queries are handled better and we have already noticed an increase in query performance, faster response times and no downtime! This is a sample output from HAProxy statistics page:&lt;/p&gt;
+
+&lt;figure&gt;
+    &lt;a href=&quot;/images/2017-11-15-haproxy-docker-and-solr/2017-11-15-haproxy-stats.png&quot;&gt;&lt;img src=&quot;/images/2017-11-15-haproxy-docker-and-solr/2017-11-15-haproxy-stats.png&quot; alt=&quot;HAProxy as a load balancer to Solr and SolrCloud with one shard and five replicas using leastconn algorithn&quot; /&gt;&lt;/a&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;We hope you find this article helpful!&lt;/p&gt;</content><author><name>cmanios</name></author><category term="haproxy" /><category term="solr" /><category term="solrcloud" /><category term="docker" /><category term="linux" /><category term="install" /><category term="load" /><category term="balancing" /><summary type="html">We use Solr 4.6 with SolrCloud configuration in a production system. You may say: “It is hight time you upgraded to the latest version, isn’t it?”. And you will be absolute right! But currently this is not the case because full reindexing costs! Our SolrCloud consists of one shard and five replicas as seen in the screenshot bellow:</summary></entry><entry><title type="html">SublimeText 3 Fix greek (and other languages) accented chars input</title><link href="https://manios.org/2017/10/17/sublime-3-fix-greek-accented-characters" rel="alternate" type="text/html" title="SublimeText 3 Fix greek (and other languages) accented chars input" /><published>2017-10-17T20:27:48+02:00</published><updated>2017-10-17T20:27:48+02:00</updated><id>https://manios.org/2017/10/17/sublime-3-fix-greek-accented-characters</id><content type="html" xml:base="https://manios.org/2017/10/17/sublime-3-fix-greek-accented-characters">&lt;p&gt;Yesterday I installed SublimeText 3 editor (build 3143) in my PC and the first thing I realised was that I could not type any Greek accented characters. Thus when I wanted to type:
+ex&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Το γοργόν και χάριν έχει.
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;, Sublime actually showed&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Το γοργ´ον και χ´αριν ´εχει
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;At first place I thought that maybe was a bug of this new version (I used SublimeText 2 for quite a long time without any problems). I search for bugs and then after quite some time I found in this &lt;a href=&quot;https://stackoverflow.com/questions/27703981/cant-type-accented-characters-in-sublime-text-3-ubuntu-14-10&quot;&gt;StackOverflow article&lt;/a&gt; that many people had experienced the same problem.&lt;/p&gt;
+
+&lt;div class=&quot;language-json highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;err&quot;&gt;//&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;err&quot;&gt;missing&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;err&quot;&gt;accented&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;err&quot;&gt;characters&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;err&quot;&gt;fix&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;err&quot;&gt;for&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;err&quot;&gt;Linux&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;err&quot;&gt;Mint&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;18.1&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;err&quot;&gt;Serena&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+
+    &lt;/span&gt;&lt;span class=&quot;err&quot;&gt;//&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;err&quot;&gt;ά&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;ό&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;ί&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;ϊ&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;ή&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;έ&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;ύ&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;ώ&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;ύ&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;ΰ&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;keys&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;´&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;α&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;command&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;insert&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;args&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;characters&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;ά&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}},&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;keys&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;´&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;ο&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;command&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;insert&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;args&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;characters&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;ό&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}},&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;keys&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;´&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;ι&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;command&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;insert&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;args&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;characters&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;ί&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}},&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;keys&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;¨&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;ι&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;command&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;insert&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;args&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;characters&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;ϊ&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}},&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;keys&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;´&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;η&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;command&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;insert&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;args&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;characters&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;ή&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}},&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;keys&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;´&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;ε&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;command&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;insert&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;args&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;characters&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;έ&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}},&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;keys&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;´&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;υ&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;command&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;insert&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;args&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;characters&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;ύ&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}},&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;keys&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;¨&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;υ&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;command&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;insert&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;args&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;characters&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;ϋ&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}},&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;keys&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;´&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;ω&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;command&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;insert&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;args&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;characters&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;ώ&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}},&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+
+    &lt;/span&gt;&lt;span class=&quot;err&quot;&gt;//&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;err&quot;&gt;Ά&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;Ό&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;Ί&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;Ή&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;Έ&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;Ύ&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;Ώ&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;keys&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;´&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Α&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;command&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;insert&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;args&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;characters&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Ά&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}},&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;keys&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;´&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Ο&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;command&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;insert&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;args&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;characters&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Ό&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}},&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;keys&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;´&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Ι&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;command&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;insert&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;args&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;characters&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Ί&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}},&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;keys&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;´&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Η&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;command&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;insert&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;args&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;characters&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Ή&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}},&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;keys&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;´&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Ε&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;command&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;insert&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;args&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;characters&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Έ&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}},&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;keys&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;´&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Υ&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;command&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;insert&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;args&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;characters&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Ύ&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}},&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;keys&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;´&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Ω&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;command&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;insert&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;args&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;characters&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Ώ&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}},&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name>cmanios</name></author><category term="sublimetext" /><category term="sublime" /><category term="text" /><category term="editor" /><category term="linux" /><category term="accented" /><category term="accent" /><category term="char" /><category term="character" /><category term="greek" /><category term="fix" /><summary type="html">Yesterday I installed SublimeText 3 editor (build 3143) in my PC and the first thing I realised was that I could not type any Greek accented characters. Thus when I wanted to type: ex Το γοργόν και χάριν έχει. , Sublime actually showed Το γοργ´ον και χ´αριν ´εχει</summary></entry><entry><title type="html">Configure Eclipse in order to build MapStruct in Java projects</title><link href="https://manios.org/2017/08/09/configure-eclipse-in-order-to-build-mapstruct-in-java-projects" rel="alternate" type="text/html" title="Configure Eclipse in order to build MapStruct in Java projects" /><published>2017-08-09T12:14:00+02:00</published><updated>2017-08-09T12:14:00+02:00</updated><id>https://manios.org/2017/08/09/configure-eclipse-in-order-to-build-mapstruct-in-java-projects</id><content type="html" xml:base="https://manios.org/2017/08/09/configure-eclipse-in-order-to-build-mapstruct-in-java-projects">&lt;p&gt;Today I was working on a Java Spring MVC project which uses Maven. My editor was the Eclipse IDE, with the current version of the &lt;a href=&quot;http://www.eclipse.org/m2e/&quot;&gt;M2E plug-in&lt;/a&gt;. When I pulled the latest commits from the Git repository, my colleagues informed me that we will be using &lt;a href=&quot;http://mapstruct.org/&quot;&gt;MapStruct&lt;/a&gt; as a bean mapper between Entities and DTOs.&lt;/p&gt;
+
+&lt;p&gt;I read a little bit about it and I Ran the project in Eclipse. The Pivotal Tc Server started, but the deployment failed with the following error:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;2017-08-09 13:23:07,364 ERROR ContextLoader - Context initialization failed
+org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'driverProviderServiceImpl': Injection of autowired dependencies failed; nested exception is org.springframework.beans.factory.BeanCreationException: Could not autowire field: private com.mycompany.bobproject.mapper.DriverMapper com.mycompany.bobproject.service.impl.DriverProviderServiceImpl.DriverMapper; nested exception is org.springframework.beans.factory.NoSuchBeanDefinitionException: No qualifying bean of type [com.mycompany.bobproject.mapper.DriverMapper] found for dependency: expected at least 1 bean which qualifies as autowire candidate for this dependency. Dependency annotations: {@org.springframework.beans.factory.annotation.Autowired(required=true)}
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessPropertyValues(AutowiredAnnotationBeanPostProcessor.java:334)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.populateBean(AbstractAutowireCapableBeanFactory.java:1214)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:543)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:482)
+	at org.springframework.beans.factory.support.AbstractBeanFactory$1.getObject(AbstractBeanFactory.java:306)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:230)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:302)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:197)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:772)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:839)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:538)
+	at org.springframework.web.context.ContextLoader.configureAndRefreshWebApplicationContext(ContextLoader.java:444)
+	at org.springframework.web.context.ContextLoader.initWebApplicationContext(ContextLoader.java:326)
+	at org.springframework.web.context.ContextLoaderListener.contextInitialized(ContextLoaderListener.java:107)
+	at org.apache.catalina.core.StandardContext.listenerStart(StandardContext.java:4745)
+	at org.apache.catalina.core.StandardContext.startInternal(StandardContext.java:5207)
+	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:150)
+	at org.apache.catalina.core.ContainerBase.addChildInternal(ContainerBase.java:752)
+	at org.apache.catalina.core.ContainerBase.addChild(ContainerBase.java:728)
+	at org.apache.catalina.core.StandardHost.addChild(StandardHost.java:734)
+	at org.apache.catalina.startup.HostConfig.deployDescriptor(HostConfig.java:596)
+	at org.apache.catalina.startup.HostConfig$DeployDescriptor.run(HostConfig.java:1805)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:745)
+Caused by: org.springframework.beans.factory.BeanCreationException: Could not autowire field: private com.mycompany.bobproject.mapper.DriverMapper com.mycompany.bobproject.service.impl.DriverProviderServiceImpl.DriverMapper; nested exception is org.springframework.beans.factory.NoSuchBeanDefinitionException: No qualifying bean of type [com.mycompany.bobproject.mapper.DriverMapper] found for dependency: expected at least 1 bean which qualifies as autowire candidate for this dependency. Dependency annotations: {@org.springframework.beans.factory.annotation.Autowired(required=true)}
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.inject(AutowiredAnnotationBeanPostProcessor.java:573)
+	at org.springframework.beans.factory.annotation.InjectionMetadata.inject(InjectionMetadata.java:88)
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessPropertyValues(AutowiredAnnotationBeanPostProcessor.java:331)
+	... 26 more
+Caused by: org.springframework.beans.factory.NoSuchBeanDefinitionException: No qualifying bean of type [com.mycompany.bobproject.mapper.DriverMapper] found for dependency: expected at least 1 bean which qualifies as autowire candidate for this dependency. Dependency annotations: {@org.springframework.beans.factory.annotation.Autowired(required=true)}
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.raiseNoSuchBeanDefinitionException(DefaultListableBeanFactory.java:1373)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1119)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1014)
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.inject(AutowiredAnnotationBeanPostProcessor.java:545)
+	... 28 more
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;After a lot of searching I found out that Eclipse does not automatically recognise and run the &lt;code class=&quot;highlighter-rouge&quot;&gt;mapstruct-processor&lt;/code&gt; which is declared in &lt;code class=&quot;highlighter-rouge&quot;&gt;pom.xml&lt;/code&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;language-xml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;plugin&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;org.apache.maven.plugins&lt;span class=&quot;nt&quot;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;maven-compiler-plugin&lt;span class=&quot;nt&quot;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;version&amp;gt;&lt;/span&gt;3.6.1&lt;span class=&quot;nt&quot;&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;configuration&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;nt&quot;&gt;&amp;lt;source&amp;gt;&lt;/span&gt;${java-version}&lt;span class=&quot;nt&quot;&gt;&amp;lt;/source&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;nt&quot;&gt;&amp;lt;target&amp;gt;&lt;/span&gt;${java-version}&lt;span class=&quot;nt&quot;&gt;&amp;lt;/target&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;nt&quot;&gt;&amp;lt;encoding&amp;gt;&lt;/span&gt;UTF-8&lt;span class=&quot;nt&quot;&gt;&amp;lt;/encoding&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;nt&quot;&gt;&amp;lt;showWarnings&amp;gt;&lt;/span&gt;true&lt;span class=&quot;nt&quot;&gt;&amp;lt;/showWarnings&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;nt&quot;&gt;&amp;lt;showDeprecation&amp;gt;&lt;/span&gt;true&lt;span class=&quot;nt&quot;&gt;&amp;lt;/showDeprecation&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;nt&quot;&gt;&amp;lt;annotationProcessorPaths&amp;gt;&lt;/span&gt;
+            &lt;span class=&quot;nt&quot;&gt;&amp;lt;path&amp;gt;&lt;/span&gt;
+                &lt;span class=&quot;nt&quot;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;org.mapstruct&lt;span class=&quot;nt&quot;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+                &lt;span class=&quot;nt&quot;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;mapstruct-processor&lt;span class=&quot;nt&quot;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+                &lt;span class=&quot;nt&quot;&gt;&amp;lt;version&amp;gt;&lt;/span&gt;${org.mapstruct.version}&lt;span class=&quot;nt&quot;&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
+            &lt;span class=&quot;nt&quot;&gt;&amp;lt;/path&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;nt&quot;&gt;&amp;lt;/annotationProcessorPaths&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;/configuration&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/plugin&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;However, if when I issued &lt;code class=&quot;highlighter-rouge&quot;&gt;mvn clean package&lt;/code&gt; the maven-compiler-plugin ran the processor and generated a &lt;code class=&quot;highlighter-rouge&quot;&gt;DriverMapperImpl&lt;/code&gt; located in &lt;code class=&quot;highlighter-rouge&quot;&gt;target/generated-sources/com.mycompany.bobproject.mapper&lt;/code&gt; directory.&lt;/p&gt;
+
+&lt;p&gt;Thus, after a lot of searching I found out in MapStruct &lt;a href=&quot;http://mapstruct.org/documentation/stable/reference/html/#_apache_maven&quot;&gt;documentation&lt;/a&gt;, that in order to use Eclipse and run the processor when project is build (automatically or manually), we have to install the &lt;a href=&quot;https://marketplace.eclipse.org/content/m2e-apt&quot;&gt;m2e-apt&lt;/a&gt; plugin using Eclipse Marketplace and configure the project using the following steps:&lt;/p&gt;
+
+&lt;h2 id=&quot;1-install-m2e-apt-plugin&quot;&gt;1. Install m2e-apt plugin&lt;/h2&gt;
+
+&lt;p&gt;Using Eclipse menu we go to &lt;code class=&quot;highlighter-rouge&quot;&gt;Help &amp;gt; Eclipse Marketplace ...&lt;/code&gt; and we search for &lt;code class=&quot;highlighter-rouge&quot;&gt;m2e-apt&lt;/code&gt;. When search completes it will look like the following:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://manios.org/images/2017-08-09-configure-eclipse-in-order-to-build-mapstruct-in-java-projects/eclipse-marketplace-m2e-apt-install.png&quot; alt=&quot;Eclipse install m2e-apt plugin from Eclipse Marketplace&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;When installation is complete, restart Eclipse. When started you will have to click on “Installed” tab of Eclipse Marketplace and verify that it looks like the following:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://manios.org/images/2017-08-09-configure-eclipse-in-order-to-build-mapstruct-in-java-projects/eclipse-marketplace-m2e-apt-installed.png&quot; alt=&quot;Eclipse installed m2e-apt plugin&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;2-configure-eclipse-to-run-apt-automatically-when-building-the-project&quot;&gt;2. Configure Eclipse to run apt automatically when building the project&lt;/h2&gt;
+
+&lt;p&gt;In order to configure Eclipse to run &lt;code class=&quot;highlighter-rouge&quot;&gt;apt&lt;/code&gt; automatically when building the project and generate MaptStruct mappings in Package or Project Explorer, we make a right click on our Project and select &lt;code class=&quot;highlighter-rouge&quot;&gt;Properties&lt;/code&gt;. Then we navigate to Maven &amp;gt; Annotation Processing and Enable Project Specific Settings as shown in the following picture:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://manios.org/images/2017-08-09-configure-eclipse-in-order-to-build-mapstruct-in-java-projects/eclipse-project-auto-annotation-processing.png&quot; alt=&quot;Eclipse enable auto annotation processing using apt and m2e-apt plugin&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;We hit “Apply” and “Apply and Close”&lt;/p&gt;
+
+&lt;h2 id=&quot;3-clean-target-directory-and-build-project&quot;&gt;3. Clean target directory and Build project&lt;/h2&gt;
+
+&lt;p&gt;Finally Clean &lt;code class=&quot;highlighter-rouge&quot;&gt;target&lt;/code&gt; directory by deleting it or by issuing the command:&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;mvn clean
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;and build the project. Now it has to run fine.&lt;/p&gt;
+
+&lt;p&gt;Finally, if Eclipse throws the following error:&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;The declared package &quot;com.mycompany.bobproject.mapper&quot; does not match the expected package &quot;annotations.com.mycompany.bobproject.mapper&quot;	DriverMapperImpl.java	/parkalot/target/generated-sources/annotations/com/ots/mycompany/bobproject/mapper	line 1
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;then you have to add&lt;/p&gt;
+&lt;div class=&quot;language-xml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;generatedSourcesDirectory&amp;gt;&lt;/span&gt;${project.build.directory}/generated-sources&lt;span class=&quot;nt&quot;&gt;&amp;lt;/generatedSourcesDirectory&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;after the MapStruct declaration. By default, &lt;a href=&quot;https://maven.apache.org/plugins/maven-compiler-plugin/compile-mojo.html#generatedSourcesDirectory&quot;&gt;generatedSourcesDirectory&lt;/a&gt; property is configured to &lt;code class=&quot;highlighter-rouge&quot;&gt;${project.build.directory}/generated-sources/annotations&lt;/code&gt;. Thus the generated class resides inside &lt;code class=&quot;highlighter-rouge&quot;&gt;annotations.com.mycompany.bobproject.mapper&lt;/code&gt; package and produces an error. After the addition, your &lt;code class=&quot;highlighter-rouge&quot;&gt;pom.xml&lt;/code&gt; will look like the following:&lt;/p&gt;
+
+&lt;div class=&quot;language-xml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;plugin&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;org.apache.maven.plugins&lt;span class=&quot;nt&quot;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;maven-compiler-plugin&lt;span class=&quot;nt&quot;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;version&amp;gt;&lt;/span&gt;3.6.1&lt;span class=&quot;nt&quot;&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;configuration&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;nt&quot;&gt;&amp;lt;source&amp;gt;&lt;/span&gt;${java-version}&lt;span class=&quot;nt&quot;&gt;&amp;lt;/source&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;nt&quot;&gt;&amp;lt;target&amp;gt;&lt;/span&gt;${java-version}&lt;span class=&quot;nt&quot;&gt;&amp;lt;/target&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;nt&quot;&gt;&amp;lt;encoding&amp;gt;&lt;/span&gt;UTF-8&lt;span class=&quot;nt&quot;&gt;&amp;lt;/encoding&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;nt&quot;&gt;&amp;lt;showWarnings&amp;gt;&lt;/span&gt;true&lt;span class=&quot;nt&quot;&gt;&amp;lt;/showWarnings&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;nt&quot;&gt;&amp;lt;showDeprecation&amp;gt;&lt;/span&gt;true&lt;span class=&quot;nt&quot;&gt;&amp;lt;/showDeprecation&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;nt&quot;&gt;&amp;lt;annotationProcessorPaths&amp;gt;&lt;/span&gt;
+            &lt;span class=&quot;nt&quot;&gt;&amp;lt;path&amp;gt;&lt;/span&gt;
+                &lt;span class=&quot;nt&quot;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;org.mapstruct&lt;span class=&quot;nt&quot;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+                &lt;span class=&quot;nt&quot;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;mapstruct-processor&lt;span class=&quot;nt&quot;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+                &lt;span class=&quot;nt&quot;&gt;&amp;lt;version&amp;gt;&lt;/span&gt;${org.mapstruct.version}&lt;span class=&quot;nt&quot;&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
+            &lt;span class=&quot;nt&quot;&gt;&amp;lt;/path&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;nt&quot;&gt;&amp;lt;/annotationProcessorPaths&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;nt&quot;&gt;&amp;lt;generatedSourcesDirectory&amp;gt;&lt;/span&gt;${project.build.directory}/generated-sources&lt;span class=&quot;nt&quot;&gt;&amp;lt;/generatedSourcesDirectory&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;/configuration&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/plugin&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;That’s it! I hope it helped you!&lt;/p&gt;</content><author><name>cmanios</name></author><category term="eclipse" /><category term="java" /><category term="spring" /><category term="maven" /><category term="m2e" /><category term="m2e-apt" /><category term="plugin" /><category term="compile" /><category term="annotation" /><category term="mapper" /><summary type="html">Today I was working on a Java Spring MVC project which uses Maven. My editor was the Eclipse IDE, with the current version of the M2E plug-in. When I pulled the latest commits from the Git repository, my colleagues informed me that we will be using MapStruct as a bean mapper between Entities and DTOs.</summary></entry><entry><title type="html">Let’s Encrypt SSL certificate without root or sudo privileges</title><link href="https://manios.org/2016/07/12/lets-encrypt-ssl-certificate-without-root-or-sudo-privileges" rel="alternate" type="text/html" title="Let's Encrypt SSL certificate without root or sudo privileges" /><published>2016-07-12T21:32:53+02:00</published><updated>2016-07-12T21:32:53+02:00</updated><id>https://manios.org/2016/07/12/lets-encrypt-ssl-certificate-without-root-or-sudo-privileges</id><content type="html" xml:base="https://manios.org/2016/07/12/lets-encrypt-ssl-certificate-without-root-or-sudo-privileges">&lt;p&gt;Five days ago we had to renew a number of SSL certificates using free &lt;a href=&quot;http://letsencrypt.org/&quot;&gt;Let’s Encrypt&lt;/a&gt; SSL authority to a few Apache servers which were installed in &lt;a href=&quot;http://www.layershift.com/&quot;&gt;Jelastic PaaS environment&lt;/a&gt;. The Apache servers were installed in an environment where:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;
+    &lt;p&gt;We did have SSH access.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;We &lt;strong&gt;did not have any root privileges or sudo command permission&lt;/strong&gt;.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;The SSH access was done using a limited &lt;code class=&quot;highlighter-rouge&quot;&gt;apache&lt;/code&gt; user.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;The underlying operating system was CentOS release 6.6 (Final) . (found out about it by running: &lt;code class=&quot;highlighter-rouge&quot;&gt;cat /etc/centos-release&lt;/code&gt;)&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Thus we could not use the official &lt;a href=&quot;https://github.com/letsencrypt/letsencrypt&quot;&gt;Let’s Encrypt client&lt;/a&gt; as it requires root privileges. After 3 hours of searching and striving to use &lt;a href=&quot;https://community.letsencrypt.org/t/list-of-client-implementations/2103&quot;&gt;multiple client implementations&lt;/a&gt;, we stumbled upon &lt;a href=&quot;https://github.com/lukas2511/letsencrypt.sh&quot;&gt;letsencrypt.sh&lt;/a&gt;. With the guidance of a &lt;a href=&quot;https://knallisworld.de/blog/2016/02/06/next-level-step-2-renewal-a-la-cron/&quot;&gt;tutorial written in German!!&lt;/a&gt; we finally managed to create our SSL certificates. So today, at last, we will show you how!!!&lt;/p&gt;
+
+&lt;p&gt;In this example, we assume that our domain name is &lt;code class=&quot;highlighter-rouge&quot;&gt;bobos.org&lt;/code&gt;. We want to create a certificate for &lt;a href=&quot;http://bobos.org&quot;&gt;bobos.org&lt;/a&gt; and &lt;a href=&quot;http://www.bobos.org&quot;&gt;www.bobos.org&lt;/a&gt;. Note that Let’s Encrypt &lt;strong&gt;does not generate wildcard certificates yet!!&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;h3 id=&quot;prerequisites&quot;&gt;Prerequisites&lt;/h3&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;
+    &lt;p&gt;No root access or sudo is required.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;We Obtain an A record for bobos.org and www.bobos.org which points to the IP of the server you are using.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Inside the aforementioned server we have to run a web server which listens to port 80. Listening to port 443 is optional.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Shell access to the server.&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;If you want to have a thourough understanding of why we are going to perform the following steps, you can refer to &lt;a href=&quot;https://letsencrypt.org/how-it-works/&quot;&gt;How it works&lt;/a&gt; official article. Few! It is high time we started. Shall we?&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Know thy environment.&lt;/li&gt;
+  &lt;li&gt;Clone letsecrypt.sh script.&lt;/li&gt;
+  &lt;li&gt;Configure the script.&lt;/li&gt;
+  &lt;li&gt;Configure your web server.&lt;/li&gt;
+  &lt;li&gt;Run the script.&lt;/li&gt;
+  &lt;li&gt;Find the certificates.&lt;/li&gt;
+  &lt;li&gt;Configure your web server to use the certificates&lt;/li&gt;
+  &lt;li&gt;Upload SSL certificates to Jelastic Administration Panel&lt;/li&gt;
+  &lt;li&gt;Reload or restart web server and test configuration&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&quot;know-thy-environment&quot;&gt;Know thy environment&lt;/h3&gt;
+
+&lt;p&gt;After login via SSH we are in &lt;code class=&quot;highlighter-rouge&quot;&gt;/var/www/&lt;/code&gt; directory:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;apache@apache2 ~ &lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;pwd&lt;/span&gt;
+/var/www
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Then we check CentOS version, because we can!&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;apache@apache2 ~ &lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;cat&lt;/span&gt; /etc/centos-release 
+CentOS release 6.6 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;Final&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;clone-letsecryptsh-script&quot;&gt;Clone letsecrypt.sh script&lt;/h3&gt;
+
+&lt;p&gt;While being in that directory we clone &lt;a href=&quot;https://github.com/lukas2511/letsencrypt.sh&quot;&gt;letsencrypt.sh&lt;/a&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;apache@apache2 ~ &lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;git clone https://github.com/lukas2511/letsencrypt.sh.git
+Cloning into &lt;span class=&quot;s1&quot;&gt;'letsencrypt.sh'&lt;/span&gt;...
+remote: Counting objects: 873, &lt;span class=&quot;k&quot;&gt;done&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;.&lt;/span&gt;
+remote: Total 873 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;delta 0&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;, reused 0 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;delta 0&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;, pack-reused 873
+Receiving objects: 100% &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;873/873&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;, 223.44 KiB | 0 bytes/s, &lt;span class=&quot;k&quot;&gt;done&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;.&lt;/span&gt;
+Resolving deltas: 100% &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;530/530&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;, &lt;span class=&quot;k&quot;&gt;done&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;.&lt;/span&gt;
+Checking connectivity... &lt;span class=&quot;k&quot;&gt;done&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;.&lt;/span&gt;
+apache@apache2 ~ &lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;chown &lt;span class=&quot;nt&quot;&gt;-R&lt;/span&gt; apache:apache letsencrypt.sh
+apache@apache2 ~ &lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;cd &lt;/span&gt;letsencrypt.sh
+apache@apache2 ~ &lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;pwd&lt;/span&gt;
+/var/www/etsencrypt.sh
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;configure-the-script&quot;&gt;Configure the script&lt;/h3&gt;
+
+&lt;p&gt;Then, we have perform a little configuration so the script is aware of our environment and the domains for which we want to generate free SSL certificates:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Prepare &lt;code class=&quot;highlighter-rouge&quot;&gt;base&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;conf&lt;/code&gt; directories:
+    &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;apache@apache2 ~/letsencrypt.sh &lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;mkdir conf 
+apache@apache2 ~/letsencrypt.sh &lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;mkdir base
+apache@apache2 ~/letsencrypt.sh &lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;cp config.sh.example conf/config.sh
+apache@apache2 ~/letsencrypt.sh &lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;cp domains.txt.exampleconfig.sh.example conf/domains.txt
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Edit configuration in &lt;code class=&quot;highlighter-rouge&quot;&gt;/var/www/letsencrypt.sh/conf/config.sh&lt;/code&gt;:
+    &lt;div class=&quot;language-ini highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;py&quot;&gt;CONFIG_D&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;/var/www/letsencrypt.sh&quot;&lt;/span&gt;
+&lt;span class=&quot;py&quot;&gt;BASEDIR&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;/var/www/letsencrypt.sh/base&quot;&lt;/span&gt;
+&lt;span class=&quot;py&quot;&gt;WELLKNOWN&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;${BASEDIR}/.acme-challenges&quot;&lt;/span&gt;
+&lt;span class=&quot;py&quot;&gt;CONTACT_EMAIL&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;aValidEmail@whateverServer.com&quot;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Add the domain names in /var/www/letsencrypt.sh/conf/domains.txt```:
+    &lt;div class=&quot;language-text highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;bobos.org www.bobos.org
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
+  &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&quot;configure-your-web-server&quot;&gt;Configure your web server&lt;/h3&gt;
+
+&lt;p&gt;Now we have to put the following lines in your site’s special apache conf i.e. &lt;code class=&quot;highlighter-rouge&quot;&gt;/etc/httpd/sites-available/bobos.conf&lt;/code&gt; or in &lt;code class=&quot;highlighter-rouge&quot;&gt;/etc/httpd/conf/httpd.conf&lt;/code&gt;. This will help Let’s Encrypt to access your server, perform domain validation and perform some challenges in order to generate our SSL certificate.&lt;/p&gt;
+
+&lt;div class=&quot;language-text highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;   Alias /.well-known/acme-challenge /var/www/letsencrypt.sh/base/.acme-challenges
+
+   &amp;lt;Directory /var/www/letsencrypt.sh/base/.acme-challenges&amp;gt;
+         Options None
+         AllowOverride None
+         Order allow,deny
+         Allow from all
+   &amp;lt;/Directory&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;run-the-script&quot;&gt;Run the script&lt;/h3&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;apache@apache2 ~/letsencrypt.sh &lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;./letsencrypt.sh &lt;span class=&quot;nt&quot;&gt;--config&lt;/span&gt; /var/www/letsencrypt.sh/conf/config.sh &lt;span class=&quot;nt&quot;&gt;-c&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;# INFO: Using main config file /var/www/letsencrypt.sh/conf/config.sh&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;# INFO: Using additional config file /var/www/letsencrypt.sh/conf/config.sh&lt;/span&gt;
+Processing bobos.org with alternative names: www.bobos.org
+ + Signing domains...
+ + Creating new directory /var/www/letsencrypt.sh/base/certs/bobos.org ...
+ + Generating private key...
+ + Generating signing request...
+ + Requesting challenge &lt;span class=&quot;k&quot;&gt;for &lt;/span&gt;bobos.org...
+ + Requesting challenge &lt;span class=&quot;k&quot;&gt;for &lt;/span&gt;www.bobos.org...
+ + Responding to challenge &lt;span class=&quot;k&quot;&gt;for &lt;/span&gt;bobos.org...
+ + Challenge is valid!
+ + Responding to challenge &lt;span class=&quot;k&quot;&gt;for &lt;/span&gt;www.bobos.org...
+ + Challenge is valid!
+ + Requesting certificate...
+ + Checking certificate...
+ + Done!
+ + Creating fullchain.pem...
+ + Done!
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;find-the-certificates&quot;&gt;Find the certificates&lt;/h3&gt;
+
+&lt;p&gt;The certificates are created in &lt;code class=&quot;highlighter-rouge&quot;&gt;$BASE/certs//&lt;/code&gt; directory:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;apache@apache2 ~/letsencrypt.sh &lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;ls&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-l&lt;/span&gt; base/certs/bobos.org/
+total 20
+&lt;span class=&quot;nt&quot;&gt;-rw-------&lt;/span&gt; 1 apache apache 1655 Jul  7 06:49 cert-1457333387.csr
+&lt;span class=&quot;nt&quot;&gt;-rw-------&lt;/span&gt; 1 apache apache 2143 Jul  7 06:49 cert-1457333387.pem
+lrwxrwxrwx 1 apache apache   19 Jul  7 06:50 cert.csr -&amp;gt; cert-1457333387.csr
+lrwxrwxrwx 1 apache apache   19 Jul  7 06:50 cert.pem -&amp;gt; cert-1457333387.pem
+&lt;span class=&quot;nt&quot;&gt;-rw-------&lt;/span&gt; 1 apache apache 1675 Jul  7 06:50 chain-1457333387.pem
+lrwxrwxrwx 1 apache apache   20 Jul  7 06:50 chain.pem -&amp;gt; chain-1457333387.pem
+&lt;span class=&quot;nt&quot;&gt;-rw-------&lt;/span&gt; 1 apache apache 3818 Jul  7 06:50 fullchain-1457333387.pem
+lrwxrwxrwx 1 apache apache   24 Jul  7 06:50 fullchain.pem -&amp;gt; fullchain-1457333387.pem
+&lt;span class=&quot;nt&quot;&gt;-rw-------&lt;/span&gt; 1 apache apache 3243 Jul  7 06:49 privkey-1457333387.pem
+lrwxrwxrwx 1 apache apache   22 Jul  7 06:50 privkey.pem -&amp;gt; privkey-1457333387.pem
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;configure-your-web-server-to-use-the-certificates&quot;&gt;Configure your web server to use the certificates&lt;/h3&gt;
+
+&lt;p&gt;Configure Apache in order to use the created certificates. It might by your site’s special conf i.e. &lt;code class=&quot;highlighter-rouge&quot;&gt;/etc/httpd/sites-available/bobos.conf&lt;/code&gt; or global &lt;code class=&quot;highlighter-rouge&quot;&gt;/etc/httpd/conf/httpd.conf&lt;/code&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;language-apache highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nc&quot;&gt;SSLEngine&lt;/span&gt; On
+&lt;span class=&quot;nc&quot;&gt;SSLCertificateFile&lt;/span&gt;      /var/www/letsencrypt.sh/base/certs/bobos.org/cert.pem
+&lt;span class=&quot;nc&quot;&gt;SSLCertificateKeyFile&lt;/span&gt;   /var/www/letsencrypt.sh/base/certs/bobos.org/privkey.pem
+&lt;span class=&quot;nc&quot;&gt;SSLCertificateChainFile&lt;/span&gt; /var/www/letsencrypt.sh/base/certs/bobos.org/chain.pem
+&lt;span class=&quot;nc&quot;&gt;SSLCACertificateFile&lt;/span&gt;    /var/www/letsencrypt.sh/base/certs/bobos.org/fullchain.pem
+&lt;span class=&quot;nc&quot;&gt;SSLHonorCipherOrder&lt;/span&gt; On
+&lt;span class=&quot;nc&quot;&gt;SSLCipherSuite&lt;/span&gt; ECDHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA256:ECDHE-RSA-AES256-SHA:ECDHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-RSA-AES128-SHA256:DHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA:ECDHE-RSA-DES-CBC3-SHA:EDH-RSA-DES-CBC3-SHA:AES256-GCM-SHA384:AES128-GCM-SHA256:AES256-SHA256:AES128-SHA256:AES256-SHA:AES128-SHA:DES-CBC3-SHA:HIGH:!aNULL:!eNULL:!EXPORT:!DES:!MD5:!PSK:!RC4
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;strong&gt;IMPORTANT NOTE!!&lt;/strong&gt; The previous configuration &lt;strong&gt;will not work&lt;/strong&gt; in Jelastic Paas environment, as it forces us to add the certificates via &lt;a href=&quot;https://app.j.layershift.co.uk/&quot;&gt;Jelastic Administration Panel&lt;/a&gt;. Jelastic puts the certificates to &lt;code class=&quot;highlighter-rouge&quot;&gt;/var/lib/jelastic/SSL&lt;/code&gt;.&lt;/p&gt;
+
+&lt;div class=&quot;language-apache highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nc&quot;&gt;SSLEngine&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;on&lt;/span&gt;
+
+&lt;span class=&quot;nc&quot;&gt;SSLProtocol&lt;/span&gt; ALL -SSLv2 -SSLv3
+&lt;span class=&quot;nc&quot;&gt;SSLHonorCipherOrder&lt;/span&gt; On
+&lt;span class=&quot;nc&quot;&gt;SSLCipherSuite&lt;/span&gt; ECDH+AESGCM:DH+AESGCM:ECDH+AES256:DH+AES256:ECDH+AES128:DH+AES:ECDH+3DES:DH+3DES:RSA+AESGCM:RSA+AES:RSA+3DES:!aNULL:!MD5:!DSS
+
+&lt;span class=&quot;nc&quot;&gt;SSLCertificateFile&lt;/span&gt; /var/lib/jelastic/SSL/jelastic.crt
+&lt;span class=&quot;nc&quot;&gt;SSLCertificateKeyFile&lt;/span&gt; /var/lib/jelastic/SSL/jelastic.key
+&lt;span class=&quot;nc&quot;&gt;SSLCACertificateFile&lt;/span&gt; /var/lib/jelastic/SSL/jelastic-ca.crt
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;upload-ssl-certificates-to-jelastic-administration-panel&quot;&gt;Upload SSL certificates to Jelastic Administration Panel&lt;/h3&gt;
+
+&lt;p&gt;Then we have to upload SSL certificates to Jelastic Administration Panel. To achieve that you can use &lt;a href=&quot;https://docs.jelastic.com/custom-ssl#docs-internal-guid-ccfc9b2c-ad8f-bb9d-9503-26def475aa76&quot;&gt;this guide&lt;/a&gt;. Otherwise (i.e. putting files via SSH) it will not work.&lt;/p&gt;
+
+&lt;h3 id=&quot;reload-or-restart-web-server-and-test-configuration&quot;&gt;Reload or restart web server and test configuration&lt;/h3&gt;
+
+&lt;p&gt;Finally we reload &lt;code class=&quot;highlighter-rouge&quot;&gt;sudo /etc/init.d/apache2 reload&lt;/code&gt; or restart (&lt;code class=&quot;highlighter-rouge&quot;&gt;sudo /etc/init.d/apache2 restart&lt;/code&gt;) Apache web server and verify that &lt;code class=&quot;highlighter-rouge&quot;&gt;https://bobos.org&lt;/code&gt; works.&lt;/p&gt;
+
+&lt;p&gt;That is all folks! Greetings from a hot and striving for the best Greece!&lt;/p&gt;</content><author><name>cmanios</name></author><category term="bash" /><category term="centos" /><category term="certificate" /><category term="encrypt" /><category term="free" /><category term="install" /><category term="jelastic" /><category term="let's encrypt" /><category term="lets" /><category term="linux" /><category term="root" /><category term="ssh" /><category term="ssl" /><category term="sudo" /><summary type="html">Five days ago we had to renew a number of SSL certificates using free Let’s Encrypt SSL authority to a few Apache servers which were installed in Jelastic PaaS environment. The Apache servers were installed in an environment where:</summary></entry><entry><title type="html">Migrate a Gitlab Docker container from version 8.0.4 to 8.2.0</title><link href="https://manios.org/2015/12/04/migrate-a-gitlab-docker-container-from-version-8-0-4-to-8-2-0" rel="alternate" type="text/html" title="Migrate a Gitlab Docker container from version 8.0.4 to 8.2.0" /><published>2015-12-04T22:47:06+02:00</published><updated>2015-12-04T22:47:06+02:00</updated><id>https://manios.org/2015/12/04/migrate-a-gitlab-docker-container-from-version-8-0-4-to-8-2-0</id><content type="html" xml:base="https://manios.org/2015/12/04/migrate-a-gitlab-docker-container-from-version-8-0-4-to-8-2-0">&lt;p&gt;&lt;strong&gt;Update 2016-05-13&lt;/strong&gt;: The following procedure works perfectly for migrations from version 8.0.4 to 8.7.5&lt;/p&gt;
+
+&lt;p&gt;A few days ago, I had to migrate a Gitlab instance installed in Docker from version 8.04 to 8.2.0. I followed the exact steps described in GitLab &lt;a href=&quot;http://doc.gitlab.com/omnibus/docker/&quot;&gt;Docker images&lt;/a&gt; documentation. But it was not so easy! Of cource, it required some more! Thus, after 4 hours of errors, searching and trials I found the way! Thank god!&lt;/p&gt;
+
+&lt;p&gt;In this article we will make the assumption that Gitlab volumes are stored in &lt;code class=&quot;highlighter-rouge&quot;&gt;/home/bob/docker-data/gitlab&lt;/code&gt; directory. Here are the exact steps I followed to make a successful migration:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Stop docker container
+    &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;docker stop gitlab
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Backup docker volumes (all gitlab files)
+    &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;backupDate&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;$(&lt;/span&gt;date +&lt;span class=&quot;s2&quot;&gt;&quot;%Y%m%d%H%M%S&quot;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;cd&lt;/span&gt; /home/bob/docker-data/ &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;sudo tar &lt;/span&gt;zvcf gitlab-data-&lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;backupDate&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;.tar.gz gitlab/
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Optionally backup docker image
+    &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;docker save &lt;span class=&quot;nt&quot;&gt;-o&lt;/span&gt; /home/bob/gitlab-ce-image.tar gitlab/gitlab-ce:latest
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Remove docker container
+    &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;docker rm gitlab
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Download the latest Gitlab docker image
+    &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;docker pull gitlab/gitlab-ce:latest
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
+  &lt;/li&gt;
+  &lt;li&gt;After the image is downloaded create and run the container
+    &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;docker run &lt;span class=&quot;nt&quot;&gt;-d&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;--hostname&lt;/span&gt; 192.168.1.1 &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;--publish&lt;/span&gt; 8443:443 &lt;span class=&quot;nt&quot;&gt;--publish&lt;/span&gt; 8082:80 &lt;span class=&quot;nt&quot;&gt;--publish&lt;/span&gt; 2224:22 &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;--name&lt;/span&gt; gitlab &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;--restart&lt;/span&gt; always &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;--volume&lt;/span&gt; /etc/localtime:/etc/localtime &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;--volume&lt;/span&gt; /home/bob/docker-data/gitlab/config:/etc/gitlab &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;--volume&lt;/span&gt; /home/bob/docker-data/gitlab/logs:/var/log/gitlab &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;--volume&lt;/span&gt; /home/bob/docker-data/gitlab/data:/var/opt/gitlab &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+gitlab/gitlab-ce:latest
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
+  &lt;/li&gt;
+  &lt;li&gt;The container starts and we observer the logs via:
+    &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;docker logs &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--tail&lt;/span&gt; 10 gitlab
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
+  &lt;/li&gt;
+  &lt;li&gt;The docker container started and we observed in the logs:
+    &lt;div class=&quot;language-text highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;[2015-11-26T15:12:26+02:00] INFO: Retrying execution of execute[create gitlab database user], 19 attempt(s) left
+[2015-11-26T15:12:28+02:00] INFO: Retrying execution of execute[create gitlab database user], 18 attempt(s) left
+... (some lines omitted) ...
+[2015-11-26T15:13:09+02:00] INFO: Retrying execution of execute[create gitlab database user], 0 attempt(s) left
+
+
+Error executing action `run` on resource 'execute[create gitlab database user]'
+
+
+Mixlib::ShellOut::ShellCommandFailed
+
+Expected process to exit with [0], but received '2'
+---- Begin output of /opt/gitlab/embedded/bin/psql --port 5432 -h /var/opt/gitlab/postgresql -d template1 -c &quot;CREATE USER gitlab&quot; ----
+STDOUT: 
+STDERR: psql: could not connect to server: No such file or directory
+Is the server running locally and accepting
+connections on Unix domain socket &quot;/var/opt/gitlab/postgresql/.s.PGSQL.5432&quot;?
+---- End output of /opt/gitlab/embedded/bin/psql --port 5432 -h /var/opt/gitlab/postgresql -d template1 -c &quot;CREATE USER gitlab&quot; ----
+Ran /opt/gitlab/embedded/bin/psql --port 5432 -h /var/opt/gitlab/postgresql -d template1 -c &quot;CREATE USER gitlab&quot; returned 2
+
+Resource Declaration:
+
+# In /opt/gitlab/embedded/cookbooks/cache/cookbooks/gitlab/recipes/postgresql.rb
+
+153:   execute &quot;create #{sql_user} database user&quot; do
+154:     command &quot;#{bin_dir}/psql --port #{pg_port} -h #{postgresql_socket_dir} -d template1 -c \&quot;CREATE USER #{sql_user}\&quot;&quot;
+155:     user postgresql_user
+156:     # Added retries to give the service time to start on slower systems
+157:     retries 20
+158:     not_if { !pg_helper.is_running? || pg_helper.user_exists?(sql_user) }
+159:   end
+160: 
+
+Compiled Resource:
+
+# Declared in /opt/gitlab/embedded/cookbooks/cache/cookbooks/gitlab/recipes/postgresql.rb:153:in `block in from_file'
+
+execute(&quot;create gitlab database user&quot;) do
+action [:run]
+retries 20
+retry_delay 2
+default_guard_interpreter :execute
+command &quot;/opt/gitlab/embedded/bin/psql --port 5432 -h /var/opt/gitlab/postgresql -d template1 -c \&quot;CREATE USER gitlab\&quot;&quot;
+backup 5
+returns 0
+user &quot;gitlab-psql&quot;
+declared_type :execute
+cookbook_name &quot;gitlab&quot;
+recipe_name &quot;postgresql&quot;
+not_if { #code block }
+end
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
+    &lt;p&gt;These are two known permission issues described in official &lt;a href=&quot;http://doc.gitlab.com/omnibus/docker/&quot;&gt;documentation&lt;/a&gt; and in &lt;a href=&quot;https://github.com/gitlabhq/gitlabhq/issues/9611&quot;&gt;issue #9611&lt;/a&gt;. In order to overcome them, we execute:&lt;/p&gt;
+    &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;docker &lt;span class=&quot;nb&quot;&gt;exec&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-it&lt;/span&gt; gitlab update-permissions
+docker &lt;span class=&quot;nb&quot;&gt;exec &lt;/span&gt;gitlab chown &lt;span class=&quot;nt&quot;&gt;-R&lt;/span&gt; gitlab-redis /var/opt/gitlab/redis
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
+    &lt;p&gt;and finally we restart the docker container:&lt;/p&gt;
+    &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;docker restart gitlab
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Then we have to check if the database migration was successfull and avoid &lt;a href=&quot;https://gitlab.com/gitlab-org/gitlab-ce/issues/3255&quot;&gt;issue #3255&lt;/a&gt;. Thus, we log into bash shell:
+    &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;docker &lt;span class=&quot;nb&quot;&gt;exec&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-t&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-i&lt;/span&gt; gitlab /bin/bash
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
+    &lt;p&gt;and we check the db migration status:&lt;/p&gt;
+    &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;gitlab-rake db:migrate:status
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
+    &lt;p&gt;If everything is stated as &lt;code class=&quot;highlighter-rouge&quot;&gt;up&lt;/code&gt;, we are OK. However, if we notice &lt;code class=&quot;highlighter-rouge&quot;&gt;down&lt;/code&gt; migrations like this&lt;/p&gt;
+    &lt;div class=&quot;language-text highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;up     20150920161119  Add line code to sent notification
+down    20150924125150  Add project id to ci commit
+down    20150924125436  Migrate project id for ci commits
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
+    &lt;p&gt;we have to rerun the database migration ourserlves:&lt;/p&gt;
+    &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;gitlab-rake db:migrate
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
+    &lt;p&gt;When it finishes we have to check that everything went ok:&lt;/p&gt;
+    &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;gitlab-rake db:migrate:status
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
+  &lt;/li&gt;
+  &lt;li&gt;While being inside the container bash shell, we reconfigure the installation:
+    &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;gitlab-ctl reconfigure
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
+    &lt;p&gt;and then check that everything went ok:&lt;/p&gt;
+    &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;gitlab-rake gitlab:check
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
+  &lt;/li&gt;
+  &lt;li&gt;If everything is OK, then the command:
+    &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;gitlab-rake gitlab:env:info &lt;span class=&quot;nv&quot;&gt;RAILS_ENV&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;production
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
+    &lt;p&gt;must return something like this:&lt;/p&gt;
+    &lt;div class=&quot;language-text highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;System information
+System:   Ubuntu 14.04
+Current User: git
+Using RVM:  no
+Ruby Version: 2.1.7p400
+Gem Version:  2.2.5
+Bundler Version:1.10.6
+Rake Version: 10.4.2
+Sidekiq Version:3.3.0
+
+GitLab information
+Version:  8.2.0
+Revision: d6bcf44
+Directory:  /opt/gitlab/embedded/service/gitlab-rails
+DB Adapter: postgresql
+URL:    http://192.168.1.1:8082
+HTTP Clone URL: http://192.168.1.1:8082/some-group/some-project.git
+SSH Clone URL:  git@192.168.1.1:some-group/some-project.git
+Using LDAP: yes
+Using Omniauth: no
+
+GitLab Shell
+Version:  2.6.7
+Repositories: /var/opt/gitlab/git-data/repositories
+Hooks:    /opt/gitlab/embedded/service/gitlab-shell/hooks/
+Git:    /opt/gitlab/embedded/bin/git
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Finally we have to clear Redis cache, or we will face the &lt;a href=&quot;https://gitlab.com/gitlab-org/gitlab-ce/issues/3619&quot;&gt;issue #3619&lt;/a&gt; or &lt;a href=&quot;https://gitlab.com/gitlab-org/gitlab-ce/issues/3609&quot;&gt;issue #3609&lt;/a&gt;:
+    &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;gitlab-rake cache:clear
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
+  &lt;/li&gt;
+  &lt;li&gt;After that you will be able to login properly to &lt;a href=&quot;http://localhost:8082&quot;&gt;http://localhost:8082&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;</content><author><name>cmanios</name></author><category term="container" /><category term="docker" /><category term="git" /><category term="gitlab" /><category term="image" /><category term="linux" /><category term="migrate" /><summary type="html">Update 2016-05-13: The following procedure works perfectly for migrations from version 8.0.4 to 8.7.5</summary></entry><entry><title type="html">JSON remove new lines via Linux and use it as string variable and as param in cURL POST request</title><link href="https://manios.org/2014/12/30/json-remove-new-lines-via-linux-and-use-it-as-string-variable-and-as-param-in-curl-post-request" rel="alternate" type="text/html" title="JSON remove new lines via Linux and use it as string variable and as param in cURL POST request" /><published>2014-12-30T23:58:16+02:00</published><updated>2014-12-30T23:58:16+02:00</updated><id>https://manios.org/2014/12/30/json-remove-new-lines-via-linux-and-use-it-as-string-variable-and-as-param-in-curl-post-request</id><content type="html" xml:base="https://manios.org/2014/12/30/json-remove-new-lines-via-linux-and-use-it-as-string-variable-and-as-param-in-curl-post-request">&lt;p&gt;Today I had to parse a JSON response in a &lt;a href=&quot;http://junit.org/&quot;&gt;JUnit test&lt;/a&gt; and then reuse it in a &lt;a href=&quot;http://curl.haxx.se/&quot;&gt;cURL&lt;/a&gt; command line call. Unfortunately I could not read the JSON response from a file or from an HTTP request, so I had to place it inline as a String variable. My JSON looked like this:&lt;/p&gt;
+
+&lt;div class=&quot;language-javascript highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;s2&quot;&gt;&quot;responseHeader&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;s2&quot;&gt;&quot;status&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+        &lt;span class=&quot;s2&quot;&gt;&quot;QTime&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;193&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;
+    &lt;span class=&quot;s2&quot;&gt;&quot;defaultCoreName&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;collection1&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;s2&quot;&gt;&quot;initFailures&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{},&lt;/span&gt;
+    &lt;span class=&quot;s2&quot;&gt;&quot;status&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;s2&quot;&gt;&quot;jet2pilot_shard1_replica2&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+            &lt;span class=&quot;s2&quot;&gt;&quot;name&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;jet2pilot_shard1_replica2&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+            &lt;span class=&quot;s2&quot;&gt;&quot;isDefaultCore&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+            &lt;span class=&quot;s2&quot;&gt;&quot;instanceDir&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;/opt/solr-4.8.1/example/solr/jet2pilot_shard1_replica2/&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+            &lt;span class=&quot;s2&quot;&gt;&quot;dataDir&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;/opt/solr-4.8.1/example/solr/jet2pilot_shard1_replica2/data/&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+            &lt;span class=&quot;s2&quot;&gt;&quot;config&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;solrconfig.xml&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+            &lt;span class=&quot;s2&quot;&gt;&quot;schema&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;schema.xml&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+            &lt;span class=&quot;s2&quot;&gt;&quot;startTime&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;2014-12-31T19:12:41.633Z&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+            &lt;span class=&quot;s2&quot;&gt;&quot;uptime&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1350610415&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;1-use-json-in-a-java-string-variable&quot;&gt;1. Use JSON in a Java string variable&lt;/h2&gt;
+
+&lt;p&gt;In order to parse JSON from a Java String variable, I had to:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;remove &lt;strong&gt;\t,\n,\r&lt;/strong&gt; characters and&lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;escape single and double quotes (',&quot;)
+Thus, Linux shell came to the rescue! So, write your JSON to a file, for example &lt;strong&gt;myresponse.json&lt;/strong&gt; and execute the following command:&lt;/p&gt;
+
+    &lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;cat &lt;/span&gt;myresponse.json | tr &lt;span class=&quot;s1&quot;&gt;'\r'&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;' '&lt;/span&gt; |  tr &lt;span class=&quot;s1&quot;&gt;'\n'&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;' '&lt;/span&gt; | sed &lt;span class=&quot;s2&quot;&gt;&quot;s/[']/&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\\\'&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;/g&quot;&lt;/span&gt; | sed &lt;span class=&quot;s1&quot;&gt;'s/\&quot;/\\&quot;/g'&lt;/span&gt; | sed &lt;span class=&quot;s1&quot;&gt;'s/ \{3,\}/ /g'&lt;/span&gt; | sed &lt;span class=&quot;s1&quot;&gt;'s/   / /g'&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; onelinejson.txt
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
+
+    &lt;p&gt;Then you can use JSON as a simple Java String variable like the following:&lt;/p&gt;
+
+    &lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nd&quot;&gt;@Test&lt;/span&gt;
+&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;testAktiston&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(){&lt;/span&gt;
+   &lt;span class=&quot;n&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;jsonString&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;{ \&quot;responseHeader\&quot;: { \&quot;status\&quot;: 0, \&quot;QTime\&quot;: 193 }, \&quot;defaultCoreName\&quot;: \&quot;collection1\&quot;, \&quot;initFailures\&quot;: {}, \&quot;status\&quot;: { \&quot;jet2pilot_shard1_replica2\&quot;: { \&quot;name\&quot;: \&quot;jet2pilot_shard1_replica2\&quot;, \&quot;isDefaultCore\&quot;: false, \&quot;instanceDir\&quot;: \&quot;/opt/solr-4.8.1/example/solr/jet2pilot_shard1_replica2/\&quot;, \&quot;dataDir\&quot;: \&quot;/opt/solr-4.8.1/example/solr/jet2pilot_shard1_replica2/data/\&quot;, \&quot;config\&quot;: \&quot;solrconfig.xml\&quot;, \&quot;schema\&quot;: \&quot;schema.xml\&quot;, \&quot;startTime\&quot;: \&quot;2014-12-31T19:12:41.633Z\&quot;, \&quot;uptime\&quot;: 1350610415 } } }&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+      
+   &lt;span class=&quot;c1&quot;&gt;// test code&lt;/span&gt;
+   &lt;span class=&quot;c1&quot;&gt;// parsing and other chaotic code&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
+  &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&quot;2-use-json-to-perform-a-post-request-using-curl&quot;&gt;2. Use JSON to perform a POST request using cURL&lt;/h2&gt;
+
+&lt;p&gt;In order to parse JSON from a Java String variable, I had to:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;
+    &lt;p&gt;remove &lt;strong&gt;\t,\n,\r&lt;/strong&gt; characters and
+Again, Linux shell makes the world go round! So, write your JSON to a file, for example &lt;strong&gt;myresponse.json&lt;/strong&gt; and execute the following command:&lt;/p&gt;
+
+    &lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;cat &lt;/span&gt;myresponse.json | tr &lt;span class=&quot;s1&quot;&gt;'\r'&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;' '&lt;/span&gt; |  tr &lt;span class=&quot;s1&quot;&gt;'\n'&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;' '&lt;/span&gt; | sed &lt;span class=&quot;s1&quot;&gt;'s/ \{3,\}/ /g'&lt;/span&gt; | sed &lt;span class=&quot;s1&quot;&gt;'s/   / /g'&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; onelinejson.txt
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
+
+    &lt;p&gt;Then use it in your POST request via cURL command (the command is multilined in order to be legible):&lt;/p&gt;
+
+    &lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;curl &lt;span class=&quot;nt&quot;&gt;-v&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;-X&lt;/span&gt; POST
+&lt;span class=&quot;nt&quot;&gt;-H&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Cookie: JSESSIONID=00213719A12D07F7E67BE8B580CD9BBC&quot;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;-H&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Content-Type: multipart/form-data&quot;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;-H&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Accept: application/json&quot;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;-F&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'repEx={ &quot;responseHeader&quot;: { &quot;status&quot;: 0, &quot;QTime&quot;: 193 }, &quot;defaultCoreName&quot;: &quot;collection1&quot;, &quot;initFailures&quot;: {}, &quot;status&quot;: { &quot;jet2pilot_shard1_replica2&quot;: { &quot;name&quot;: &quot;jet2pilot_shard1_replica2&quot;, &quot;isDefaultCore&quot;: false, &quot;instanceDir&quot;: &quot;/opt/solr-4.8.1/example/solr/jet2pilot_shard1_replica2/&quot;, &quot;dataDir&quot;: &quot;/opt/solr-4.8.1/example/solr/jet2pilot_shard1_replica2/data/&quot;, &quot;config&quot;: &quot;solrconfig.xml&quot;, &quot;schema&quot;: &quot;schema.xml&quot;, &quot;startTime&quot;: &quot;2014-12-31T19:12:41.633Z&quot;, &quot;uptime&quot;: 1350610415 } } }'&lt;/span&gt;
+&lt;span class=&quot;s2&quot;&gt;&quot;http://192.168.1.89:8080/apios/insertios&quot;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
+  &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;That is all about καρντάσια (kardasia is translated as “folks” in Thessaloniki, Greece)! Have a nice year!&lt;/p&gt;</content><author><name>cmanios</name></author><category term="curl" /><category term="java" /><category term="json" /><category term="junit" /><category term="linux" /><category term="newline" /><category term="parse" /><category term="shell" /><summary type="html">Today I had to parse a JSON response in a JUnit test and then reuse it in a cURL command line call. Unfortunately I could not read the JSON response from a file or from an HTTP request, so I had to place it inline as a String variable. My JSON looked like this:</summary></entry><entry><title type="html">Solr fix corrupted index using Lucene</title><link href="https://manios.org/2014/11/01/solr-fix-corrupted-index-using-lucene" rel="alternate" type="text/html" title="Solr fix corrupted index using Lucene" /><published>2014-11-01T16:40:40+02:00</published><updated>2014-11-01T16:40:40+02:00</updated><id>https://manios.org/2014/11/01/solr-fix-corrupted-index-using-lucene</id><content type="html" xml:base="https://manios.org/2014/11/01/solr-fix-corrupted-index-using-lucene">&lt;p&gt;A few days ago, a Solr server in our SolrCloud installation stopped unexpectedly. After examining solr.log file I spotted that it could not start again because &lt;strong&gt;index.20140510031827076&lt;/strong&gt; file was corrupted. After some searching I found this &lt;a href=&quot;https://support.lucidworks.com/hc/en-us/articles/202091128-How-to-deal-with-Index-Corruption&quot;&gt;Lucidworks article&lt;/a&gt; which described how to deal with a corrupted index file. So I proceeded to the following steps:&lt;/p&gt;
+
+&lt;h3 id=&quot;warning&quot;&gt;WARNING!!&lt;/h3&gt;
+
+&lt;p&gt;&lt;strong&gt;This procedure may result in unrecoverable data loss. &lt;em&gt;It is vital that you backup your index before performing index checking and repair&lt;/em&gt;.&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Find the guilty index file containing the corrupted segment. For me it was located in:
+    &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;C:/Program Files/apache-solr-4.6.0/example/solr/hellaserver_shard1_replica4/data/index.20140510031827076
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Find Lucene core .jar file. I work with Apache Solr 4.6.0 so it is a file named lucene-core-4.6.0.jar. It is usually in &lt;code class=&quot;highlighter-rouge&quot;&gt;$SOLR_HOME/example/solr-webapp/webapp/WEB-INF/lib/lucene-core-4.6.0.jar&lt;/code&gt;. So, switch to the directory where it exists:
+    &lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;cd &lt;/span&gt;C:/Program Files/apache-solr-4.6.0/example/solr-webapp/webapp/WEB-INF/lib
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Check the segments of the corrupted index file in order to identify the problematic segment. To accomplish that, run:
+    &lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;java &lt;span class=&quot;nt&quot;&gt;-cp&lt;/span&gt; lucene-core-4.6.0.jar &lt;span class=&quot;nt&quot;&gt;-ea&lt;/span&gt;:org.apache.lucene... org.apache.lucene.index.CheckIndex &lt;span class=&quot;s2&quot;&gt;&quot;C:/Program Files/apache-solr-4.6.0/example/solr/hellaserver_shard1_replica4/data/index.20140510031827076&quot;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
+    &lt;p&gt;The check results for a &lt;strong&gt;healthy&lt;/strong&gt; segment look like the following:&lt;/p&gt;
+    &lt;div class=&quot;language-text highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;1 of 37: name=_48r7 docCount=3021717
+   codec=Lucene46
+   compound=false
+   numFiles=11
+   size (MB)=5,020.87
+   diagnostics = {timestamp=1403095380034, os=Windows Server 2012, os.version=6
+.2, mergeFactor=10, source=merge, lucene.version=4.6.0 1543363 - simon - 2013-11
+-19 11:05:50, os.arch=amd64, mergeMaxNumSegments=-1, java.version=1.7.0_51, java
+.vendor=Oracle Corporation}
+   has deletions [delGen=170]
+   test: open reader.........OK [196 deleted docs]
+   test: fields..............OK [135 fields]
+   test: field norms.........OK [52 fields]
+   test: terms, freq, prox...OK [16644025 terms; 441992389 terms/docs pairs; 39
+0271915 tokens]
+   test (ignoring deletes): terms, freq, prox...OK [16646658 terms; 442060892 t
+erms/docs pairs; 390381979 tokens]
+   test: stored fields.......OK [107214499 total field count; avg 35.484 fields
+per doc]
+   test: term vectors........OK [0 total vector count; avg 0 term/freq vector f
+ields per doc]
+   test: docvalues...........OK [0 docvalues fields; 0 BINARY; 0 NUMERIC; 0 SOR
+TED; 0 SORTED_SET]
+
+2 of 37: name=_3b16 docCount=2449309
+   codec=Lucene46
+   compound=false
+   numFiles=11
+   size (MB)=3,831.743
+   diagnostics = {timestamp=1402370404453, os=Windows Server 2012, os.version=6
+.2, mergeFactor=10, source=merge, lucene.version=4.6.0 1543363 - simon - 2013-11
+-19 11:05:50, os.arch=amd64, mergeMaxNumSegments=-1, java.version=1.7.0_51, java
+.vendor=Oracle Corporation}
+   has deletions [delGen=426]
+   test: open reader.........OK [20262 deleted docs]
+   test: fields..............OK [92 fields]
+   test: field norms.........OK [35 fields]
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
+    &lt;p&gt;When the index checker encounters a &lt;strong&gt;corrupted&lt;/strong&gt; segment, the output looks like the following:&lt;/p&gt;
+    &lt;div class=&quot;language-text highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;37 of 37: name=_4gxr docCount=11
+   codec=Lucene46
+   compound=false
+   numFiles=10
+   size (MB)=75.71
+   diagnostics = {timestamp=1403212995547, os=Windows Server 2012, os.version=6
+.2, source=flush, lucene.version=4.6.0 1543363 - simon - 2013-11-19 11:05:50, os
+.arch=amd64, java.version=1.7.0_51, java.vendor=Oracle Corporation}
+   no deletions
+   test: open reader.........FAILED
+   WARNING: fixIndex() would remove reference to this segment; full exception:
+org.apache.lucene.index.CorruptIndexException: invalid docCount: 48066 maxDoc: 1
+1 (resource=MMapIndexInput(path=&quot;C:\Program Files\apache-solr-4.6.0\example\solr
+\hellasever_shard1_replica4\data\index.20140510031827076\_4gxr_Lucene41_0.ti
+m&quot;))
+      at org.apache.lucene.codecs.BlockTreeTermsReader.(BlockTreeTermsRe
+ader.java:166)
+      at org.apache.lucene.codecs.lucene41.Lucene41PostingsFormat.fieldsProduc
+er(Lucene41PostingsFormat.java:437)
+      at org.apache.lucene.codecs.perfield.PerFieldPostingsFormat$FieldsReader
+.(PerFieldPostingsFormat.java:195)
+      at org.apache.lucene.codecs.perfield.PerFieldPostingsFormat.fieldsProduc
+er(PerFieldPostingsFormat.java:244)
+      at org.apache.lucene.index.SegmentCoreReaders.(SegmentCoreReaders.
+java:115)
+      at org.apache.lucene.index.SegmentReader.(SegmentReader.java:95)
+      at org.apache.lucene.index.CheckIndex.checkIndex(CheckIndex.java:554)
+      at org.apache.lucene.index.CheckIndex.main(CheckIndex.java:1941)
+
+WARNING: 1 broken segments (containing 11 documents) detected
+WARNING: would write new segments file, and 11 documents would be lost, if -fix
+were specified
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
+  &lt;/li&gt;
+  &lt;li&gt;After the reconnaissance of the corrupted segment, rerun the command with &lt;strong&gt;-fix&lt;/strong&gt; parameter:
+    &lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;java &lt;span class=&quot;nt&quot;&gt;-cp&lt;/span&gt; lucene-core-4.6.0.jar &lt;span class=&quot;nt&quot;&gt;-ea&lt;/span&gt;:org.apache.lucene... org.apache.lucene.index.CheckIndex &lt;span class=&quot;s2&quot;&gt;&quot;C:/Program Files/apache-solr-4.6.0/example/solr/hellaserver_shard1_replica4/data/index.20140510031827076&quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-fix&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
+    &lt;p&gt;When the checker fixes the segment, the output will look like the following:&lt;/p&gt;
+    &lt;div class=&quot;language-text highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;37 of 37: name=_4gxr docCount=11
+   codec=Lucene46
+   compound=false
+   numFiles=10
+   size (MB)=75.71
+   diagnostics = {timestamp=1403212995547, os=Windows Server 2012, os.version=6
+.2, source=flush, lucene.version=4.6.0 1543363 - simon - 2013-11-19 11:05:50, os
+.arch=amd64, java.version=1.7.0_51, java.vendor=Oracle Corporation}
+   no deletions
+   test: open reader.........FAILED
+   WARNING: fixIndex() would remove reference to this segment; full exception:
+org.apache.lucene.index.CorruptIndexException: invalid docCount: 48066 maxDoc: 1
+1 (resource=MMapIndexInput(path=&quot;C:\Program Files\apache-solr-4.6.0\example\solr
+\hellasever_shard1_replica4\data\index.20140510031827076\_4gxr_Lucene41_0.ti
+m&quot;))
+      at org.apache.lucene.codecs.BlockTreeTermsReader.&amp;lt;init&amp;gt;(BlockTreeTermsRe
+ader.java:166)
+      at org.apache.lucene.codecs.lucene41.Lucene41PostingsFormat.fieldsProduc
+er(Lucene41PostingsFormat.java:437)
+      at org.apache.lucene.codecs.perfield.PerFieldPostingsFormat$FieldsReader
+.&amp;lt;init&amp;gt;(PerFieldPostingsFormat.java:195)
+      at org.apache.lucene.codecs.perfield.PerFieldPostingsFormat.fieldsProduc
+er(PerFieldPostingsFormat.java:244)
+      at org.apache.lucene.index.SegmentCoreReaders.&amp;lt;init&amp;gt;(SegmentCoreReaders.
+java:115)
+      at org.apache.lucene.index.SegmentReader.&amp;lt;init&amp;gt;(SegmentReader.java:95)
+      at org.apache.lucene.index.CheckIndex.checkIndex(CheckIndex.java:554)
+      at org.apache.lucene.index.CheckIndex.main(CheckIndex.java:1941)
+
+WARNING: 1 broken segments (containing 11 documents) detected
+WARNING: 11 documents will be lost
+
+NOTE: will write new segments file in 5 seconds; this will remove 11 docs from t
+he index. THIS IS YOUR LAST CHANCE TO CTRL+C!
+5...
+4...
+3...
+2...
+1...
+Writing...
+OK
+Wrote new segments file &quot;segments_y5e&quot;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Finally, restart Solr server in order to resynchronise with the shard leader.&lt;/li&gt;
+&lt;/ol&gt;</content><author><name>cmanios</name></author><category term="apache" /><category term="check" /><category term="core" /><category term="corrupt" /><category term="fix" /><category term="index" /><category term="java" /><category term="linux" /><category term="lucene" /><category term="repair" /><category term="segment" /><category term="solr" /><category term="windows" /><summary type="html">A few days ago, a Solr server in our SolrCloud installation stopped unexpectedly. After examining solr.log file I spotted that it could not start again because index.20140510031827076 file was corrupted. After some searching I found this Lucidworks article which described how to deal with a corrupted index file. So I proceeded to the following steps:</summary></entry><entry><title type="html">Linux: Extract audio and video using ffmpeg</title><link href="https://manios.org/2014/07/28/linux-extract-audio-and-video-using-ffmpeg" rel="alternate" type="text/html" title="Linux: Extract audio and video using ffmpeg " /><published>2014-07-28T13:21:08+02:00</published><updated>2014-07-28T13:21:08+02:00</updated><id>https://manios.org/2014/07/28/linux-extract-audio-and-video-using-ffmpeg</id><content type="html" xml:base="https://manios.org/2014/07/28/linux-extract-audio-and-video-using-ffmpeg">&lt;p&gt;Today I had some mp4 video files and I wanted to extract the audio and video into separate files. So to do that you can do the following:&lt;/p&gt;
+
+&lt;h4 id=&quot;extract-audio-from-video-file-and-convert-it-to-mp3&quot;&gt;Extract audio from video file and convert it to mp3&lt;/h4&gt;
+
+&lt;p&gt;To accomplish that, execute the command:&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;ffmpeg &lt;span class=&quot;nt&quot;&gt;-i&lt;/span&gt; logothetis-bureaucracy.mp4  &lt;span class=&quot;nt&quot;&gt;-ab&lt;/span&gt; 128k &lt;span class=&quot;nt&quot;&gt;-ac&lt;/span&gt; 2 &lt;span class=&quot;nt&quot;&gt;-ar&lt;/span&gt; 44100 &lt;span class=&quot;nt&quot;&gt;-vn&lt;/span&gt; logothetis-bureaucracy.mp3
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h4 id=&quot;extract-only-the-video-segment-from-a-video&quot;&gt;Extract only the video segment from a video&lt;/h4&gt;
+
+&lt;p&gt;To accomplish that, execute the command:&lt;/p&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;ffmpeg &lt;span class=&quot;nt&quot;&gt;-i&lt;/span&gt; video.wmv &lt;span class=&quot;nt&quot;&gt;-vcodec&lt;/span&gt; copy &lt;span class=&quot;nt&quot;&gt;-an&lt;/span&gt; onlyvideo.wmv 
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name>cmanios</name></author><category term="audio" /><category term="extract" /><category term="ffmpeg" /><category term="linux" /><category term="mp3" /><category term="mp4" /><category term="shell" /><category term="video" /><summary type="html">Today I had some mp4 video files and I wanted to extract the audio and video into separate files. So to do that you can do the following:</summary></entry><entry><title type="html">Nginx https reverse proxy to Wordpress with Apache, http and different port</title><link href="https://manios.org/2014/04/12/nginx-https-reverse-proxy-to-wordpress-with-apache-http-and-different-port" rel="alternate" type="text/html" title="Nginx https reverse proxy to Wordpress with Apache, http and different port" /><published>2014-04-12T16:32:52+02:00</published><updated>2014-04-12T16:32:52+02:00</updated><id>https://manios.org/2014/04/12/nginx-https-reverse-proxy-to-wordpress-with-apache-http-and-different-port</id><content type="html" xml:base="https://manios.org/2014/04/12/nginx-https-reverse-proxy-to-wordpress-with-apache-http-and-different-port">&lt;p&gt;Today I had to hide a &lt;a href=&quot;http://wordpress.org/latest.zip&quot;&gt;Wordpress 3.8.1&lt;/a&gt; blog behind an Nginx reverse proxy configured to use only &lt;strong&gt;https&lt;/strong&gt;. Nginx was behind an external firewall which forwarded https://bob.org:8080/blog to Nginx using https (port 4443). The difficulty was that whe Wordpress blog was installed in an Apache HTTP server in port 80 and it worked using &lt;strong&gt;http&lt;/strong&gt;!. Lets say that my site was https://bob.org and I had to put the blog in https://bob.org:8080/blog. Thus my list of burdens was the following:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Configure Nginx to use only https and redirect http to https.&lt;/li&gt;
+  &lt;li&gt;Reverse proxy in Nginx from &lt;strong&gt;bob.org:8080/blog&lt;/strong&gt; to &lt;strong&gt;192.168.1.10/wordpress&lt;/strong&gt; in Apache.&lt;/li&gt;
+  &lt;li&gt;Force Wordpress links to use port 8080&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;The following is the diagram summarised my server configuration:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;      +--------------+
+      |  Firewall    |
+      | bob.org:8080 | 
+      +------+-------+
+            |
+            |
+            v
+      +–––––––––+                  +––––––––––––––+
+      |  Nginx  |      http        |  Wordpress   |
+      | (https) |+----------------&amp;gt;| Apache HTTP  |
+      |         |                  | (port 80)    |
+      +–––––––––+                  +––––––––––––––+ 
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;So you will say: “Are you completely insane ??!!”
+I was asked to do it! That is my answer!&lt;/p&gt;
+
+&lt;p&gt;Finally after one hour of searching I used a combination of two support articles (&lt;a href=&quot;http://wordpress.org/support/topic/wordpress-behind-reverse-proxy-1&quot;&gt;post1&lt;/a&gt;, &lt;a href=&quot;http://wordpress.org/support/topic/compatibility-with-wordpress-behind-a-reverse-proxy&quot;&gt;post2&lt;/a&gt;), some PHP knowledge and experience and a little of imagination, I created a solution:&lt;/p&gt;
+
+&lt;h4 id=&quot;configure-nginx-to-reverse-proxy-all-requests-to-blog&quot;&gt;Configure Nginx to reverse proxy all requests to /blog&lt;/h4&gt;
+
+&lt;p&gt;This is a fragment of my &lt;code class=&quot;highlighter-rouge&quot;&gt;/etc/nginx/sites-available/default-ssl&lt;/code&gt; Nginx configuration file:&lt;/p&gt;
+
+&lt;div class=&quot;language-nginx highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;upstream&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;blog-webservers&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;kn&quot;&gt;server&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;192.168.1.10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;80&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;c1&quot;&gt;# redirect http to https
+# http://serverfault.com/a/171238
+&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;server&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;kn&quot;&gt;listen&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;80&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;kn&quot;&gt;rewrite&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;^(.*)&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;https://&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$host$1&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;permanent&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;server&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;kn&quot;&gt;listen&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;*:443&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+    &lt;span class=&quot;kn&quot;&gt;ssl&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;on&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;kn&quot;&gt;ssl_certificate&lt;/span&gt;     &lt;span class=&quot;n&quot;&gt;/etc/nginx/crypto/server.crt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;kn&quot;&gt;ssl_certificate_key&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;/etc/nginx/crypto/server.key&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+    &lt;span class=&quot;kn&quot;&gt;ssl_client_certificate&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;/etc/nginx/crypto/ca.crt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;kn&quot;&gt;ssl_verify_client&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;optional&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;kn&quot;&gt;ssl_verify_depth&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+    &lt;span class=&quot;c1&quot;&gt;# pem key asking for password problem
+&lt;/span&gt;    &lt;span class=&quot;c1&quot;&gt;# http://pandemoniumillusion.wordpress.com/2008/04/21/nginx-ssl-passphrase-at-startup/
+&lt;/span&gt;
+    &lt;span class=&quot;kn&quot;&gt;server_name&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;bob.org&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;kn&quot;&gt;access_log&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;/var/log/nginx/ssl.access.log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;kn&quot;&gt;error_log&lt;/span&gt;   &lt;span class=&quot;n&quot;&gt;/var/log/nginx/ssl.error.log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;kn&quot;&gt;error_page&lt;/span&gt;  &lt;span class=&quot;mi&quot;&gt;404&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;/404.html&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+
+    &lt;span class=&quot;c1&quot;&gt;# reverse proxy to blog web servers
+&lt;/span&gt;    &lt;span class=&quot;kn&quot;&gt;location&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;/blog&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; 
+        &lt;span class=&quot;kn&quot;&gt;proxy_pass&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;http://blog-webservers/wordpress/&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;kn&quot;&gt;proxy_redirect&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;https://server_name&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;http://blog-webservers/wordpress&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+	
+        &lt;span class=&quot;kn&quot;&gt;proxy_read_timeout&lt;/span&gt;       &lt;span class=&quot;mi&quot;&gt;3500&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;kn&quot;&gt;proxy_connect_timeout&lt;/span&gt;    &lt;span class=&quot;mi&quot;&gt;3250&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+        &lt;span class=&quot;kn&quot;&gt;proxy_set_header&lt;/span&gt;   &lt;span class=&quot;s&quot;&gt;X-Real-IP&lt;/span&gt;          &lt;span class=&quot;nv&quot;&gt;$remote_addr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;kn&quot;&gt;proxy_set_header&lt;/span&gt;   &lt;span class=&quot;s&quot;&gt;Host&lt;/span&gt;               &lt;span class=&quot;nv&quot;&gt;$host&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;kn&quot;&gt;proxy_set_header&lt;/span&gt;   &lt;span class=&quot;s&quot;&gt;X-Forwarded-For&lt;/span&gt;    &lt;span class=&quot;nv&quot;&gt;$proxy_add_x_forwarded_for&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;kn&quot;&gt;proxy_set_header&lt;/span&gt;   &lt;span class=&quot;s&quot;&gt;X-Forwarded-Proto&lt;/span&gt;  &lt;span class=&quot;s&quot;&gt;https&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+       
+ 
+        &lt;span class=&quot;kn&quot;&gt;proxy_set_header&lt;/span&gt;   &lt;span class=&quot;s&quot;&gt;SSL_PROTOCOL&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$ssl_protocol&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;kn&quot;&gt;proxy_set_header&lt;/span&gt;   &lt;span class=&quot;s&quot;&gt;SSL_CLIENT_CERT&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$ssl_client_cert&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;kn&quot;&gt;proxy_set_header&lt;/span&gt;   &lt;span class=&quot;s&quot;&gt;SSL_CLIENT_VERIFY&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$ssl_client_verify&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;kn&quot;&gt;proxy_set_header&lt;/span&gt;   &lt;span class=&quot;s&quot;&gt;SSL_SERVER_S_DN&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$ssl_client_s_dn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h4 id=&quot;configure-wordpress-wp-configphp&quot;&gt;Configure Wordpress wp-config.php&lt;/h4&gt;
+
+&lt;p&gt;I added the following lines on top of &lt;code class=&quot;highlighter-rouge&quot;&gt;wp-config.php&lt;/code&gt; file:&lt;/p&gt;
+
+&lt;div class=&quot;language-php highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;// If Wordpress is behind reverse proxy 
+// which proxies https to http
+&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;empty&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$_SERVER&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'HTTP_X_FORWARDED_HOST'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]))&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;||&lt;/span&gt;
+     &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;empty&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$_SERVER&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'HTTP_X_FORWARDED_FOR'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]))&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; 
+
+    &lt;span class=&quot;c1&quot;&gt;// http://wordpress.org/support/topic/wordpress-behind-reverse-proxy-1
+&lt;/span&gt;    &lt;span class=&quot;nv&quot;&gt;$_SERVER&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'HTTP_HOST'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$_SERVER&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'HTTP_X_FORWARDED_HOST'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+
+    &lt;span class=&quot;nb&quot;&gt;define&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'WP_HOME'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'https://bob.org:8080/blog'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;nb&quot;&gt;define&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'WP_SITEURL'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'https://bob.org:8080/blog'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+
+    &lt;span class=&quot;c1&quot;&gt;// rewrite blog word with wordpress
+&lt;/span&gt;    &lt;span class=&quot;nv&quot;&gt;$_SERVER&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'REQUEST_URI'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;str_replace&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;wordpress&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;blog&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;nv&quot;&gt;$_SERVER&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'REQUEST_URI'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]);&lt;/span&gt;
+
+    &lt;span class=&quot;c1&quot;&gt;// http://wordpress.org/support/topic/compatibility-with-wordpress-behind-a-reverse-proxy
+&lt;/span&gt;    &lt;span class=&quot;nv&quot;&gt;$_SERVER&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'HTTPS'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'on'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;If you want to debug the former PHP code fragment you can print &lt;code class=&quot;highlighter-rouge&quot;&gt;$_SERVER&lt;/code&gt; variables before and after configuration changing command inside the if block:&lt;/p&gt;
+
+&lt;div class=&quot;language-php highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'&amp;lt;br&amp;gt;Before:'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'&amp;lt;br&amp;gt;$_SERVER[\'HTTP_HOST\'] : '&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$_SERVER&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'HTTP_HOST'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'&amp;lt;br&amp;gt;$_SERVER[\'HTTP_X_FORWARDED_HOST\']: '&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$_SERVER&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'HTTP_X_FORWARDED_HOST'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'&amp;lt;br&amp;gt;$_SERVER[\'REQUEST_URI\']: '&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$_SERVER&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'REQUEST_URI'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'&amp;lt;br&amp;gt;$_SERVER[\'HTTP_X_FORWARDED_SERVER\']: '&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$_SERVER&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'HTTP_X_FORWARDED_SERVER'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'&amp;lt;br&amp;gt;$_SERVER[\'HTTP_X_FORWARDED_FOR\']: '&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$_SERVER&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'HTTP_X_FORWARDED_FOR'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'&amp;lt;br&amp;gt;$_SERVER[\'HTTP_X_FORWARDED_FOR\']: '&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$_SERVER&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'HTTP_X_FORWARDED_FOR'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'&amp;lt;br&amp;gt;$_SERVER[\'HTTPS\']: '&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$_SERVER&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'HTTPS'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'&amp;lt;br&amp;gt;$_SERVER[\'REMOTE_ADDR\']: '&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$_SERVER&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'REMOTE_ADDR'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;    
+&lt;span class=&quot;k&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'&amp;lt;br&amp;gt;$_SERVER[\'SERVER_NAME\']: '&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$_SERVER&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'SERVER_NAME'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'&amp;lt;br&amp;gt;$_SERVER[\'SERVER_PROTOCOL\']: '&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$_SERVER&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'SERVER_PROTOCOL'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'&amp;lt;br&amp;gt;WP_HOME: '&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;WP_HOME&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'&amp;lt;br&amp;gt;WP_SITEURL : '&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;WP_SITEURL&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;I am exhausted, just writting it down! Be patient!&lt;/p&gt;</content><author><name>cmanios</name></author><category term="apache" /><category term="blog" /><category term="http" /><category term="https" /><category term="nginx" /><category term="port" /><category term="proxy" /><category term="reverse" /><category term="wordpress" /><summary type="html">Today I had to hide a Wordpress 3.8.1 blog behind an Nginx reverse proxy configured to use only https. Nginx was behind an external firewall which forwarded https://bob.org:8080/blog to Nginx using https (port 4443). The difficulty was that whe Wordpress blog was installed in an Apache HTTP server in port 80 and it worked using http!. Lets say that my site was https://bob.org and I had to put the blog in https://bob.org:8080/blog. Thus my list of burdens was the following:</summary></entry><entry><title type="html">Export Untracked, modified, moved and deleted files from a Git repository to archive</title><link href="https://manios.org/2014/04/12/export-untracked-modified-moved-and-deleted-files-from-a-git-repository-to-archive" rel="alternate" type="text/html" title="Export Untracked, modified, moved and deleted files from a Git repository to archive" /><published>2014-04-12T15:35:56+02:00</published><updated>2014-04-12T15:35:56+02:00</updated><id>https://manios.org/2014/04/12/export-untracked-modified-moved-and-deleted-files-from-a-git-repository-to-archive</id><content type="html" xml:base="https://manios.org/2014/04/12/export-untracked-modified-moved-and-deleted-files-from-a-git-repository-to-archive">&lt;p&gt;Today I wanted to export to a .tar.gz archive all unstracked (new) , modified and deleted files from a Git repository. After some searching, I found &lt;a href=&quot;http://stackoverflow.com/questions/855767/can-i-use-git-diff-on-untracked-files&quot;&gt;a StackOverflow post&lt;/a&gt; which helped a lot. So after you &lt;strong&gt;cd&lt;/strong&gt; inside your repository and you have two options:&lt;/p&gt;
+
+&lt;h4 id=&quot;export-modified-moved-and-deleted-files&quot;&gt;Export modified moved and deleted files&lt;/h4&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;tar &lt;/span&gt;zvcf ~/new-files-cache.tar.gz &lt;span class=&quot;sb&quot;&gt;`&lt;/span&gt;git diff &lt;span class=&quot;nt&quot;&gt;--name-only&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--diff-filter&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;ACMRT&lt;span class=&quot;sb&quot;&gt;`&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h4 id=&quot;export-untracked-new-modified-and-deleted-files&quot;&gt;Export &lt;strong&gt;Untracked (new)&lt;/strong&gt;, modified and deleted files&lt;/h4&gt;
+
+&lt;p&gt;To achieve that I followed another custom route. If you find something smarter, please inform me!&lt;/p&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;tar &lt;/span&gt;zvcf ~/new-files-cache.tar.gz &lt;span class=&quot;sb&quot;&gt;`&lt;/span&gt; git status &lt;span class=&quot;nt&quot;&gt;--short&lt;/span&gt; | sed &lt;span class=&quot;s1&quot;&gt;'s/^ *[^ ]* \(.*\)/\1/g'&lt;/span&gt; &lt;span class=&quot;sb&quot;&gt;`&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;That’s it! Have fun with Git!&lt;/p&gt;</content><author><name>cmanios</name></author><category term="archive" /><category term="control" /><category term="deleted" /><category term="export" /><category term="git" /><category term="modified" /><category term="moved" /><category term="new" /><category term="repository" /><category term="source" /><category term="tar" /><category term="untracked" /><summary type="html">Today I wanted to export to a .tar.gz archive all unstracked (new) , modified and deleted files from a Git repository. After some searching, I found a StackOverflow post which helped a lot. So after you cd inside your repository and you have two options:</summary></entry></feed>

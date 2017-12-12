@@ -1,0 +1,762 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.2.2 by Michael Rose
+  Copyright 2017 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE.txt
+-->
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin SEO -->
+
+
+
+
+
+
+
+
+
+<title>Nginx https reverse proxy to Wordpress with Apache, http and different port - cmanios</title>
+
+
+
+
+<meta name="description" content="Today I had to hide a Wordpress 3.8.1 blog behind an Nginx reverse proxy configured to use only https. Nginx was behind an external firewall which forwarded https://bob.org:8080/blog to Nginx using https (port 4443). The difficulty was that whe Wordpress blog was installed in an Apache HTTP server in port 80 and it worked using http!. Lets say that my site was https://bob.org and I had to put the blog in https://bob.org:8080/blog. Thus my list of burdens was the following:">
+
+
+
+
+<meta name="author" content="cmanios">
+
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="cmanios">
+<meta property="og:title" content="Nginx https reverse proxy to Wordpress with Apache, http and different port">
+
+
+  <link rel="canonical" href="https://manios.org/2014/04/12/nginx-https-reverse-proxy-to-wordpress-with-apache-http-and-different-port">
+  <meta property="og:url" content="https://manios.org/2014/04/12/nginx-https-reverse-proxy-to-wordpress-with-apache-http-and-different-port">
+
+
+
+  <meta property="og:description" content="Today I had to hide a Wordpress 3.8.1 blog behind an Nginx reverse proxy configured to use only https. Nginx was behind an external firewall which forwarded https://bob.org:8080/blog to Nginx using https (port 4443). The difficulty was that whe Wordpress blog was installed in an Apache HTTP server in port 80 and it worked using http!. Lets say that my site was https://bob.org and I had to put the blog in https://bob.org:8080/blog. Thus my list of burdens was the following:">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+
+
+
+  <meta property="og:type" content="article">
+  <meta property="article:published_time" content="2014-04-12T16:32:52+02:00">
+
+
+
+
+
+
+
+
+  <script type="application/ld+json">
+    {
+      "@context" : "http://schema.org",
+      "@type" : "Person",
+      "name" : "Christos Manios",
+      "url" : "https://manios.org",
+      "sameAs" : null
+    }
+  </script>
+
+
+
+
+
+
+
+<!-- end SEO -->
+
+
+<link href="https://manios.org/feed.xml" type="application/atom+xml" rel="alternate" title="cmanios Feed">
+
+<!-- http://t.co/dKP3o1e -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="https://manios.org/assets/css/main.css">
+
+<!--[if lte IE 9]>
+  <style>
+    /* old IE unsupported flexbox fixes */
+    .greedy-nav .site-title {
+      padding-right: 3em;
+    }
+    .greedy-nav button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+    }
+  </style>
+<![endif]-->
+
+
+    <!-- start custom head snippets -->
+
+<!-- insert favicons. use http://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+  </head>
+
+  <body class="layout--single">
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+    <div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        <a class="site-title" href="https://manios.org/">cmanios</a>
+        <ul class="visible-links">
+          
+            
+            <li class="masthead__menu-item"><a href="https://manios.org/year-archive/">Posts archive</a></li>
+          
+            
+            <li class="masthead__menu-item"><a href="https://manios.org/categories/">Categories</a></li>
+          
+            
+            <li class="masthead__menu-item"><a href="https://manios.org/tags/">Tags</a></li>
+          
+            
+            <li class="masthead__menu-item"><a href="https://manios.org/about/">About</a></li>
+          
+        </ul>
+        <button type="button">
+          <span class="visually-hidden">Toggle Menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+    
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+<div itemscope itemtype="http://schema.org/Person">
+
+  
+
+  <div class="author__content">
+    <h3 class="author__name" itemprop="name">Christos Manios</h3>
+    
+      <p class="author__bio" itemprop="description">
+        Developer life is a NullPointerException
+      </p>
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+        <li itemprop="homeLocation" itemscope itemtype="http://schema.org/Place">
+          <i class="fa fa-fw fa-map-marker" aria-hidden="true"></i> <span itemprop="name">Thessaloniki, GR</span>
+        </li>
+      
+
+      
+
+      
+
+      
+
+      
+        <li>
+          <a href="https://twitter.com/maniosolr" itemprop="sameAs">
+            <i class="fa fa-fw fa-twitter-square" aria-hidden="true"></i> Twitter
+          </a>
+        </li>
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+        <li>
+          <a href="https://github.com/manios" itemprop="sameAs">
+            <i class="fa fa-fw fa-github" aria-hidden="true"></i> GitHub
+          </a>
+        </li>
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs">
+      <i class="fa fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+  <article class="page" itemscope itemtype="http://schema.org/CreativeWork">
+    <meta itemprop="headline" content="Nginx https reverse proxy to Wordpress with Apache, http and different port">
+    <meta itemprop="description" content="Today I had to hide a Wordpress 3.8.1 blog behind an Nginx reverse proxy configured to use only https. Nginx was behind an external firewall which forwarded https://bob.org:8080/blog to Nginx using https (port 4443). The difficulty was that whe Wordpress blog was installed in an Apache HTTP server in port 80 and it worked using http!. Lets say that my site was https://bob.org and I had to put the blog in https://bob.org:8080/blog. Thus my list of burdens was the following:">
+    <meta itemprop="datePublished" content="April 12, 2014">
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 class="page__title" itemprop="headline">Nginx https reverse proxy to Wordpress with Apache, http and different port
+</h1>
+          
+            <p class="page__meta"><i class="fa fa-clock-o" aria-hidden="true"></i> 
+
+
+
+
+  3 minute read
+</p>
+          
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+        <p>Today I had to hide a <a href="http://wordpress.org/latest.zip">Wordpress 3.8.1</a> blog behind an Nginx reverse proxy configured to use only <strong>https</strong>. Nginx was behind an external firewall which forwarded https://bob.org:8080/blog to Nginx using https (port 4443). The difficulty was that whe Wordpress blog was installed in an Apache HTTP server in port 80 and it worked using <strong>http</strong>!. Lets say that my site was https://bob.org and I had to put the blog in https://bob.org:8080/blog. Thus my list of burdens was the following:</p>
+
+<ol>
+  <li>Configure Nginx to use only https and redirect http to https.</li>
+  <li>Reverse proxy in Nginx from <strong>bob.org:8080/blog</strong> to <strong>192.168.1.10/wordpress</strong> in Apache.</li>
+  <li>Force Wordpress links to use port 8080</li>
+</ol>
+
+<p>The following is the diagram summarised my server configuration:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>      +--------------+
+      |  Firewall    |
+      | bob.org:8080 | 
+      +------+-------+
+            |
+            |
+            v
+      +–––––––––+                  +––––––––––––––+
+      |  Nginx  |      http        |  Wordpress   |
+      | (https) |+----------------&gt;| Apache HTTP  |
+      |         |                  | (port 80)    |
+      +–––––––––+                  +––––––––––––––+ 
+</code></pre></div></div>
+
+<p>So you will say: “Are you completely insane ??!!”
+I was asked to do it! That is my answer!</p>
+
+<p>Finally after one hour of searching I used a combination of two support articles (<a href="http://wordpress.org/support/topic/wordpress-behind-reverse-proxy-1">post1</a>, <a href="http://wordpress.org/support/topic/compatibility-with-wordpress-behind-a-reverse-proxy">post2</a>), some PHP knowledge and experience and a little of imagination, I created a solution:</p>
+
+<h4 id="configure-nginx-to-reverse-proxy-all-requests-to-blog">Configure Nginx to reverse proxy all requests to /blog</h4>
+
+<p>This is a fragment of my <code class="highlighter-rouge">/etc/nginx/sites-available/default-ssl</code> Nginx configuration file:</p>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">upstream</span> <span class="s">blog-webservers</span> <span class="p">{</span>
+    <span class="kn">server</span> <span class="nf">192.168.1.10</span><span class="p">:</span><span class="mi">80</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c1"># redirect http to https
+# http://serverfault.com/a/171238
+</span><span class="k">server</span> <span class="p">{</span>
+    <span class="kn">listen</span> <span class="mi">80</span><span class="p">;</span>
+    <span class="kn">rewrite</span> <span class="s">^(.*)</span> <span class="s">https://</span><span class="nv">$host$1</span> <span class="s">permanent</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">server</span> <span class="p">{</span>
+    <span class="kn">listen</span> <span class="s">*:443</span><span class="p">;</span>
+
+    <span class="kn">ssl</span> <span class="no">on</span><span class="p">;</span>
+    <span class="kn">ssl_certificate</span>     <span class="n">/etc/nginx/crypto/server.crt</span><span class="p">;</span>
+    <span class="kn">ssl_certificate_key</span> <span class="n">/etc/nginx/crypto/server.key</span><span class="p">;</span>
+
+    <span class="kn">ssl_client_certificate</span> <span class="n">/etc/nginx/crypto/ca.crt</span><span class="p">;</span>
+    <span class="kn">ssl_verify_client</span> <span class="s">optional</span><span class="p">;</span>
+    <span class="kn">ssl_verify_depth</span> <span class="mi">10</span><span class="p">;</span>
+
+    <span class="c1"># pem key asking for password problem
+</span>    <span class="c1"># http://pandemoniumillusion.wordpress.com/2008/04/21/nginx-ssl-passphrase-at-startup/
+</span>
+    <span class="kn">server_name</span> <span class="s">bob.org</span><span class="p">;</span>
+    <span class="kn">access_log</span>  <span class="n">/var/log/nginx/ssl.access.log</span><span class="p">;</span>
+    <span class="kn">error_log</span>   <span class="n">/var/log/nginx/ssl.error.log</span><span class="p">;</span>
+    <span class="kn">error_page</span>  <span class="mi">404</span> <span class="n">/404.html</span><span class="p">;</span>
+
+
+    <span class="c1"># reverse proxy to blog web servers
+</span>    <span class="kn">location</span> <span class="n">/blog</span> <span class="p">{</span> 
+        <span class="kn">proxy_pass</span> <span class="s">http://blog-webservers/wordpress/</span><span class="p">;</span>
+        <span class="kn">proxy_redirect</span> <span class="s">https://server_name</span> <span class="s">http://blog-webservers/wordpress</span><span class="p">;</span>
+	
+        <span class="kn">proxy_read_timeout</span>       <span class="mi">3500</span><span class="p">;</span>
+        <span class="kn">proxy_connect_timeout</span>    <span class="mi">3250</span><span class="p">;</span>
+
+        <span class="kn">proxy_set_header</span>   <span class="s">X-Real-IP</span>          <span class="nv">$remote_addr</span><span class="p">;</span>
+        <span class="kn">proxy_set_header</span>   <span class="s">Host</span>               <span class="nv">$host</span><span class="p">;</span>
+        <span class="kn">proxy_set_header</span>   <span class="s">X-Forwarded-For</span>    <span class="nv">$proxy_add_x_forwarded_for</span><span class="p">;</span>
+        <span class="kn">proxy_set_header</span>   <span class="s">X-Forwarded-Proto</span>  <span class="s">https</span><span class="p">;</span>
+       
+ 
+        <span class="kn">proxy_set_header</span>   <span class="s">SSL_PROTOCOL</span> <span class="nv">$ssl_protocol</span><span class="p">;</span>
+        <span class="kn">proxy_set_header</span>   <span class="s">SSL_CLIENT_CERT</span> <span class="nv">$ssl_client_cert</span><span class="p">;</span>
+        <span class="kn">proxy_set_header</span>   <span class="s">SSL_CLIENT_VERIFY</span> <span class="nv">$ssl_client_verify</span><span class="p">;</span>
+        <span class="kn">proxy_set_header</span>   <span class="s">SSL_SERVER_S_DN</span> <span class="nv">$ssl_client_s_dn</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h4 id="configure-wordpress-wp-configphp">Configure Wordpress wp-config.php</h4>
+
+<p>I added the following lines on top of <code class="highlighter-rouge">wp-config.php</code> file:</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// If Wordpress is behind reverse proxy 
+// which proxies https to http
+</span><span class="k">if</span> <span class="p">(</span> <span class="p">(</span><span class="o">!</span><span class="k">empty</span><span class="p">(</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'HTTP_X_FORWARDED_HOST'</span><span class="p">]))</span> <span class="o">||</span>
+     <span class="p">(</span><span class="o">!</span><span class="k">empty</span><span class="p">(</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'HTTP_X_FORWARDED_FOR'</span><span class="p">]))</span> <span class="p">)</span> <span class="p">{</span> 
+
+    <span class="c1">// http://wordpress.org/support/topic/wordpress-behind-reverse-proxy-1
+</span>    <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'HTTP_HOST'</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'HTTP_X_FORWARDED_HOST'</span><span class="p">];</span>
+
+    <span class="nb">define</span><span class="p">(</span><span class="s1">'WP_HOME'</span><span class="p">,</span> <span class="s1">'https://bob.org:8080/blog'</span><span class="p">);</span>
+    <span class="nb">define</span><span class="p">(</span><span class="s1">'WP_SITEURL'</span><span class="p">,</span> <span class="s1">'https://bob.org:8080/blog'</span><span class="p">);</span>
+
+    <span class="c1">// rewrite blog word with wordpress
+</span>    <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'REQUEST_URI'</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str_replace</span><span class="p">(</span><span class="s2">"wordpress"</span><span class="p">,</span> <span class="s2">"blog"</span><span class="p">,</span>
+    <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'REQUEST_URI'</span><span class="p">]);</span>
+
+    <span class="c1">// http://wordpress.org/support/topic/compatibility-with-wordpress-behind-a-reverse-proxy
+</span>    <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'HTTPS'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'on'</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>If you want to debug the former PHP code fragment you can print <code class="highlighter-rouge">$_SERVER</code> variables before and after configuration changing command inside the if block:</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">echo</span> <span class="s1">'&lt;br&gt;Before:'</span><span class="p">;</span>
+<span class="k">echo</span> <span class="s1">'&lt;br&gt;$_SERVER[\'HTTP_HOST\'] : '</span> <span class="o">.</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'HTTP_HOST'</span><span class="p">];</span>
+<span class="k">echo</span> <span class="s1">'&lt;br&gt;$_SERVER[\'HTTP_X_FORWARDED_HOST\']: '</span> <span class="o">.</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'HTTP_X_FORWARDED_HOST'</span><span class="p">];</span>
+<span class="k">echo</span> <span class="s1">'&lt;br&gt;$_SERVER[\'REQUEST_URI\']: '</span> <span class="o">.</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'REQUEST_URI'</span><span class="p">];</span>
+<span class="k">echo</span> <span class="s1">'&lt;br&gt;$_SERVER[\'HTTP_X_FORWARDED_SERVER\']: '</span> <span class="o">.</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'HTTP_X_FORWARDED_SERVER'</span><span class="p">];</span>
+<span class="k">echo</span> <span class="s1">'&lt;br&gt;$_SERVER[\'HTTP_X_FORWARDED_FOR\']: '</span> <span class="o">.</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'HTTP_X_FORWARDED_FOR'</span><span class="p">];</span>
+<span class="k">echo</span> <span class="s1">'&lt;br&gt;$_SERVER[\'HTTP_X_FORWARDED_FOR\']: '</span> <span class="o">.</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'HTTP_X_FORWARDED_FOR'</span><span class="p">];</span>
+<span class="k">echo</span> <span class="s1">'&lt;br&gt;$_SERVER[\'HTTPS\']: '</span> <span class="o">.</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'HTTPS'</span><span class="p">];</span>
+<span class="k">echo</span> <span class="s1">'&lt;br&gt;$_SERVER[\'REMOTE_ADDR\']: '</span> <span class="o">.</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'REMOTE_ADDR'</span><span class="p">];</span>    
+<span class="k">echo</span> <span class="s1">'&lt;br&gt;$_SERVER[\'SERVER_NAME\']: '</span> <span class="o">.</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'SERVER_NAME'</span><span class="p">];</span>
+<span class="k">echo</span> <span class="s1">'&lt;br&gt;$_SERVER[\'SERVER_PROTOCOL\']: '</span> <span class="o">.</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'SERVER_PROTOCOL'</span><span class="p">];</span>
+<span class="k">echo</span> <span class="s1">'&lt;br&gt;WP_HOME: '</span> <span class="o">.</span> <span class="nx">WP_HOME</span><span class="p">;</span>
+<span class="k">echo</span> <span class="s1">'&lt;br&gt;WP_SITEURL : '</span> <span class="o">.</span> <span class="nx">WP_SITEURL</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>I am exhausted, just writting it down! Be patient!</p>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+  
+
+
+  
+  
+  
+
+  <p class="page__taxonomy">
+    <strong><i class="fa fa-fw fa-tags" aria-hidden="true"></i> Tags: </strong>
+    <span itemprop="keywords">
+    
+      
+      
+      <a href="https://manios.org/tags/#apache" class="page__taxonomy-item" rel="tag">apache</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#blog" class="page__taxonomy-item" rel="tag">blog</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#http" class="page__taxonomy-item" rel="tag">http</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#https" class="page__taxonomy-item" rel="tag">https</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#nginx" class="page__taxonomy-item" rel="tag">nginx</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#port" class="page__taxonomy-item" rel="tag">port</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#proxy" class="page__taxonomy-item" rel="tag">proxy</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#reverse" class="page__taxonomy-item" rel="tag">reverse</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#wordpress" class="page__taxonomy-item" rel="tag">wordpress</a>
+    
+    </span>
+  </p>
+
+
+
+
+  
+
+
+  
+  
+  
+
+  <p class="page__taxonomy">
+    <strong><i class="fa fa-fw fa-folder-open" aria-hidden="true"></i> Categories: </strong>
+    <span itemprop="keywords">
+    
+      
+      
+      <a href="https://manios.org/categories/#linux" class="page__taxonomy-item" rel="tag">Linux</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/categories/#nginx" class="page__taxonomy-item" rel="tag">Nginx</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/categories/#server" class="page__taxonomy-item" rel="tag">Server</a>
+    
+    </span>
+  </p>
+
+
+        
+          <p class="page__date"><strong><i class="fa fa-fw fa-calendar" aria-hidden="true"></i> Updated:</strong> <time datetime="2014-04-12T16:32:52+02:00">April 12, 2014</time></p>
+        
+      </footer>
+
+      <section class="page__share">
+  
+    <h4 class="page__share-title">Share on</h4>
+  
+
+  <a href="https://twitter.com/intent/tweet?text=Nginx+https+reverse+proxy+to+Wordpress+with+Apache%2C+http+and+different+port%20https%3A%2F%2Fmanios.org%2F2014%2F04%2F12%2Fnginx-https-reverse-proxy-to-wordpress-with-apache-http-and-different-port" class="btn btn--twitter" title="Share on Twitter"><i class="fa fa-fw fa-twitter" aria-hidden="true"></i><span> Twitter</span></a>
+
+  <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fmanios.org%2F2014%2F04%2F12%2Fnginx-https-reverse-proxy-to-wordpress-with-apache-http-and-different-port" class="btn btn--facebook" title="Share on Facebook"><i class="fa fa-fw fa-facebook" aria-hidden="true"></i><span> Facebook</span></a>
+
+  <a href="https://plus.google.com/share?url=https%3A%2F%2Fmanios.org%2F2014%2F04%2F12%2Fnginx-https-reverse-proxy-to-wordpress-with-apache-http-and-different-port" class="btn btn--google-plus" title="Share on Google Plus"><i class="fa fa-fw fa-google-plus" aria-hidden="true"></i><span> Google+</span></a>
+
+  <a href="https://www.linkedin.com/shareArticle?mini=true&url=https%3A%2F%2Fmanios.org%2F2014%2F04%2F12%2Fnginx-https-reverse-proxy-to-wordpress-with-apache-http-and-different-port" class="btn btn--linkedin" title="Share on LinkedIn"><i class="fa fa-fw fa-linkedin" aria-hidden="true"></i><span> LinkedIn</span></a>
+</section>
+
+
+      
+  <nav class="pagination">
+    
+      <a href="https://manios.org/2014/04/12/export-untracked-modified-moved-and-deleted-files-from-a-git-repository-to-archive" class="pagination--pager" title="Export Untracked, modified, moved and deleted files from a Git repository to archive
+">Previous</a>
+    
+    
+      <a href="https://manios.org/2014/07/28/linux-extract-audio-and-video-using-ffmpeg" class="pagination--pager" title="Linux: Extract audio and video using ffmpeg
+">Next</a>
+    
+  </nav>
+
+    </div>
+
+    
+      <div class="page__comments">
+  
+  
+      <h4 class="page__comments-title">Leave a Comment</h4>
+      <section id="disqus_thread"></section>
+    
+</div>
+    
+  </article>
+
+  
+  
+    <div class="page__related">
+      <h4 class="page__related-title">You May Also Enjoy</h4>
+      <div class="grid__wrapper">
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="http://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="https://manios.org/2017/11/15/use-haproxy-and-docker-for-solr-load-balancing" rel="permalink">Use HAProxy and Docker to load balance requests to Solr and SolrCloud
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="fa fa-clock-o" aria-hidden="true"></i> 
+
+
+
+
+  2 minute read
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">We use Solr 4.6 with SolrCloud configuration in a production system. You may say: “It is hight time you upgraded to the latest version, isn’t it?”. And you w...</p>
+  </article>
+</div>
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="http://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="https://manios.org/2017/10/17/sublime-3-fix-greek-accented-characters" rel="permalink">SublimeText 3 Fix greek (and other languages) accented chars input
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="fa fa-clock-o" aria-hidden="true"></i> 
+
+
+
+
+  1 minute read
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Yesterday I installed SublimeText 3 editor (build 3143) in my PC and the first thing I realised was that I could not type any Greek accented characters. Thus...</p>
+  </article>
+</div>
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="http://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="https://manios.org/2017/08/09/configure-eclipse-in-order-to-build-mapstruct-in-java-projects" rel="permalink">Configure Eclipse in order to build MapStruct in Java projects
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="fa fa-clock-o" aria-hidden="true"></i> 
+
+
+
+
+  4 minute read
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Today I was working on a Java Spring MVC project which uses Maven. My editor was the Eclipse IDE, with the current version of the M2E plug-in. When I pulled ...</p>
+  </article>
+</div>
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="http://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="https://manios.org/2016/07/12/lets-encrypt-ssl-certificate-without-root-or-sudo-privileges" rel="permalink">Let’s Encrypt SSL certificate without root or sudo privileges
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="fa fa-clock-o" aria-hidden="true"></i> 
+
+
+
+
+  6 minute read
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Five days ago we had to renew a number of SSL certificates using free Let’s Encrypt SSL authority to a few Apache servers which were installed in Jelastic Pa...</p>
+  </article>
+</div>
+        
+      </div>
+    </div>
+  
+</div>
+
+
+	<!-- TODO add Google AdSense -->
+    <!--<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <div align="center" style="margin: 1em 0;">
+    <ins class="adsbygoogle"
+         style="display:block; border-bottom: initial;"
+         data-ad-client="ca-pub-7328585512091257"
+         data-ad-slot="3049671934"
+         data-ad-format="auto"></ins>
+    </div>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>-->
+
+    <div class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+      <li><strong>Follow:</strong></li>
+    
+    
+    
+    
+      <li><a href="http://github.com/manios"><i class="fa fa-fw fa-github" aria-hidden="true"></i> GitHub</a></li>
+    
+    
+    
+    <li><a href="https://manios.org/feed.xml"><i class="fa fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2017 Christos Manios. Powered by <a href="http://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="https://manios.org/assets/js/main.min.js"></script>
+
+
+
+
+
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-96500199-2', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+    
+  <script>
+    var disqus_config = function () {
+      this.page.url = "https://manios.org/2014/04/12/nginx-https-reverse-proxy-to-wordpress-with-apache-http-and-different-port";  // Replace PAGE_URL with your page's canonical URL variable
+      this.page.identifier = "/2014/04/12/nginx-https-reverse-proxy-to-wordpress-with-apache-http-and-different-port"; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+    (function() { // DON'T EDIT BELOW THIS LINE
+      var d = document, s = d.createElement('script');
+      s.src = 'https://manios.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  </script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+  
+
+
+
+  </body>
+</html>

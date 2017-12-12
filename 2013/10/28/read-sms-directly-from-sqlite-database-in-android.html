@@ -1,0 +1,758 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.2.2 by Michael Rose
+  Copyright 2017 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE.txt
+-->
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin SEO -->
+
+
+
+
+
+
+
+
+
+<title>Read SMS directly from Sqlite database in Android - cmanios</title>
+
+
+
+
+<meta name="description" content="Today I wanted to extract the SMS content out of the android SMS application SQLite database using ADB.">
+
+
+
+
+<meta name="author" content="cmanios">
+
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="cmanios">
+<meta property="og:title" content="Read SMS directly from Sqlite database in Android">
+
+
+  <link rel="canonical" href="https://manios.org/2013/10/28/read-sms-directly-from-sqlite-database-in-android">
+  <meta property="og:url" content="https://manios.org/2013/10/28/read-sms-directly-from-sqlite-database-in-android">
+
+
+
+  <meta property="og:description" content="Today I wanted to extract the SMS content out of the android SMS application SQLite database using ADB.">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+
+
+
+  <meta property="og:type" content="article">
+  <meta property="article:published_time" content="2013-10-28T23:22:48+02:00">
+
+
+
+
+
+
+
+
+  <script type="application/ld+json">
+    {
+      "@context" : "http://schema.org",
+      "@type" : "Person",
+      "name" : "Christos Manios",
+      "url" : "https://manios.org",
+      "sameAs" : null
+    }
+  </script>
+
+
+
+
+
+
+
+<!-- end SEO -->
+
+
+<link href="https://manios.org/feed.xml" type="application/atom+xml" rel="alternate" title="cmanios Feed">
+
+<!-- http://t.co/dKP3o1e -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="https://manios.org/assets/css/main.css">
+
+<!--[if lte IE 9]>
+  <style>
+    /* old IE unsupported flexbox fixes */
+    .greedy-nav .site-title {
+      padding-right: 3em;
+    }
+    .greedy-nav button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+    }
+  </style>
+<![endif]-->
+
+
+    <!-- start custom head snippets -->
+
+<!-- insert favicons. use http://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+  </head>
+
+  <body class="layout--single">
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+    <div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        <a class="site-title" href="https://manios.org/">cmanios</a>
+        <ul class="visible-links">
+          
+            
+            <li class="masthead__menu-item"><a href="https://manios.org/year-archive/">Posts archive</a></li>
+          
+            
+            <li class="masthead__menu-item"><a href="https://manios.org/categories/">Categories</a></li>
+          
+            
+            <li class="masthead__menu-item"><a href="https://manios.org/tags/">Tags</a></li>
+          
+            
+            <li class="masthead__menu-item"><a href="https://manios.org/about/">About</a></li>
+          
+        </ul>
+        <button type="button">
+          <span class="visually-hidden">Toggle Menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+    
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+<div itemscope itemtype="http://schema.org/Person">
+
+  
+
+  <div class="author__content">
+    <h3 class="author__name" itemprop="name">Christos Manios</h3>
+    
+      <p class="author__bio" itemprop="description">
+        Developer life is a NullPointerException
+      </p>
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+        <li itemprop="homeLocation" itemscope itemtype="http://schema.org/Place">
+          <i class="fa fa-fw fa-map-marker" aria-hidden="true"></i> <span itemprop="name">Thessaloniki, GR</span>
+        </li>
+      
+
+      
+
+      
+
+      
+
+      
+        <li>
+          <a href="https://twitter.com/maniosolr" itemprop="sameAs">
+            <i class="fa fa-fw fa-twitter-square" aria-hidden="true"></i> Twitter
+          </a>
+        </li>
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+        <li>
+          <a href="https://github.com/manios" itemprop="sameAs">
+            <i class="fa fa-fw fa-github" aria-hidden="true"></i> GitHub
+          </a>
+        </li>
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs">
+      <i class="fa fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+  <article class="page" itemscope itemtype="http://schema.org/CreativeWork">
+    <meta itemprop="headline" content="Read SMS directly from Sqlite database in Android">
+    <meta itemprop="description" content="Today I wanted to extract the SMS content out of the android SMS application SQLite database using ADB.">
+    <meta itemprop="datePublished" content="October 28, 2013">
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 class="page__title" itemprop="headline">Read SMS directly from Sqlite database in Android
+</h1>
+          
+            <p class="page__meta"><i class="fa fa-clock-o" aria-hidden="true"></i> 
+
+
+
+
+  3 minute read
+</p>
+          
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+        <p>Today I wanted to extract the SMS content out of the android SMS application SQLite database using <a href="http://www.google.gr/url?sa=t&amp;rct=j&amp;q=&amp;esrc=s&amp;source=web&amp;cd=1&amp;cad=rja&amp;ved=0CCkQFjAA&amp;url=http%3A%2F%2Fdeveloper.android.com%2Ftools%2Fhelp%2Fadb.html&amp;ei=acRuUo2bKYue0wXG0YDICA&amp;usg=AFQjCNEjP4a62JACRkJEaSn0Qu3dlk8fnQ&amp;bvm=bv.55123115,d.d2k">ADB</a>.</p>
+
+<p><strong>NOTE:</strong> The whole procedure was tested on a rooted phone running <a href="http://www.cyanogenmod.org/">Cyanogenmod</a> Android. It may not work on unrooted phones</p>
+
+<p>So I achieved that , using the following steps:</p>
+
+<ol>
+  <li>Find SMS database file location</li>
+  <li><a href="adb_pull_sms_database">Pull SQLite database file with ADB</a></li>
+  <li>Identify sms tables</li>
+  <li>Identify the thread _ID of the SMS you want to read</li>
+  <li>Find all sms messages for a specific thread id</li>
+</ol>
+
+<p>In detail:</p>
+
+<h3 id="1-find-sms-database-file-location">1. Find SMS database file location</h3>
+
+<p>After some searching I found that the location of sms database file is in</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/data/data/com.android.providers.telephony/databases/mmssms.db
+</code></pre></div></div>
+
+<h3 id="2-pull-sqlite-database-file-with-adb">2. Pull SQLite database file with ADB</h3>
+
+<p>This step is optional. Open a shell and type:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>adb pull /data/data/com.android.providers.telephony/databases/mmssms.db mmssms.db
+</code></pre></div></div>
+
+<p>Now the whole sms database is copied locally in your working directory!</p>
+
+<h3 id="3-identify-sms-tables">3. Identify sms tables</h3>
+
+<p>Open the SQLite using command line or your favourite SQLite editor. The tables in which the android telephony application stores SMS messages are threads and sms.
+Table <strong>Threads</strong> stores a record as a header for every SMS thread which is started:</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">threads</span> <span class="p">(</span>
+   <span class="n">_id</span> <span class="n">INTEGER</span> <span class="k">PRIMARY</span> <span class="k">KEY</span> <span class="n">AUTOINCREMENT</span><span class="p">,</span>
+   <span class="n">date</span> <span class="n">INTEGER</span> <span class="k">DEFAULT</span> <span class="mi">0</span><span class="p">,</span><span class="n">message_count</span> <span class="n">INTEGER</span> <span class="k">DEFAULT</span> <span class="mi">0</span><span class="p">,</span>
+   <span class="n">recipient_ids</span> <span class="n">TEXT</span><span class="p">,</span><span class="n">snippet</span> <span class="n">TEXT</span><span class="p">,</span>
+   <span class="n">snippet_cs</span> <span class="n">INTEGER</span> <span class="k">DEFAULT</span> <span class="mi">0</span><span class="p">,</span>
+   <span class="k">read</span> <span class="n">INTEGER</span> <span class="k">DEFAULT</span> <span class="mi">1</span><span class="p">,</span>
+   <span class="k">type</span> <span class="n">INTEGER</span> <span class="k">DEFAULT</span> <span class="mi">0</span><span class="p">,</span>
+   <span class="n">error</span> <span class="n">INTEGER</span> <span class="k">DEFAULT</span> <span class="mi">0</span><span class="p">,</span>
+   <span class="n">has_attachment</span> <span class="n">INTEGER</span> <span class="k">DEFAULT</span> <span class="mi">0</span>
+<span class="p">)</span>
+</code></pre></div></div>
+
+<p>Table <strong>SMS</strong> stores all outgoing and incoming messages for every thread:</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">sms</span> <span class="p">(</span><span class="n">_id</span> <span class="n">INTEGER</span> <span class="k">PRIMARY</span> <span class="k">KEY</span><span class="p">,</span>
+   <span class="n">thread_id</span> <span class="n">INTEGER</span><span class="p">,</span>
+   <span class="n">address</span> <span class="n">TEXT</span><span class="p">,</span>
+   <span class="n">person</span> <span class="n">INTEGER</span><span class="p">,</span>
+   <span class="n">date</span> <span class="n">INTEGER</span><span class="p">,</span>
+   <span class="n">date_sent</span> <span class="n">INTEGER</span> <span class="k">DEFAULT</span> <span class="mi">0</span><span class="p">,</span>
+   <span class="n">protocol</span> <span class="n">INTEGER</span><span class="p">,</span>
+   <span class="k">read</span> <span class="n">INTEGER</span> <span class="k">DEFAULT</span> <span class="mi">0</span><span class="p">,</span>
+   <span class="n">status</span> <span class="n">INTEGER</span> <span class="k">DEFAULT</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+   <span class="k">type</span> <span class="n">INTEGER</span><span class="p">,</span>
+   <span class="n">reply_path_present</span> <span class="n">INTEGER</span><span class="p">,</span>
+   <span class="n">subject</span> <span class="n">TEXT</span><span class="p">,</span>
+   <span class="n">body</span> <span class="n">TEXT</span><span class="p">,</span>
+   <span class="n">service_center</span> <span class="n">TEXT</span><span class="p">,</span>
+   <span class="n">locked</span> <span class="n">INTEGER</span> <span class="k">DEFAULT</span> <span class="mi">0</span><span class="p">,</span>
+   <span class="n">error_code</span> <span class="n">INTEGER</span> <span class="k">DEFAULT</span> <span class="mi">0</span><span class="p">,</span>
+   <span class="n">seen</span> <span class="n">INTEGER</span> <span class="k">DEFAULT</span> <span class="mi">0</span>
+<span class="p">)</span>
+</code></pre></div></div>
+
+<h3 id="4-identify-the-thread-_id-of-the-sms-you-want-to-read">4. Identify the thread _ID of the SMS you want to read</h3>
+
+<p>Run a SQL query and read <strong>snippet</strong> column. This column stores the last sms in your thread and is the visible text of every SMS list item when you open the SMS application.</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">SELECT</span> <span class="n">_id</span><span class="p">,</span> <span class="n">snippet</span>
+<span class="k">FROM</span> <span class="n">threads</span><span class="p">;</span>
+</code></pre></div></div>
+
+<h3 id="5-find-all-sms-messages-for-a-specific-thread-id">5. Find all sms messages for a specific thread id</h3>
+
+<p>In my case the thread _id had the value 310. Knowing this id we run another query on <strong>sms</strong> table in order to get SMS messages ordered chronologically by date:</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">SELECT</span> 	<span class="n">datetime</span><span class="p">(</span><span class="n">date</span><span class="o">/</span><span class="mi">1000</span><span class="p">,</span> <span class="s1">'unixepoch'</span><span class="p">,</span><span class="s1">'localtime'</span><span class="p">)</span>  <span class="p">,</span><span class="n">datetime</span><span class="p">(</span><span class="n">date_sent</span><span class="o">/</span><span class="mi">1000</span><span class="p">,</span> <span class="s1">'unixepoch'</span><span class="p">,</span><span class="s1">'localtime'</span><span class="p">)</span> <span class="p">,</span><span class="n">person</span><span class="p">,</span><span class="n">body</span>
+<span class="k">FROM</span> <span class="n">sms</span>
+<span class="k">WHERE</span> <span class="n">thread_id</span> <span class="o">=</span> <span class="mi">310</span>
+<span class="k">ORDER</span> <span class="k">BY</span> <span class="n">date</span>
+</code></pre></div></div>
+
+<p>The results are going to be similar to the following:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>+-----------------------------------------------------------------------------------------------------------------+
+| date                | date_sent             | person    |  body						  |
+|------------------------------------------------------------------------------------------------------------------
+| 2013-10-20 13:48:18 | 2013-10-20 13:48:16   |	  54	  | Hello Christos! How are you?			  |
+| 2013-10-20 16:34:03 | 1970-01-01 02:00:00   | 	  | Fine, thanks ! I configure the left MFD of a F-16 jet |
+| 2013-10-20 16:40:02 | 2013-10-20 16:40:01   |	  54	  | Awesome! I am throwing a party tomorrow at 21:45!	  |
+| 2013-10-20 17:15:15 | 1970-01-01 02:00:00   |		  | Thanks! I will be there!				  |
++-----------------------------------------------------------------------------------------------------------------+
+</code></pre></div></div>
+
+<p>Note that person with id 54 is my friend Kitsos and person = NULL is me!</p>
+
+<p>Good luck tampering and hacking with your Android device !</p>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+  
+
+
+  
+  
+  
+
+  <p class="page__taxonomy">
+    <strong><i class="fa fa-fw fa-tags" aria-hidden="true"></i> Tags: </strong>
+    <span itemprop="keywords">
+    
+      
+      
+      <a href="https://manios.org/tags/#adb" class="page__taxonomy-item" rel="tag">adb</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#android" class="page__taxonomy-item" rel="tag">android</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#cyanogenmod" class="page__taxonomy-item" rel="tag">cyanogenmod</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#database" class="page__taxonomy-item" rel="tag">database</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#file" class="page__taxonomy-item" rel="tag">file</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#linux" class="page__taxonomy-item" rel="tag">linux</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#location" class="page__taxonomy-item" rel="tag">location</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#root" class="page__taxonomy-item" rel="tag">root</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#shell" class="page__taxonomy-item" rel="tag">shell</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#sms" class="page__taxonomy-item" rel="tag">sms</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#sqlite" class="page__taxonomy-item" rel="tag">sqlite</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#telephony" class="page__taxonomy-item" rel="tag">telephony</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#thread" class="page__taxonomy-item" rel="tag">thread</a>
+    
+    </span>
+  </p>
+
+
+
+
+  
+
+
+  
+  
+  
+
+  <p class="page__taxonomy">
+    <strong><i class="fa fa-fw fa-folder-open" aria-hidden="true"></i> Categories: </strong>
+    <span itemprop="keywords">
+    
+      
+      
+      <a href="https://manios.org/categories/#android" class="page__taxonomy-item" rel="tag">Android</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/categories/#databases" class="page__taxonomy-item" rel="tag">Databases</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/categories/#linux" class="page__taxonomy-item" rel="tag">Linux</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/categories/#sqlite" class="page__taxonomy-item" rel="tag">SQLite</a>
+    
+    </span>
+  </p>
+
+
+        
+          <p class="page__date"><strong><i class="fa fa-fw fa-calendar" aria-hidden="true"></i> Updated:</strong> <time datetime="2013-10-28T23:22:48+02:00">October 28, 2013</time></p>
+        
+      </footer>
+
+      <section class="page__share">
+  
+    <h4 class="page__share-title">Share on</h4>
+  
+
+  <a href="https://twitter.com/intent/tweet?text=Read+SMS+directly+from+Sqlite+database+in+Android%20https%3A%2F%2Fmanios.org%2F2013%2F10%2F28%2Fread-sms-directly-from-sqlite-database-in-android" class="btn btn--twitter" title="Share on Twitter"><i class="fa fa-fw fa-twitter" aria-hidden="true"></i><span> Twitter</span></a>
+
+  <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fmanios.org%2F2013%2F10%2F28%2Fread-sms-directly-from-sqlite-database-in-android" class="btn btn--facebook" title="Share on Facebook"><i class="fa fa-fw fa-facebook" aria-hidden="true"></i><span> Facebook</span></a>
+
+  <a href="https://plus.google.com/share?url=https%3A%2F%2Fmanios.org%2F2013%2F10%2F28%2Fread-sms-directly-from-sqlite-database-in-android" class="btn btn--google-plus" title="Share on Google Plus"><i class="fa fa-fw fa-google-plus" aria-hidden="true"></i><span> Google+</span></a>
+
+  <a href="https://www.linkedin.com/shareArticle?mini=true&url=https%3A%2F%2Fmanios.org%2F2013%2F10%2F28%2Fread-sms-directly-from-sqlite-database-in-android" class="btn btn--linkedin" title="Share on LinkedIn"><i class="fa fa-fw fa-linkedin" aria-hidden="true"></i><span> LinkedIn</span></a>
+</section>
+
+
+      
+  <nav class="pagination">
+    
+      <a href="https://manios.org/2013/08/13/linux-get-hard-disk-statistics-using-python" class="pagination--pager" title="Linux get hard disk statistics using Python
+">Previous</a>
+    
+    
+      <a href="https://manios.org/2013/12/31/remove-special-and-control-characters-from-string-using-python" class="pagination--pager" title="Remove special and control characters from string using Python
+">Next</a>
+    
+  </nav>
+
+    </div>
+
+    
+      <div class="page__comments">
+  
+  
+      <h4 class="page__comments-title">Leave a Comment</h4>
+      <section id="disqus_thread"></section>
+    
+</div>
+    
+  </article>
+
+  
+  
+    <div class="page__related">
+      <h4 class="page__related-title">You May Also Enjoy</h4>
+      <div class="grid__wrapper">
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="http://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="https://manios.org/2017/11/15/use-haproxy-and-docker-for-solr-load-balancing" rel="permalink">Use HAProxy and Docker to load balance requests to Solr and SolrCloud
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="fa fa-clock-o" aria-hidden="true"></i> 
+
+
+
+
+  2 minute read
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">We use Solr 4.6 with SolrCloud configuration in a production system. You may say: “It is hight time you upgraded to the latest version, isn’t it?”. And you w...</p>
+  </article>
+</div>
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="http://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="https://manios.org/2017/10/17/sublime-3-fix-greek-accented-characters" rel="permalink">SublimeText 3 Fix greek (and other languages) accented chars input
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="fa fa-clock-o" aria-hidden="true"></i> 
+
+
+
+
+  1 minute read
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Yesterday I installed SublimeText 3 editor (build 3143) in my PC and the first thing I realised was that I could not type any Greek accented characters. Thus...</p>
+  </article>
+</div>
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="http://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="https://manios.org/2017/08/09/configure-eclipse-in-order-to-build-mapstruct-in-java-projects" rel="permalink">Configure Eclipse in order to build MapStruct in Java projects
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="fa fa-clock-o" aria-hidden="true"></i> 
+
+
+
+
+  4 minute read
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Today I was working on a Java Spring MVC project which uses Maven. My editor was the Eclipse IDE, with the current version of the M2E plug-in. When I pulled ...</p>
+  </article>
+</div>
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="http://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="https://manios.org/2016/07/12/lets-encrypt-ssl-certificate-without-root-or-sudo-privileges" rel="permalink">Let’s Encrypt SSL certificate without root or sudo privileges
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="fa fa-clock-o" aria-hidden="true"></i> 
+
+
+
+
+  6 minute read
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Five days ago we had to renew a number of SSL certificates using free Let’s Encrypt SSL authority to a few Apache servers which were installed in Jelastic Pa...</p>
+  </article>
+</div>
+        
+      </div>
+    </div>
+  
+</div>
+
+
+	<!-- TODO add Google AdSense -->
+    <!--<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <div align="center" style="margin: 1em 0;">
+    <ins class="adsbygoogle"
+         style="display:block; border-bottom: initial;"
+         data-ad-client="ca-pub-7328585512091257"
+         data-ad-slot="3049671934"
+         data-ad-format="auto"></ins>
+    </div>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>-->
+
+    <div class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+      <li><strong>Follow:</strong></li>
+    
+    
+    
+    
+      <li><a href="http://github.com/manios"><i class="fa fa-fw fa-github" aria-hidden="true"></i> GitHub</a></li>
+    
+    
+    
+    <li><a href="https://manios.org/feed.xml"><i class="fa fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2017 Christos Manios. Powered by <a href="http://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="https://manios.org/assets/js/main.min.js"></script>
+
+
+
+
+
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-96500199-2', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+    
+  <script>
+    var disqus_config = function () {
+      this.page.url = "https://manios.org/2013/10/28/read-sms-directly-from-sqlite-database-in-android";  // Replace PAGE_URL with your page's canonical URL variable
+      this.page.identifier = "/2013/10/28/read-sms-directly-from-sqlite-database-in-android"; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+    (function() { // DON'T EDIT BELOW THIS LINE
+      var d = document, s = d.createElement('script');
+      s.src = 'https://manios.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  </script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+  
+
+
+
+  </body>
+</html>

@@ -1,0 +1,705 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.2.2 by Michael Rose
+  Copyright 2017 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE.txt
+-->
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin SEO -->
+
+
+
+
+
+
+
+
+
+<title>Use HAProxy and Docker to load balance requests to Solr and SolrCloud - cmanios</title>
+
+
+
+
+<meta name="description" content="We use Solr 4.6 with SolrCloud configuration in a production system. You may say: “It is hight time you upgraded to the latest version, isn’t it?”. And you will be absolute right! But currently this is not the case because full reindexing costs! Our SolrCloud consists of one shard and five replicas as seen in the screenshot bellow:">
+
+
+
+
+<meta name="author" content="cmanios">
+
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="cmanios">
+<meta property="og:title" content="Use HAProxy and Docker to load balance requests to Solr and SolrCloud">
+
+
+  <link rel="canonical" href="https://manios.org/2017/11/15/use-haproxy-and-docker-for-solr-load-balancing">
+  <meta property="og:url" content="https://manios.org/2017/11/15/use-haproxy-and-docker-for-solr-load-balancing">
+
+
+
+  <meta property="og:description" content="We use Solr 4.6 with SolrCloud configuration in a production system. You may say: “It is hight time you upgraded to the latest version, isn’t it?”. And you will be absolute right! But currently this is not the case because full reindexing costs! Our SolrCloud consists of one shard and five replicas as seen in the screenshot bellow:">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+
+
+
+  <meta property="og:type" content="article">
+  <meta property="article:published_time" content="2017-11-15T12:14:00+02:00">
+
+
+
+
+
+
+
+
+  <script type="application/ld+json">
+    {
+      "@context" : "http://schema.org",
+      "@type" : "Person",
+      "name" : "Christos Manios",
+      "url" : "https://manios.org",
+      "sameAs" : null
+    }
+  </script>
+
+
+
+
+
+
+
+<!-- end SEO -->
+
+
+<link href="https://manios.org/feed.xml" type="application/atom+xml" rel="alternate" title="cmanios Feed">
+
+<!-- http://t.co/dKP3o1e -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="https://manios.org/assets/css/main.css">
+
+<!--[if lte IE 9]>
+  <style>
+    /* old IE unsupported flexbox fixes */
+    .greedy-nav .site-title {
+      padding-right: 3em;
+    }
+    .greedy-nav button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+    }
+  </style>
+<![endif]-->
+
+
+    <!-- start custom head snippets -->
+
+<!-- insert favicons. use http://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+  </head>
+
+  <body class="layout--single">
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+    <div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        <a class="site-title" href="https://manios.org/">cmanios</a>
+        <ul class="visible-links">
+          
+            
+            <li class="masthead__menu-item"><a href="https://manios.org/year-archive/">Posts archive</a></li>
+          
+            
+            <li class="masthead__menu-item"><a href="https://manios.org/categories/">Categories</a></li>
+          
+            
+            <li class="masthead__menu-item"><a href="https://manios.org/tags/">Tags</a></li>
+          
+            
+            <li class="masthead__menu-item"><a href="https://manios.org/about/">About</a></li>
+          
+        </ul>
+        <button type="button">
+          <span class="visually-hidden">Toggle Menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+    
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+<div itemscope itemtype="http://schema.org/Person">
+
+  
+
+  <div class="author__content">
+    <h3 class="author__name" itemprop="name">Christos Manios</h3>
+    
+      <p class="author__bio" itemprop="description">
+        Developer life is a NullPointerException
+      </p>
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+        <li itemprop="homeLocation" itemscope itemtype="http://schema.org/Place">
+          <i class="fa fa-fw fa-map-marker" aria-hidden="true"></i> <span itemprop="name">Thessaloniki, GR</span>
+        </li>
+      
+
+      
+
+      
+
+      
+
+      
+        <li>
+          <a href="https://twitter.com/maniosolr" itemprop="sameAs">
+            <i class="fa fa-fw fa-twitter-square" aria-hidden="true"></i> Twitter
+          </a>
+        </li>
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+        <li>
+          <a href="https://github.com/manios" itemprop="sameAs">
+            <i class="fa fa-fw fa-github" aria-hidden="true"></i> GitHub
+          </a>
+        </li>
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs">
+      <i class="fa fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+  <article class="page" itemscope itemtype="http://schema.org/CreativeWork">
+    <meta itemprop="headline" content="Use HAProxy and Docker to load balance requests to Solr and SolrCloud">
+    <meta itemprop="description" content="We use Solr 4.6 with SolrCloud configuration in a production system. You may say: “It is hight time you upgraded to the latest version, isn’t it?”. And you will be absolute right! But currently this is not the case because full reindexing costs! Our SolrCloud consists of one shard and five replicas as seen in the screenshot bellow:">
+    <meta itemprop="datePublished" content="November 15, 2017">
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 class="page__title" itemprop="headline">Use HAProxy and Docker to load balance requests to Solr and SolrCloud
+</h1>
+          
+            <p class="page__meta"><i class="fa fa-clock-o" aria-hidden="true"></i> 
+
+
+
+
+  2 minute read
+</p>
+          
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+        <p>We use Solr 4.6 with SolrCloud configuration in a production system. You may say: “It is hight time you upgraded to the latest version, isn’t it?”. And you will be absolute right! But currently this is not the case because full reindexing costs! Our SolrCloud consists of one shard and five replicas as seen in the screenshot bellow:</p>
+
+<figure>
+    <a href="/images/2017-11-15-haproxy-docker-and-solr/2017-11-15-solrcloud.png"><img src="/images/2017-11-15-haproxy-docker-and-solr/2017-11-15-solrcloud.png" alt="SolrCloud with one shard and five replicas" /></a>
+</figure>
+
+<p>The problem we were facing was that SolrJ library does balance the requests using round robin algorithm when using class <a href="https://lucene.apache.org/solr/4_6_0/solr-solrj/org/apache/solr/client/solrj/impl/LBHttpSolrServer.html">LBHttpSolrServer</a>. Furthermore, when a request to a node fails for any reason (timeout, http 403, http 404, etc), it <a href="http://grepcode.com/file/repo1.maven.org/maven2/org.apache.solr/solr-solrj/4.6.0/org/apache/solr/client/solrj/impl/LBHttpSolrServer.java?av=f#265">puts the node to a zombie list</a> for 60 seconds. This can become a burden when the SolrCloud has heavy loads and you will start to see in your application logs:</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Exception in thread "main" org.apache.solr.client.solrj.SolrServerException: No live SolrServers available to handle this request
+	at org.apache.solr.client.solrj.impl.LBHttpSolrServer.request(LBHttpSolrServer.java:289)
+	at org.apache.solr.client.solrj.impl.CloudSolrServer.request(CloudSolrServer.java:310)
+	at org.apache.solr.client.solrj.request.AbstractUpdateRequest.process(AbstractUpdateRequest.java:117)
+	at org.apache.solr.client.solrj.SolrServer.add(SolrServer.java:116)
+	at org.apache.solr.client.solrj.SolrServer.add(SolrServer.java:102)
+</code></pre></div></div>
+
+<p>So we decided to put a HAProxy instance to load balance the query requests to the SolrCloud using <code class="highlighter-rouge">leastconn</code> (least connections) algorithm. After a lot of search and using a combination of <a href="http://cbonte.github.io/haproxy-dconv/1.7/configuration.html">official documentation</a> and articles (<a href="http://davehall.com.au/blog/dave/2010/03/13/solr-replication-load-balancing-haproxy-and-drupal">link1</a>, <a href="https://gist.github.com/feniix/1974460">link2</a>) and the official HAProxy <a href="https://hub.docker.com/_/haproxy/">Docker image</a> we created a container using the following configuration:</p>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">global</span>
+    <span class="s">log</span> <span class="mi">127</span><span class="s">.0.0.1</span> <span class="s">local0</span> <span class="s">notice</span>
+    <span class="s">maxconn</span> <span class="mi">2000</span>
+    <span class="c1">#user haproxy
+</span>    <span class="c1">#group haproxy
+</span>
+<span class="s">defaults</span>
+    <span class="s">log</span>     <span class="s">global</span>
+    <span class="s">mode</span>    <span class="s">http</span>
+    <span class="s">option</span>  <span class="s">httplog</span>
+    <span class="s">option</span>  <span class="s">dontlognull</span>
+    <span class="s">retries</span> <span class="mi">3</span>
+    <span class="s">timeout</span> <span class="s">connect</span>  <span class="mi">5000</span>
+    <span class="s">timeout</span> <span class="s">client</span>  <span class="mi">10000</span>
+    <span class="s">timeout</span> <span class="s">server</span>  <span class="mi">10000</span>
+
+<span class="s">listen</span> <span class="s">solrcloud</span>
+    <span class="s">bind</span> <span class="nf">0.0.0.0</span><span class="p">:</span><span class="mi">8983</span>
+    <span class="s">mode</span> <span class="s">http</span>
+    <span class="s">stats</span> <span class="s">enable</span>
+    <span class="s">stats</span> <span class="s">uri</span> <span class="n">/haproxy?stats</span>
+    <span class="s">stats</span> <span class="s">realm</span> <span class="s">Strictly</span><span class="err">\</span> <span class="s">Private</span>
+    <span class="s">stats</span> <span class="s">auth</span> <span class="s">haproxyuser:haproxypassword</span>
+    <span class="s">balance</span> <span class="s">leastconn</span>
+    <span class="s">option</span> <span class="s">httpclose</span>
+    <span class="s">option</span> <span class="s">forwardfor</span>
+    <span class="s">option</span> <span class="s">httpchk</span> <span class="s">GET</span> <span class="n">/solr/paradise-papers/admin/ping?wt=json</span>
+    <span class="s">server</span> <span class="s">search1</span> <span class="nf">192.168.1.1</span><span class="p">:</span><span class="mi">8983</span> <span class="s">check</span> <span class="s">port</span> <span class="mi">8983</span> <span class="s">inter</span> <span class="s">20s</span> <span class="s">fastinter</span> <span class="s">2s</span>
+    <span class="s">server</span> <span class="s">search2</span> <span class="nf">192.168.1.2</span><span class="p">:</span><span class="mi">8983</span> <span class="s">check</span> <span class="s">port</span> <span class="mi">8983</span> <span class="s">inter</span> <span class="s">20s</span> <span class="s">fastinter</span> <span class="s">2s</span>
+    <span class="s">server</span> <span class="s">search3</span> <span class="nf">192.168.1.3</span><span class="p">:</span><span class="mi">8983</span> <span class="s">check</span> <span class="s">port</span> <span class="mi">8983</span> <span class="s">inter</span> <span class="s">20s</span> <span class="s">fastinter</span> <span class="s">2s</span>
+    <span class="s">server</span> <span class="s">search4</span> <span class="nf">192.168.1.4</span><span class="p">:</span><span class="mi">8983</span> <span class="s">check</span> <span class="s">port</span> <span class="mi">8983</span> <span class="s">inter</span> <span class="s">20s</span> <span class="s">fastinter</span> <span class="s">2s</span>
+    <span class="s">server</span> <span class="s">search5</span> <span class="nf">192.168.1.5</span><span class="p">:</span><span class="mi">8983</span> <span class="s">check</span> <span class="s">port</span> <span class="mi">8983</span> <span class="s">inter</span> <span class="s">20s</span> <span class="s">fastinter</span> <span class="s">2s</span>
+</code></pre></div></div>
+
+<h3 id="notes-on-configuration">Notes on configuration:</h3>
+
+<ul>
+  <li>Our HAProxy runs in <code class="highlighter-rouge">192.168.1.10</code> and all the queries are handled by port <code class="highlighter-rouge">8983</code>.</li>
+  <li>We can see statistics about the distribution of requests using HAProxy statistics page which is accessible in <a href="http://192.168.1.10:8983/haproxy?stats">http://192.168.1.10:8983/haproxy?stats</a>. See:
+    <div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="k">stats</span> <span class="s">uri</span> <span class="n">/haproxy?stats</span>
+  <span class="s">stats</span> <span class="s">realm</span> <span class="s">Strictly</span><span class="err">\</span> <span class="s">Private</span>
+  <span class="s">stats</span> <span class="s">auth</span> <span class="s">haproxyuser:haproxypassword</span>
+</code></pre></div>    </div>
+  </li>
+  <li>We check if every Solr node is alive by pinging it (see: <code class="highlighter-rouge">option httpchk GET /solr/paradise-papers/admin/ping?wt=json</code>)</li>
+  <li>Check interval is 20 seconds (see: <code class="highlighter-rouge">inter 20s</code>)</li>
+</ul>
+
+<p>Now our search queries are handled better and we have already noticed an increase in query performance, faster response times and no downtime! This is a sample output from HAProxy statistics page:</p>
+
+<figure>
+    <a href="/images/2017-11-15-haproxy-docker-and-solr/2017-11-15-haproxy-stats.png"><img src="/images/2017-11-15-haproxy-docker-and-solr/2017-11-15-haproxy-stats.png" alt="HAProxy as a load balancer to Solr and SolrCloud with one shard and five replicas using leastconn algorithn" /></a>
+</figure>
+
+<p>We hope you find this article helpful!</p>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+  
+
+
+  
+  
+  
+
+  <p class="page__taxonomy">
+    <strong><i class="fa fa-fw fa-tags" aria-hidden="true"></i> Tags: </strong>
+    <span itemprop="keywords">
+    
+      
+      
+      <a href="https://manios.org/tags/#balancing" class="page__taxonomy-item" rel="tag">balancing</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#docker" class="page__taxonomy-item" rel="tag">docker</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#haproxy" class="page__taxonomy-item" rel="tag">haproxy</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#install" class="page__taxonomy-item" rel="tag">install</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#linux" class="page__taxonomy-item" rel="tag">linux</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#load" class="page__taxonomy-item" rel="tag">load</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#solr" class="page__taxonomy-item" rel="tag">solr</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#solrcloud" class="page__taxonomy-item" rel="tag">solrcloud</a>
+    
+    </span>
+  </p>
+
+
+
+
+  
+
+
+  
+  
+  
+
+  <p class="page__taxonomy">
+    <strong><i class="fa fa-fw fa-folder-open" aria-hidden="true"></i> Categories: </strong>
+    <span itemprop="keywords">
+    
+      
+      
+      <a href="https://manios.org/categories/#haproxy" class="page__taxonomy-item" rel="tag">HAProxy</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/categories/#linux" class="page__taxonomy-item" rel="tag">Linux</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/categories/#solr" class="page__taxonomy-item" rel="tag">Solr</a>
+    
+    </span>
+  </p>
+
+
+        
+          <p class="page__date"><strong><i class="fa fa-fw fa-calendar" aria-hidden="true"></i> Updated:</strong> <time datetime="2017-11-15T12:14:00+02:00">November 15, 2017</time></p>
+        
+      </footer>
+
+      <section class="page__share">
+  
+    <h4 class="page__share-title">Share on</h4>
+  
+
+  <a href="https://twitter.com/intent/tweet?text=Use+HAProxy+and+Docker+to+load+balance+requests+to+Solr+and+SolrCloud%20https%3A%2F%2Fmanios.org%2F2017%2F11%2F15%2Fuse-haproxy-and-docker-for-solr-load-balancing" class="btn btn--twitter" title="Share on Twitter"><i class="fa fa-fw fa-twitter" aria-hidden="true"></i><span> Twitter</span></a>
+
+  <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fmanios.org%2F2017%2F11%2F15%2Fuse-haproxy-and-docker-for-solr-load-balancing" class="btn btn--facebook" title="Share on Facebook"><i class="fa fa-fw fa-facebook" aria-hidden="true"></i><span> Facebook</span></a>
+
+  <a href="https://plus.google.com/share?url=https%3A%2F%2Fmanios.org%2F2017%2F11%2F15%2Fuse-haproxy-and-docker-for-solr-load-balancing" class="btn btn--google-plus" title="Share on Google Plus"><i class="fa fa-fw fa-google-plus" aria-hidden="true"></i><span> Google+</span></a>
+
+  <a href="https://www.linkedin.com/shareArticle?mini=true&url=https%3A%2F%2Fmanios.org%2F2017%2F11%2F15%2Fuse-haproxy-and-docker-for-solr-load-balancing" class="btn btn--linkedin" title="Share on LinkedIn"><i class="fa fa-fw fa-linkedin" aria-hidden="true"></i><span> LinkedIn</span></a>
+</section>
+
+
+      
+  <nav class="pagination">
+    
+      <a href="https://manios.org/2017/10/17/sublime-3-fix-greek-accented-characters" class="pagination--pager" title="SublimeText 3 Fix greek (and other languages) accented chars input
+">Previous</a>
+    
+    
+      <a href="#" class="pagination--pager disabled">Next</a>
+    
+  </nav>
+
+    </div>
+
+    
+      <div class="page__comments">
+  
+  
+      <h4 class="page__comments-title">Leave a Comment</h4>
+      <section id="disqus_thread"></section>
+    
+</div>
+    
+  </article>
+
+  
+  
+    <div class="page__related">
+      <h4 class="page__related-title">You May Also Enjoy</h4>
+      <div class="grid__wrapper">
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="http://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="https://manios.org/2017/10/17/sublime-3-fix-greek-accented-characters" rel="permalink">SublimeText 3 Fix greek (and other languages) accented chars input
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="fa fa-clock-o" aria-hidden="true"></i> 
+
+
+
+
+  1 minute read
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Yesterday I installed SublimeText 3 editor (build 3143) in my PC and the first thing I realised was that I could not type any Greek accented characters. Thus...</p>
+  </article>
+</div>
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="http://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="https://manios.org/2017/08/09/configure-eclipse-in-order-to-build-mapstruct-in-java-projects" rel="permalink">Configure Eclipse in order to build MapStruct in Java projects
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="fa fa-clock-o" aria-hidden="true"></i> 
+
+
+
+
+  4 minute read
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Today I was working on a Java Spring MVC project which uses Maven. My editor was the Eclipse IDE, with the current version of the M2E plug-in. When I pulled ...</p>
+  </article>
+</div>
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="http://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="https://manios.org/2016/07/12/lets-encrypt-ssl-certificate-without-root-or-sudo-privileges" rel="permalink">Let’s Encrypt SSL certificate without root or sudo privileges
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="fa fa-clock-o" aria-hidden="true"></i> 
+
+
+
+
+  6 minute read
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Five days ago we had to renew a number of SSL certificates using free Let’s Encrypt SSL authority to a few Apache servers which were installed in Jelastic Pa...</p>
+  </article>
+</div>
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="http://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="https://manios.org/2015/12/04/migrate-a-gitlab-docker-container-from-version-8-0-4-to-8-2-0" rel="permalink">Migrate a Gitlab Docker container from version 8.0.4 to 8.2.0
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="fa fa-clock-o" aria-hidden="true"></i> 
+
+
+
+
+  4 minute read
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Update 2016-05-13: The following procedure works perfectly for migrations from version 8.0.4 to 8.7.5
+
+</p>
+  </article>
+</div>
+        
+      </div>
+    </div>
+  
+  
+</div>
+
+
+	<!-- TODO add Google AdSense -->
+    <!--<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <div align="center" style="margin: 1em 0;">
+    <ins class="adsbygoogle"
+         style="display:block; border-bottom: initial;"
+         data-ad-client="ca-pub-7328585512091257"
+         data-ad-slot="3049671934"
+         data-ad-format="auto"></ins>
+    </div>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>-->
+
+    <div class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+      <li><strong>Follow:</strong></li>
+    
+    
+    
+    
+      <li><a href="http://github.com/manios"><i class="fa fa-fw fa-github" aria-hidden="true"></i> GitHub</a></li>
+    
+    
+    
+    <li><a href="https://manios.org/feed.xml"><i class="fa fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2017 Christos Manios. Powered by <a href="http://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="https://manios.org/assets/js/main.min.js"></script>
+
+
+
+
+
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-96500199-2', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+    
+  <script>
+    var disqus_config = function () {
+      this.page.url = "https://manios.org/2017/11/15/use-haproxy-and-docker-for-solr-load-balancing";  // Replace PAGE_URL with your page's canonical URL variable
+      this.page.identifier = "/2017/11/15/use-haproxy-and-docker-for-solr-load-balancing"; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+    (function() { // DON'T EDIT BELOW THIS LINE
+      var d = document, s = d.createElement('script');
+      s.src = 'https://manios.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  </script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+  
+
+
+
+  </body>
+</html>
