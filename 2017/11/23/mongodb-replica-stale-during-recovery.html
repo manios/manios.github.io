@@ -1,0 +1,760 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.2.2 by Michael Rose
+  Copyright 2017 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE.txt
+-->
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin SEO -->
+
+
+
+
+
+
+
+
+
+<title>MongoDB replica error RS102 too stale to catch up during full recovery - cmanios</title>
+
+
+
+
+<meta name="description" content="We run MongoDB 2.6.0 on a production system configured with a replica set of 3 members:  Primary  Secondary  Arbiter">
+
+
+
+
+<meta name="author" content="cmanios">
+
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="cmanios">
+<meta property="og:title" content="MongoDB replica error RS102 too stale to catch up during full recovery">
+
+
+  <link rel="canonical" href="https://manios.org/2017/11/23/mongodb-replica-stale-during-recovery">
+  <meta property="og:url" content="https://manios.org/2017/11/23/mongodb-replica-stale-during-recovery">
+
+
+
+  <meta property="og:description" content="We run MongoDB 2.6.0 on a production system configured with a replica set of 3 members:  Primary  Secondary  Arbiter">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+
+
+
+  <meta property="og:type" content="article">
+  <meta property="article:published_time" content="2017-11-23T10:09:00+02:00">
+
+
+
+
+
+
+
+
+  <script type="application/ld+json">
+    {
+      "@context" : "http://schema.org",
+      "@type" : "Person",
+      "name" : "Christos Manios",
+      "url" : "https://manios.org",
+      "sameAs" : null
+    }
+  </script>
+
+
+
+
+
+
+
+<!-- end SEO -->
+
+
+<link href="https://manios.org/feed.xml" type="application/atom+xml" rel="alternate" title="cmanios Feed">
+
+<!-- http://t.co/dKP3o1e -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="https://manios.org/assets/css/main.css">
+
+<!--[if lte IE 9]>
+  <style>
+    /* old IE unsupported flexbox fixes */
+    .greedy-nav .site-title {
+      padding-right: 3em;
+    }
+    .greedy-nav button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+    }
+  </style>
+<![endif]-->
+
+
+    <!-- start custom head snippets -->
+
+<!-- insert favicons. use http://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({
+        google_ad_client: "ca-pub-6651682831425197",
+        enable_page_level_ads: true
+      });
+    </script>
+  </head>
+
+  <body class="layout--single">
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+    <div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        <a class="site-title" href="https://manios.org/">cmanios</a>
+        <ul class="visible-links">
+          
+            
+            <li class="masthead__menu-item"><a href="https://manios.org/year-archive/">Posts archive</a></li>
+          
+            
+            <li class="masthead__menu-item"><a href="https://manios.org/categories/">Categories</a></li>
+          
+            
+            <li class="masthead__menu-item"><a href="https://manios.org/tags/">Tags</a></li>
+          
+            
+            <li class="masthead__menu-item"><a href="https://manios.org/about/">About</a></li>
+          
+        </ul>
+        <button type="button">
+          <span class="visually-hidden">Toggle Menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+    
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+<div itemscope itemtype="http://schema.org/Person">
+
+  
+
+  <div class="author__content">
+    <h3 class="author__name" itemprop="name">Christos Manios</h3>
+    
+      <p class="author__bio" itemprop="description">
+        Developer life is a NullPointerException
+      </p>
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+        <li itemprop="homeLocation" itemscope itemtype="http://schema.org/Place">
+          <i class="fa fa-fw fa-map-marker" aria-hidden="true"></i> <span itemprop="name">Thessaloniki, GR</span>
+        </li>
+      
+
+      
+
+      
+
+      
+
+      
+        <li>
+          <a href="https://twitter.com/maniosolr" itemprop="sameAs">
+            <i class="fa fa-fw fa-twitter-square" aria-hidden="true"></i> Twitter
+          </a>
+        </li>
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+        <li>
+          <a href="https://github.com/manios" itemprop="sameAs">
+            <i class="fa fa-fw fa-github" aria-hidden="true"></i> GitHub
+          </a>
+        </li>
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs">
+      <i class="fa fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+  <article class="page" itemscope itemtype="http://schema.org/CreativeWork">
+    <meta itemprop="headline" content="MongoDB replica error RS102 too stale to catch up during full recovery">
+    <meta itemprop="description" content="We run MongoDB 2.6.0 on a production system configured with a replica set of 3 members:  Primary  Secondary  Arbiter">
+    <meta itemprop="datePublished" content="November 23, 2017">
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 class="page__title" itemprop="headline">MongoDB replica error RS102 too stale to catch up during full recovery
+</h1>
+          
+            <p class="page__meta"><i class="fa fa-clock-o" aria-hidden="true"></i> 
+
+
+
+
+  3 minute read
+</p>
+          
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+        <p>We run MongoDB 2.6.0 on a production system configured with a replica set of 3 members:</p>
+<ul>
+  <li>Primary</li>
+  <li>Secondary</li>
+  <li>Arbiter</li>
+</ul>
+
+<p>About 3 weeks ago we had to move the data files from a data centre to another due to disk size problems. Database size had reached 15.6TB. Thus we copied only the data from the <code class="highlighter-rouge">PRIMARY</code> node to the new data centre and we started the <code class="highlighter-rouge">SECONDARY</code> node totally empty in order to recover via full replication. You can read more about the procedure in this blog post: <TODO Add="" post="">.</TODO></p>
+
+<p>Due to the large size of the database we had to check the recovery replication process daily. During the last 3 days the status of the replica was as usual <code class="highlighter-rouge">STARTUP2</code> and the logs showed that it builds its indexes:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>2017-11-20T08:53:55.491+0200 [rsSync] Index Build: 62017200/69819295 88%
+2017-11-21T09:10:01.192+0200 [rsSync] Index Build: 66154400/69819295 94%
+2017-11-22T08:33:52.992+0200 [rsSync] Index: (2/3) BTree Bottom Up Progress: 33284400/53472142 62%
+</code></pre></div></div>
+
+<p>In the meantime, Nagios monitoring showed an increase in the replication lag:</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>2017-11-20T08:53:55.491+0200 Replication lag: 586379 seconds (6.79 days)
+2017-11-21T09:10:01.192+0200 Replication lag: 673901 seconds (7.8 days)
+2017-11-22T08:33:52.992+0200 Nagios - Replication lag: 758020 seconds (8.77 days)
+</code></pre></div></div>
+
+<p>It made us quite skeptikal until today, when in the daily check, we stumbled upon an error! What a coincidence! Replication had stopped with the following error:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>2017-11-23T08:54:25.937+0200 [rsBackgroundSync] replSet not trying to sync from 192.168.10.4:27017, it is vetoed for 8 more seconds
+2017-11-23T08:54:25.937+0200 [rsBackgroundSync] replSet not trying to sync from 192.168.10.4:27017, it is vetoed for 8 more seconds
+2017-11-23T08:54:30.000+0200 [rsBackgroundSync] replSet not trying to sync from 192.168.10.4:27017, it is vetoed for 3 more seconds
+2017-11-23T08:54:30.000+0200 [rsBackgroundSync] replSet not trying to sync from 192.168.10.4:27017, it is vetoed for 3 more seconds
+2017-11-23T08:54:34.062+0200 [rsBackgroundSync] replSet syncing to: 192.168.10.4:27017
+2017-11-23T08:54:34.109+0200 [rsBackgroundSync] replSet error RS102 too stale to catch up, at least from 192.168.10.4:27017
+2017-11-23T08:54:34.109+0200 [rsBackgroundSync] replSet our last optime : Nov 13 14:06:29 5a098ac5:6
+2017-11-23T08:54:34.109+0200 [rsBackgroundSync] replSet oldest at 192.168.10.4:27017 : Nov 16 10:30:19 5a0d4c9b:6
+2017-11-23T08:54:34.109+0200 [rsBackgroundSync] replSet See http://dochub.mongodb.org/core/resyncingaverystalereplicasetmember
+</code></pre></div></div>
+
+<p>Also when we run on the <code class="highlighter-rouge">PRIMARY</code> the command <code class="highlighter-rouge">rs.status()</code> it gave us the following output:</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+    </span><span class="s2">"set"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"panamapapers-rs"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"date"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="err">ISODate(</span><span class="s2">"2017-11-23T07:12:11.000Z"</span><span class="err">)</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"myState"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"members"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"> 
+        </span><span class="p">{</span><span class="w">
+            </span><span class="s2">"_id"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"name"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"192.168.10.4:27017"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"health"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"state"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"stateStr"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"PRIMARY"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"uptime"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="mi">1380243</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"optime"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="err">Timestamp(</span><span class="mi">1511421121</span><span class="p">,</span><span class="w"> </span><span class="mi">7</span><span class="err">)</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"optimeDate"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="err">ISODate(</span><span class="s2">"2017-11-23T07:12:01.000Z"</span><span class="err">)</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"electionTime"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="err">Timestamp(</span><span class="mi">1510041044</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="err">)</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"electionDate"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="err">ISODate(</span><span class="s2">"2017-11-07T07:50:44.000Z"</span><span class="err">)</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"self"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+        </span><span class="p">},</span><span class="w"> 
+        </span><span class="p">{</span><span class="w">
+            </span><span class="s2">"_id"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"name"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"192.168.10.5:27017"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"health"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"state"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"stateStr"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"RECOVERING"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"uptime"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="mi">836950</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"optime"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="err">Timestamp(</span><span class="mi">1510574789</span><span class="p">,</span><span class="w"> </span><span class="mi">6</span><span class="err">)</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"optimeDate"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="err">ISODate(</span><span class="s2">"2017-11-13T12:06:29.000Z"</span><span class="err">)</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"lastHeartbeat"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="err">ISODate(</span><span class="s2">"2017-11-23T07:12:11.000Z"</span><span class="err">)</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"lastHeartbeatRecv"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="err">ISODate(</span><span class="s2">"2017-11-23T07:12:10.000Z"</span><span class="err">)</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"pingMs"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"lastHeartbeatMessage"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"error RS102 too stale to catch up"</span><span class="w">
+        </span><span class="p">},</span><span class="w"> 
+        </span><span class="p">{</span><span class="w">
+            </span><span class="s2">"_id"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"name"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"192.168.10.9:27017"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"health"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"state"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="mi">7</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"stateStr"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"ARBITER"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"uptime"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="mi">1380095</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"lastHeartbeat"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="err">ISODate(</span><span class="s2">"2017-11-23T07:12:10.000Z"</span><span class="err">)</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"lastHeartbeatRecv"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="err">ISODate(</span><span class="s2">"2017-11-23T07:12:10.000Z"</span><span class="err">)</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"pingMs"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+    </span><span class="p">],</span><span class="w">
+    </span><span class="s2">"ok"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="mf">1.0</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>After searching in the internet we found issue <a href="https://jira.mongodb.org/browse/SERVER-14523">SERVER-14523</a> where a guy had the same problem as ours. Furthermore we read again the official documentation of how to <a href="https://docs.mongodb.com/v2.6/tutorial/resync-replica-set-member/">Resync a Member of a Replica Set</a>. The solutions to our problem were the following:</p>
+<ol>
+  <li><a href="https://docs.mongodb.com/manual/core/replica-set-oplog/">Resize the oplog</a> to a large value and restart initial sync replication by deleting all files in the <code class="highlighter-rouge">SECONDARY</code> node.</li>
+  <li>Copy all data files from the <code class="highlighter-rouge">PRIMARY</code> to the <code class="highlighter-rouge">SECONDARY</code> node and restart both of them.</li>
+</ol>
+
+<p>We rejected resizing the oplog because the database grows every day +9GB so the oplog had to become at least 81GB in order to contain the changes of the aforementioned last 9 days.</p>
+
+<p>That’s it! I hope it helped you!</p>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+  
+
+
+  
+  
+  
+
+  <p class="page__taxonomy">
+    <strong><i class="fa fa-fw fa-tags" aria-hidden="true"></i> Tags: </strong>
+    <span itemprop="keywords">
+    
+      
+      
+      <a href="https://manios.org/tags/#catch" class="page__taxonomy-item" rel="tag">catch</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#database" class="page__taxonomy-item" rel="tag">database</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#error" class="page__taxonomy-item" rel="tag">error</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#linux" class="page__taxonomy-item" rel="tag">linux</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#mongo" class="page__taxonomy-item" rel="tag">mongo</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#mongodb" class="page__taxonomy-item" rel="tag">mongodb</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#recovery" class="page__taxonomy-item" rel="tag">recovery</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#replica" class="page__taxonomy-item" rel="tag">replica</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#replication" class="page__taxonomy-item" rel="tag">replication</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#rs102" class="page__taxonomy-item" rel="tag">rs102</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#secondary" class="page__taxonomy-item" rel="tag">secondary</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#set" class="page__taxonomy-item" rel="tag">set</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#stale" class="page__taxonomy-item" rel="tag">stale</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#sync" class="page__taxonomy-item" rel="tag">sync</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#synchronisation" class="page__taxonomy-item" rel="tag">synchronisation</a>
+    
+    </span>
+  </p>
+
+
+
+
+  
+
+
+  
+  
+  
+
+  <p class="page__taxonomy">
+    <strong><i class="fa fa-fw fa-folder-open" aria-hidden="true"></i> Categories: </strong>
+    <span itemprop="keywords">
+    
+      
+      
+      <a href="https://manios.org/categories/#databases" class="page__taxonomy-item" rel="tag">Databases</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/categories/#linux" class="page__taxonomy-item" rel="tag">Linux</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/categories/#mongodb" class="page__taxonomy-item" rel="tag">MongoDB</a>
+    
+    </span>
+  </p>
+
+
+        
+          <p class="page__date"><strong><i class="fa fa-fw fa-calendar" aria-hidden="true"></i> Updated:</strong> <time datetime="2017-11-23T10:09:00+02:00">November 23, 2017</time></p>
+        
+      </footer>
+
+      <section class="page__share">
+  
+    <h4 class="page__share-title">Share on</h4>
+  
+
+  <a href="https://twitter.com/intent/tweet?text=MongoDB+replica+error+RS102+too+stale+to+catch+up+during+full+recovery%20https%3A%2F%2Fmanios.org%2F2017%2F11%2F23%2Fmongodb-replica-stale-during-recovery" class="btn btn--twitter" title="Share on Twitter"><i class="fa fa-fw fa-twitter" aria-hidden="true"></i><span> Twitter</span></a>
+
+  <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fmanios.org%2F2017%2F11%2F23%2Fmongodb-replica-stale-during-recovery" class="btn btn--facebook" title="Share on Facebook"><i class="fa fa-fw fa-facebook" aria-hidden="true"></i><span> Facebook</span></a>
+
+  <a href="https://plus.google.com/share?url=https%3A%2F%2Fmanios.org%2F2017%2F11%2F23%2Fmongodb-replica-stale-during-recovery" class="btn btn--google-plus" title="Share on Google Plus"><i class="fa fa-fw fa-google-plus" aria-hidden="true"></i><span> Google+</span></a>
+
+  <a href="https://www.linkedin.com/shareArticle?mini=true&url=https%3A%2F%2Fmanios.org%2F2017%2F11%2F23%2Fmongodb-replica-stale-during-recovery" class="btn btn--linkedin" title="Share on LinkedIn"><i class="fa fa-fw fa-linkedin" aria-hidden="true"></i><span> LinkedIn</span></a>
+</section>
+
+
+      
+  <nav class="pagination">
+    
+      <a href="https://manios.org/2017/11/15/use-haproxy-and-docker-for-solr-load-balancing" class="pagination--pager" title="Use HAProxy and Docker to load balance requests to Solr and SolrCloud
+">Previous</a>
+    
+    
+      <a href="https://manios.org/2017/12/14/install-and-configure-and-troubleshoot-ntp-servers-in-debian-linux" class="pagination--pager" title="Install, configure and troubleshoot NTP servers in Debian Linux
+">Next</a>
+    
+  </nav>
+
+    </div>
+
+    
+      <div class="page__comments">
+  
+  
+      <h4 class="page__comments-title">Leave a Comment</h4>
+      <section id="disqus_thread"></section>
+    
+</div>
+    
+  </article>
+
+  
+  
+    <div class="page__related">
+      <h4 class="page__related-title">You May Also Enjoy</h4>
+      <div class="grid__wrapper">
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="http://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="https://manios.org/2017/12/14/install-and-configure-and-troubleshoot-ntp-servers-in-debian-linux" rel="permalink">Install, configure and troubleshoot NTP servers in Debian Linux
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="fa fa-clock-o" aria-hidden="true"></i> 
+
+
+
+
+  13 minute read
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">If you are reading this article, perhaps you have searched a lot about NTP server installation in Linux, issues and problems encountered and how to troublesh...</p>
+  </article>
+</div>
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="http://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="https://manios.org/2017/11/15/use-haproxy-and-docker-for-solr-load-balancing" rel="permalink">Use HAProxy and Docker to load balance requests to Solr and SolrCloud
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="fa fa-clock-o" aria-hidden="true"></i> 
+
+
+
+
+  2 minute read
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">We use Solr 4.6 with SolrCloud configuration in a production system. You may say: “It is hight time you upgraded to the latest version, isn’t it?”. And you w...</p>
+  </article>
+</div>
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="http://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="https://manios.org/2017/10/17/sublime-3-fix-greek-accented-characters" rel="permalink">SublimeText 3 Fix greek (and other languages) accented chars input
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="fa fa-clock-o" aria-hidden="true"></i> 
+
+
+
+
+  1 minute read
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Yesterday I installed SublimeText 3 editor (build 3143) in my PC and the first thing I realised was that I could not type any Greek accented characters. Thus...</p>
+  </article>
+</div>
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="http://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="https://manios.org/2017/08/09/configure-eclipse-in-order-to-build-mapstruct-in-java-projects" rel="permalink">Configure Eclipse in order to build MapStruct in Java projects
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="fa fa-clock-o" aria-hidden="true"></i> 
+
+
+
+
+  4 minute read
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Today I was working on a Java Spring MVC project which uses Maven. My editor was the Eclipse IDE, with the current version of the M2E plug-in. When I pulled ...</p>
+  </article>
+</div>
+        
+      </div>
+    </div>
+  
+  
+</div>
+
+
+	<!-- TODO add Google AdSense -->
+    <!--<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <div align="center" style="margin: 1em 0;">
+    <ins class="adsbygoogle"
+         style="display:block; border-bottom: initial;"
+         data-ad-client="ca-pub-7328585512091257"
+         data-ad-slot="3049671934"
+         data-ad-format="auto"></ins>
+    </div>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>-->
+
+    <div class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+      <li><strong>Follow:</strong></li>
+    
+    
+    
+    
+      <li><a href="http://github.com/manios"><i class="fa fa-fw fa-github" aria-hidden="true"></i> GitHub</a></li>
+    
+    
+    
+    <li><a href="https://manios.org/feed.xml"><i class="fa fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2017 Christos Manios. Powered by <a href="http://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="https://manios.org/assets/js/main.min.js"></script>
+
+
+
+
+
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-96500199-2', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+    
+  <script>
+    var disqus_config = function () {
+      this.page.url = "https://manios.org/2017/11/23/mongodb-replica-stale-during-recovery";  // Replace PAGE_URL with your page's canonical URL variable
+      this.page.identifier = "/2017/11/23/mongodb-replica-stale-during-recovery"; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+    (function() { // DON'T EDIT BELOW THIS LINE
+      var d = document, s = d.createElement('script');
+      s.src = 'https://manios-org.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  </script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+  
+
+
+
+  </body>
+</html>
