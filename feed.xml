@@ -1,4 +1,240 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="https://manios.org/feed.xml" rel="self" type="application/atom+xml" /><link href="https://manios.org/" rel="alternate" type="text/html" /><updated>2017-12-20T15:25:47+02:00</updated><id>https://manios.org/</id><title type="html">cmanios</title><subtitle>Developer life is a NullPointerException</subtitle><author><name>Christos Manios</name></author><entry><title type="html">Install, configure and troubleshoot NTP servers in Debian Linux</title><link href="https://manios.org/2017/12/14/install-and-configure-and-troubleshoot-ntp-servers-in-debian-linux" rel="alternate" type="text/html" title="Install, configure and troubleshoot NTP servers in Debian Linux" /><published>2017-12-14T10:42:00+02:00</published><updated>2017-12-14T10:42:00+02:00</updated><id>https://manios.org/2017/12/14/install-and-configure-and-troubleshoot-ntp-servers-in-debian-linux</id><content type="html" xml:base="https://manios.org/2017/12/14/install-and-configure-and-troubleshoot-ntp-servers-in-debian-linux">&lt;p&gt;If you are reading this article, perhaps you have searched a lot about NTP server installation in Linux, issues and problems encountered and how to troubleshoot them! We know that there are so many articles about how to configure NTP servers but we could not find any which contains all the issues we faced in the same place!&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="https://manios.org/feed.xml" rel="self" type="application/atom+xml" /><link href="https://manios.org/" rel="alternate" type="text/html" /><updated>2018-07-25T22:44:10+03:00</updated><id>https://manios.org/</id><title type="html">cmanios</title><subtitle>Developer life is a NullPointerException</subtitle><author><name>Christos Manios</name></author><entry><title type="html">Creating a Beat based on Metricbeat resolving Init and create metricset failures</title><link href="https://manios.org/2018/07/23/create-a-beat-based-on-metricbeat-resolving-bugs" rel="alternate" type="text/html" title="Creating a Beat based on Metricbeat resolving Init and create metricset failures" /><published>2018-07-23T22:31:00+03:00</published><updated>2018-07-23T22:31:00+03:00</updated><id>https://manios.org/2018/07/23/create-a-beat-based-on-metricbeat-resolving-bugs</id><content type="html" xml:base="https://manios.org/2018/07/23/create-a-beat-based-on-metricbeat-resolving-bugs">&lt;p&gt;I suspect that you are reading this post after having trouble creating a new Elastic Beat based on Metricbeat. Bud do not worry! We have you covered and solved the issues for you!&lt;/p&gt;
+
+&lt;p&gt;Long story short, a few days ago we wanted to create a new Metricbeat. After reading and executing step by step the official guide “&lt;a href=&quot;https://www.elastic.co/guide/en/beats/devguide/current/creating-beat-from-metricbeat.html&quot;&gt;Creating a Beat based on Metricbeat&lt;/a&gt;” we stumpled upon a series of issues like &lt;a href=&quot;https://discuss.elastic.co/t/step-3-init-and-create-the-metricset-failure/112046/12&quot;&gt;Step 3 - Init and create the metricset failure&lt;/a&gt;. After spending 2 days trying to resolve our local dependencies and solve the issues in our development environment, we decided to make everything in a sterilized environment, hence a Docker container.&lt;/p&gt;
+
+&lt;p&gt;To begin with, we used Go language &lt;a href=&quot;https://hub.docker.com/_/golang/&quot;&gt;official Docker image&lt;/a&gt; with tag &lt;code class=&quot;highlighter-rouge&quot;&gt;golang:1.10.2-stretch&lt;/code&gt; and we run everything in it. So in a shell, we executed:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;docker run -it --rm --name go1.10 golang:1.10.2-stretch /bin/bash
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;When the container is started, a new shell is loaded and we can download all the dependencies needed, by executing inside it:&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;apt-get update &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+ &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; apt-get install &lt;span class=&quot;nt&quot;&gt;-y&lt;/span&gt; wget curl git vim &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+ &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;set number&quot;&lt;/span&gt; | tee &lt;span class=&quot;nt&quot;&gt;-a&lt;/span&gt; /etc/vim/vimrc &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+ &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;syntax on&quot;&lt;/span&gt; | tee &lt;span class=&quot;nt&quot;&gt;-a&lt;/span&gt; /etc/vim/vimrc &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+ &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;colorscheme evening&quot;&lt;/span&gt; | tee &lt;span class=&quot;nt&quot;&gt;-a&lt;/span&gt; /etc/vim/vimrc  &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+ &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; wget https://bootstrap.pypa.io/get-pip.py &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+ &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; python get-pip.py &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+ &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; rm get-pip.py &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+ &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; pip install virtualenv &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+ &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-e&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n\n&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;Our environment:&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;===================================&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+ &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; go version &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+ &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Python version: &quot;&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+ &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; python &lt;span class=&quot;nt&quot;&gt;--version&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+ &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;virtualenv version: &quot;&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+ &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; virtualenv &lt;span class=&quot;nt&quot;&gt;--version&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+ &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;===================================&quot;&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+ &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Fetching metricbeat source code: &quot;&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+ &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; go get github.com/elastic/beats/metricbeat &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+ &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;[OK]&quot;&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+ &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;cd&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;GOPATH&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;/src/github.com/elastic/beats &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+ &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Checking out commit 2619e137c1f7eb031fc89132045117a85c7ef818 to new branch in order to avoid bug&quot;&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+ &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; git checkout &lt;span class=&quot;nt&quot;&gt;-b&lt;/span&gt; working 2619e137c1f7eb031fc89132045117a85c7ef818 &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+ &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;cd&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$GOPATH&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+ &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; sed &lt;span class=&quot;nt&quot;&gt;-i&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'s/@-cp -r module\/[*]\/_meta\/kibana _meta\//@-cp -r ${GOPATH}\/src\/github.com\/elastic\/beats\/metricbeat\/module\/*\/_meta\/kibana _meta\//'&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;GOPATH&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;/src/github.com/elastic/beats/metricbeat/Makefile &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+ &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Elastic beats environment has been initialised successfully! You can now generate a new Metricbeat!&quot;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;If everything works as expected you should see something like this in the output:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Our environment:
+===================================
+go version go1.10.2 linux/amd64
+Python version: Python 2.7.13
+virtualenv version: 16.0.0
+===================================
+Fetching metricbeat source code: [OK]
+Checking out commit 2619e137c1f7eb031fc89132045117a85c7ef818 to new branch in order to avoid bug
+Switched to a new branch 'working'
+Elastic beats environment has been initialised successfully! You can now generate a new Metricbeat!
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;The environment is set up correctly. Let’s create a new Metricbeat. So execute:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;python ${GOPATH}/src/github.com/elastic/beats/script/generate.py --type=metricbeat
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;and respond to the input as the example:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;root@1e407b4d73a7:/go# python ${GOPATH}/src/github.com/elastic/beats/script/generate.py --type=metricbeat
+Beat Name [Examplebeat]: weatherbeat
+Your Github Name [your-github-name]: manios
+Beat Path [github.com/manios/weatherbeat]:
+Firstname Lastname: Christos Manios
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;The newly created Metricbeat will be stored in &lt;code class=&quot;highlighter-rouge&quot;&gt;${GOPATH}/src/github.com/manios/weatherbeat/&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Navigate to the Metricbeat directory. Execute the following to avoid weird errors when creating a metricset:&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;cd&lt;/span&gt;  &lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;GOPATH&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;/src/github.com/manios/weatherbeat &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; cp &lt;span class=&quot;nt&quot;&gt;-r&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$GOPATH&lt;/span&gt;/src/github.com/elastic/beats/metricbeat/scripts &lt;span class=&quot;nb&quot;&gt;.&lt;/span&gt; 
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Now we are ready to create a new Metricset. The metricset module will be called &lt;code class=&quot;highlighter-rouge&quot;&gt;skgtemperatures&lt;/code&gt; and the metricset itself &lt;code class=&quot;highlighter-rouge&quot;&gt;hydro&lt;/code&gt;. According to the official guide we execute &lt;code class=&quot;highlighter-rouge&quot;&gt;make setup&lt;/code&gt; and the output will be the following:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;mkdir -p vendor/github.com/elastic/
+cp -R /go/src/github.com/elastic/beats vendor/github.com/elastic/
+rm -rf vendor/github.com/elastic/beats/.git
+make create-metricset
+make[1]: Entering directory '/go/src/github.com/manios/weatherbeat'
+New python executable in /go/src/github.com/manios/weatherbeat/build/python-env/bin/python
+Installing setuptools, pip, wheel...done.
+docker-compose 1.22.0 has requirement requests!=2.11.0,!=2.12.2,!=2.18.0,&amp;lt;2.19,&amp;gt;=2.6.1, but you'll have requests 2.19.1 which is incompatible.
+# Work around pip bug. See: https://github.com/pypa/pip/issues/4464
+find /go/src/github.com/manios/weatherbeat/build/python-env -type d -name 'dist-packages' -exec sh -c &quot;echo dist-packages &amp;gt; {}.pth&quot; ';'
+Module name: skgtemperature
+Metricset name: hydro
+Module skgtemperature created.
+Metricset hydro created.
+make[1]: Leaving directory '/go/src/github.com/manios/weatherbeat'
+make collect
+make[1]: Entering directory '/go/src/github.com/manios/weatherbeat'
+# Work around pip bug. See: https://github.com/pypa/pip/issues/4464
+find /go/src/github.com/manios/weatherbeat/build/python-env -type d -name 'dist-packages' -exec sh -c &quot;echo dist-packages &amp;gt; {}.pth&quot; ';'
+make[1]: Leaving directory '/go/src/github.com/manios/weatherbeat'
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;If everything works as expected then if you execute a &lt;code class=&quot;highlighter-rouge&quot;&gt;tree&lt;/code&gt; command, to &lt;code class=&quot;highlighter-rouge&quot;&gt;module&lt;/code&gt; directory you will probably have the following structure:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;-- skgtemperature
+    |-- _meta
+    |   |-- config.yml
+    |   |-- docs.asciidoc
+    |   `-- fields.yml
+    |-- doc.go
+    `-- hydro
+        |-- _meta
+        |   |-- data.json
+        |   |-- docs.asciidoc
+        |   `-- fields.yml
+        `-- hydro.go
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;That’s it! I hope it helps!&lt;/p&gt;</content><author><name>cmanios</name></author><category term="elastic" /><category term="metricbeat" /><category term="beats" /><category term="elasticsearch" /><category term="create" /><category term="generator" /><category term="go" /><category term="golang" /><category term="elk" /><category term="search" /><category term="kibana" /><category term="index" /><category term="monitor" /><summary type="html">I suspect that you are reading this post after having trouble creating a new Elastic Beat based on Metricbeat. Bud do not worry! We have you covered and solved the issues for you!</summary></entry><entry><title type="html">Git merge conflicts using Tortoise Git merge in Windows</title><link href="https://manios.org/2018/05/30/git-merge-conflicts-using-tortoise-git-merge-windows" rel="alternate" type="text/html" title="Git merge conflicts using Tortoise Git merge in Windows" /><published>2018-05-30T20:42:00+03:00</published><updated>2018-05-30T20:42:00+03:00</updated><id>https://manios.org/2018/05/30/git-merge-conflicts-using-tortoise-git-merge-windows</id><content type="html" xml:base="https://manios.org/2018/05/30/git-merge-conflicts-using-tortoise-git-merge-windows">&lt;p&gt;Today we wanted to use Tortoise Git Merge, a Windows Git utility which comes with &lt;a href=&quot;https://tortoisegit.org&quot;&gt;Tortoise Git&lt;/a&gt;. It helps us do a 3 way merge and solve our conflicts easily. The advantage of it is that it automatically merges the lines that where uniquely modified in every file and you only need to merge the common changes where the conflicts are. So in our case we had a file , let’s call it &lt;code class=&quot;highlighter-rouge&quot;&gt;README.md&lt;/code&gt;, in which we had 1000 changed lines out of which only 2 had a conflict with the file pulled from upstream server. Eclipse and IntelliJ do provide a merge editor but as far as we are concerned they are not automatically merging your unique changes (please correct us if we are wrong). After some searching on the web of how to do so, we found &lt;a href=&quot;https://stackoverflow.com/questions/5190188/why-cant-i-use-tortoisemerge-as-my-git-merge-tool-on-windows/19711169#19711169&quot;&gt;StackOverflow Question 5190188 : Why can’t I use TortoiseMerge as my git merge tool on Windows?&lt;/a&gt; which explains different approaches.&lt;/p&gt;
+
+&lt;p&gt;So according to the aforementioned question and our experiments, in order to use Tortoise Git Merge you have to download and install &lt;a href=&quot;https://tortoisegit.org&quot;&gt;Tortoise Git&lt;/a&gt; and configure your local &lt;code class=&quot;highlighter-rouge&quot;&gt;.gitconfig&lt;/code&gt; file with the following lines:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;[core]
+	longpaths = true
+	autocrlf = true
+[merge]
+	tool=tortoisemerge
+[mergetool &quot;tortoisemerge&quot;]
+	cmd = \&quot;C:\\Program Files\\TortoiseGit\\bin\\TortoiseGitMerge.exe\&quot; -base:\&quot;$BASE\&quot; -theirs:\&quot;$LOCAL\&quot; -mine:\&quot;$REMOTE\&quot; -merged:\&quot;$MERGED\&quot;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;If you want an one liner equivalent command, you can run the following:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;git config --global mergetool.tortoisemerge.cmd &quot;\&quot;C:\\Program Files\\TortoiseGit\\bin\\TortoiseGitMerge.exe\&quot; -base:\&quot;$BASE\&quot; -theirs:\&quot;$LOCAL\&quot; -mine:\&quot;$REMOTE\&quot; -merged:\&quot;$MERGED\&quot;&quot;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;NOTE:
+The &lt;code class=&quot;highlighter-rouge&quot;&gt;core&lt;/code&gt; section is complimentary for Windows in order to help Git use long paths and overcome Windows 260 character &lt;a href=&quot;https://msdn.microsoft.com/en-us/library/windows/desktop/aa365247(v=vs.85).aspx&quot;&gt;MAX_PATH&lt;/a&gt; limitation. Furthermore we need to automatically checkout with file ending using &lt;code class=&quot;highlighter-rouge&quot;&gt;CRLF&lt;/code&gt; and push to &lt;code class=&quot;highlighter-rouge&quot;&gt;LF&lt;/code&gt;, thus the &lt;code class=&quot;highlighter-rouge&quot;&gt;autocrlf&lt;/code&gt; is set to &lt;code class=&quot;highlighter-rouge&quot;&gt;true&lt;/code&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;After this short parenthesis, back in action! When you pull from a remote repository, or you merge, or rebase a branch and Git complains about conflicts you can use in your shell or in &lt;a href=&quot;https://gitforwindows.org/&quot;&gt;Git Bash&lt;/a&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;git mergetool
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Tortoise merge will appear with a display like the following:&lt;/p&gt;
+
+&lt;figure&gt;
+    &lt;a href=&quot;/images/2018-05-30-git-merge-with-tortoise-git/tortoiseMerge3WayMerge.png&quot;&gt;&lt;img src=&quot;/images/2018-05-30-git-merge-with-tortoise-git/tortoiseMerge3WayMerge.png&quot; alt=&quot;Tortoise merge open to merge conflicts&quot; /&gt;&lt;/a&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;In this image, conflicts are marked with red and the automatically merged lines are marked with yellow. Left side (Theirs) is the version of the file which comes from repository and right side (Mine) is your local version with your changes.&lt;/p&gt;
+
+&lt;p&gt;That’s it. We hope this quick guide helped you!&lt;/p&gt;</content><author><name>cmanios</name></author><category term="git" /><category term="merge" /><category term="mergetool" /><category term="tortoise" /><category term="conflict" /><category term="windows" /><category term="client" /><summary type="html">Today we wanted to use Tortoise Git Merge, a Windows Git utility which comes with Tortoise Git. It helps us do a 3 way merge and solve our conflicts easily. The advantage of it is that it automatically merges the lines that where uniquely modified in every file and you only need to merge the common changes where the conflicts are. So in our case we had a file , let’s call it README.md, in which we had 1000 changed lines out of which only 2 had a conflict with the file pulled from upstream server. Eclipse and IntelliJ do provide a merge editor but as far as we are concerned they are not automatically merging your unique changes (please correct us if we are wrong). After some searching on the web of how to do so, we found StackOverflow Question 5190188 : Why can’t I use TortoiseMerge as my git merge tool on Windows? which explains different approaches.</summary></entry><entry><title type="html">Debug HTTP request of Java SOAP JAX-WS web service client</title><link href="https://manios.org/2018/04/03/java-soap-service-client-debug-http-message" rel="alternate" type="text/html" title="Debug HTTP request of Java SOAP JAX-WS web service client" /><published>2018-04-03T19:42:00+03:00</published><updated>2018-04-03T19:42:00+03:00</updated><id>https://manios.org/2018/04/03/java-soap-service-client-debug-http-message</id><content type="html" xml:base="https://manios.org/2018/04/03/java-soap-service-client-debug-http-message">&lt;p&gt;Today I wanted to debug in Java a JAX-WS SOAP web service client and see the exact message that is send as an &lt;a href=&quot;https://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html&quot;&gt;HTTP request&lt;/a&gt;. So after searching, I found in this   &lt;a href=&quot;https://stackoverflow.com/questions/1945618/tracing-xml-request-responses-with-jax-ws&quot;&gt;StackOverflow question&lt;/a&gt; that if we insert the following lines before calling the service:&lt;/p&gt;
+
+&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;System&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;setProperty&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;com.sun.xml.ws.transport.http.client.HttpTransportPipe.dump&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;true&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;System&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;setProperty&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;com.sun.xml.internal.ws.transport.http.client.HttpTransportPipe.dump&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;true&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;System&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;setProperty&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;com.sun.xml.ws.transport.http.HttpAdapter.dump&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;true&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;System&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;setProperty&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;com.sun.xml.internal.ws.transport.http.HttpAdapter.dump&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;true&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;when we call the service it will produce the following output in logs (or console output):&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-txt&quot;&gt;---[HTTP request - http://localhost:9090/ContactRequestServicePort]---
+Accept: text/xml, multipart/related
+Content-Type: text/xml; charset=utf-8
+SOAPAction: &quot;newContact&quot;
+User-Agent: JAX-WS RI 2.2.9-b130926.1035 svn-revision#5f6196f2b90e9460065a4c2f4e30e065b245e51e
+&amp;lt;?xml version=&quot;1.0&quot; ?&amp;gt;&amp;lt;S:Envelope xmlns:S=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;&amp;gt;&amp;lt;S:Body&amp;gt;&amp;lt;ns2:newContact xmlns:ns4=&quot;http://www.acmecorp.com/contacts/Exception&quot; xmlns:ns3=&quot;http://www.acmecorp.com/contacts/RequestMetaInfo&quot; xmlns:ns2=&quot;http://www.acmecorp.com/contacts/crm-contact/Service&quot;&amp;gt;&amp;lt;ns2:contact&amp;gt;&amp;lt;ns2:prefix&amp;gt;Mr&amp;lt;/ns2:prefix&amp;gt;&amp;lt;ns2:name&amp;gt;John&amp;lt;/ns2:name&amp;gt;&amp;lt;ns2:surname&amp;gt;Longjohn&amp;lt;/ns2:surname&amp;gt;&amp;lt;/ns2:contact&amp;gt;&amp;lt;/ns2:newContact&amp;gt;&amp;lt;/S:Body&amp;gt;&amp;lt;/S:Envelope&amp;gt;--------------------
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;It works! Now we have the entire HTTP request and we can pretty print the XML which is included in the message body of HTTP request to see what we send to the web service:&lt;/p&gt;
+
+&lt;div class=&quot;language-xml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;cp&quot;&gt;&amp;lt;?xml version=&quot;1.0&quot; ?&amp;gt;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;S:Envelope&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;xmlns:S=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;S:Body&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;nt&quot;&gt;&amp;lt;ns2:newContact&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;xmlns:ns4=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;http://www.acmecorp.com/contacts/Exception&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;xmlns:ns3=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;http://www.acmecorp.com/contacts/RequestMetaInfo&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;xmlns:ns2=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;http://www.acmecorp.com/contacts/crm-contact/Service&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+            &lt;span class=&quot;nt&quot;&gt;&amp;lt;ns2:contact&amp;gt;&lt;/span&gt;
+                &lt;span class=&quot;nt&quot;&gt;&amp;lt;ns2:prefix&amp;gt;&lt;/span&gt;Mr&lt;span class=&quot;nt&quot;&gt;&amp;lt;/ns2:prefix&amp;gt;&lt;/span&gt;
+                &lt;span class=&quot;nt&quot;&gt;&amp;lt;ns2:name&amp;gt;&lt;/span&gt;John&lt;span class=&quot;nt&quot;&gt;&amp;lt;/ns2:name&amp;gt;&lt;/span&gt;
+                &lt;span class=&quot;nt&quot;&gt;&amp;lt;ns2:surname&amp;gt;&lt;/span&gt;Longjohn&lt;span class=&quot;nt&quot;&gt;&amp;lt;/ns2:surname&amp;gt;&lt;/span&gt;
+            &lt;span class=&quot;nt&quot;&gt;&amp;lt;/ns2:contact&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;nt&quot;&gt;&amp;lt;/ns2:newContact&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;/S:Body&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/S:Envelope&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name>cmanios</name></author><category term="java" /><category term="http" /><category term="request" /><category term="message" /><category term="debug" /><category term="soap" /><category term="client" /><category term="jax" /><category term="ws" /><category term="jax-ws" /><category term="web" /><category term="service" /><category term="print" /><category term="log" /><category term="console" /><category term="wsdl" /><summary type="html">Today I wanted to debug in Java a JAX-WS SOAP web service client and see the exact message that is send as an HTTP request. So after searching, I found in this StackOverflow question that if we insert the following lines before calling the service:</summary></entry><entry><title type="html">HTTP Basic Authentication in Java SOAP JAX-WS web service client</title><link href="https://manios.org/2018/03/30/java-soap-jax-ws-client-basic-auth" rel="alternate" type="text/html" title="HTTP Basic Authentication in Java SOAP JAX-WS web service client" /><published>2018-03-30T17:42:00+03:00</published><updated>2018-03-30T17:42:00+03:00</updated><id>https://manios.org/2018/03/30/java-soap-jax-ws-client-basic-auth</id><content type="html" xml:base="https://manios.org/2018/03/30/java-soap-jax-ws-client-basic-auth">&lt;p&gt;Today I had to create a Java client for a SOAP web service. So I opened &lt;a href=&quot;http://netbeans.org/&quot;&gt;Netbeans&lt;/a&gt; IDE and used the great tool which generates JAX-WS client code using the respective service &lt;code class=&quot;highlighter-rouge&quot;&gt;.wsdl&lt;/code&gt; file. However, the service needed to be called using &lt;a href=&quot;https://en.wikipedia.org/wiki/Basic_access_authentication&quot;&gt;Basic Http Authentication&lt;/a&gt;.&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;strong&gt;NOTE&lt;/strong&gt;: The solution provided works if the WSDL is not protected itself by Basic Http Authentication. The Basic Authentication &lt;u&gt;is added as a header in the HTTP request&lt;/u&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;After a lot of searching I found that (StackOverflow question) this is possible:&lt;/p&gt;
+
+&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;ContactCreationRequestService_Service&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;srv&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ContactCreationRequestService_Service&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;ContactCreationRequestService&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;porta&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;c1&quot;&gt;// Get service port&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;try&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;porta&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;srv&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getContactCreationRequestServicePort&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;catch&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Exception&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;){&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;logger&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;error&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;c1&quot;&gt;// Add username and password for Basic Authentication&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;Map&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Object&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;reqContext&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;((&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;BindingProvider&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;porta&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getRequestContext&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;reqContext&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;put&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;BindingProvider&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;USERNAME_PROPERTY&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;username&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;reqContext&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;put&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;BindingProvider&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;PASSWORD_PROPERTY&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;password&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+
+&lt;span class=&quot;c1&quot;&gt;// Create a contact request&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;ContactRequest&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ka&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ContactRequest&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;ka&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;setPrefix&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Mr&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;ka&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;setName&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Christos&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;ka&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;setSurname&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Manios&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;NewContact&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;nka&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;NewContact&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;nka&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;setContactRequest&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ka&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+
+&lt;span class=&quot;c1&quot;&gt;// Call the web service&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;try&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;porta&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;newContactCreationRequest&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;nka&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;catch&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;SoapServiceException&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;logger&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;error&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;If we enable debugging to see the actual HTTP request, then the logs will show output like the following:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;---[HTTP request - http://localhost:9090/ContactRequestServicePort]---
+Accept: text/xml, multipart/related
+Authorization: Basic dXNlcm5hbWU6cGFzc3dvcmQ=
+Content-Type: text/xml; charset=utf-8
+SOAPAction: &quot;newContact&quot;
+User-Agent: JAX-WS RI 2.2.9-b130926.1035 svn-revision#5f6196f2b90e9460065a4c2f4e30e065b245e51e
+&amp;lt;?xml version=&quot;1.0&quot; ?&amp;gt;&amp;lt;S:Envelope xmlns:S=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;&amp;gt;&amp;lt;S:Body&amp;gt;&amp;lt;ns2:newContact xmlns:ns4=&quot;http://www.acmecorp.com/contacts/Exception&quot; xmlns:ns3=&quot;http://www.acmecorp.com/contacts/RequestMetaInfo&quot; xmlns:ns2=&quot;http://www.acmecorp.com/contacts/crm-contact/Service&quot;&amp;gt;&amp;lt;ns2:contact&amp;gt;&amp;lt;ns2:prefix&amp;gt;Mr&amp;lt;/ns2:prefix&amp;gt;&amp;lt;ns2:name&amp;gt;John&amp;lt;/ns2:name&amp;gt;&amp;lt;ns2:surname&amp;gt;Longjohn&amp;lt;/ns2:surname&amp;gt;&amp;lt;/ns2:contact&amp;gt;&amp;lt;/ns2:newContact&amp;gt;&amp;lt;/S:Body&amp;gt;&amp;lt;/S:Envelope&amp;gt;--------------------
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;You can observe that the request contains the &lt;code class=&quot;highlighter-rouge&quot;&gt;Authorization&lt;/code&gt; header as expected:&lt;/p&gt;
+
+&lt;p&gt;```
+Authorization: Basic dXNlcm5hbWU6cGFzc3dvcmQ=
+``&lt;/p&gt;</content><author><name>cmanios</name></author><category term="java" /><category term="soap" /><category term="basic" /><category term="auth" /><category term="authentication" /><category term="client" /><category term="jax" /><category term="ws" /><category term="jax-ws" /><category term="web" /><category term="service" /><category term="http" /><category term="netbeans" /><category term="wsdl" /><summary type="html">Today I had to create a Java client for a SOAP web service. So I opened Netbeans IDE and used the great tool which generates JAX-WS client code using the respective service .wsdl file. However, the service needed to be called using Basic Http Authentication.</summary></entry><entry><title type="html">Install, configure and troubleshoot NTP servers in Debian Linux</title><link href="https://manios.org/2017/12/14/install-and-configure-and-troubleshoot-ntp-servers-in-debian-linux" rel="alternate" type="text/html" title="Install, configure and troubleshoot NTP servers in Debian Linux" /><published>2017-12-14T10:42:00+02:00</published><updated>2017-12-14T10:42:00+02:00</updated><id>https://manios.org/2017/12/14/install-and-configure-and-troubleshoot-ntp-servers-in-debian-linux</id><content type="html" xml:base="https://manios.org/2017/12/14/install-and-configure-and-troubleshoot-ntp-servers-in-debian-linux">&lt;p&gt;If you are reading this article, perhaps you have searched a lot about NTP server installation in Linux, issues and problems encountered and how to troubleshoot them! We know that there are so many articles about how to configure NTP servers but we could not find any which contains all the issues we faced in the same place!&lt;/p&gt;
 
 &lt;h2 id=&quot;our-story&quot;&gt;Our story&lt;/h2&gt;
 
@@ -430,7 +666,7 @@ Tue Nov 24 11:00:34 EEST 2017
 
 &lt;p&gt;We rejected resizing the oplog because the database grows every day +9GB so the oplog had to become at least 81GB in order to contain the changes of the aforementioned last 9 days.&lt;/p&gt;
 
-&lt;p&gt;That’s it! I hope it helped you!&lt;/p&gt;</content><author><name>cmanios</name></author><category term="mongo" /><category term="mongodb" /><category term="database" /><category term="replication" /><category term="recovery" /><category term="secondary" /><category term="replica" /><category term="sync" /><category term="synchronisation" /><category term="linux" /><category term="stale" /><category term="catch" /><category term="error" /><category term="set" /><category term="rs102" /><summary type="html">We run MongoDB 2.6.0 on a production system configured with a replica set of 3 members: Primary Secondary Arbiter</summary></entry><entry><title type="html">Use HAProxy and Docker to load balance requests to Solr and SolrCloud</title><link href="https://manios.org/2017/11/15/use-haproxy-and-docker-for-solr-load-balancing" rel="alternate" type="text/html" title="Use HAProxy and Docker to load balance requests to Solr and SolrCloud" /><published>2017-11-15T12:14:00+02:00</published><updated>2017-11-15T12:14:00+02:00</updated><id>https://manios.org/2017/11/15/use-haproxy-and-docker-for-solr-load-balancing</id><content type="html" xml:base="https://manios.org/2017/11/15/use-haproxy-and-docker-for-solr-load-balancing">&lt;p&gt;We use Solr 4.6 with SolrCloud configuration in a production system. You may say: “It is hight time you upgraded to the latest version, isn’t it?”. And you will be absolute right! But currently this is not the case because full reindexing costs! Our SolrCloud consists of one shard and five replicas as seen in the screenshot bellow:&lt;/p&gt;
+&lt;p&gt;That’s it! I hope it helped you!&lt;/p&gt;</content><author><name>cmanios</name></author><category term="mongo" /><category term="mongodb" /><category term="database" /><category term="replication" /><category term="recovery" /><category term="secondary" /><category term="replica" /><category term="sync" /><category term="synchronisation" /><category term="linux" /><summary type="html">We run MongoDB 2.6.0 on a production system configured with a replica set of 3 members: Primary Secondary Arbiter</summary></entry><entry><title type="html">Use HAProxy and Docker to load balance requests to Solr and SolrCloud</title><link href="https://manios.org/2017/11/15/use-haproxy-and-docker-for-solr-load-balancing" rel="alternate" type="text/html" title="Use HAProxy and Docker to load balance requests to Solr and SolrCloud" /><published>2017-11-15T12:14:00+02:00</published><updated>2017-11-15T12:14:00+02:00</updated><id>https://manios.org/2017/11/15/use-haproxy-and-docker-for-solr-load-balancing</id><content type="html" xml:base="https://manios.org/2017/11/15/use-haproxy-and-docker-for-solr-load-balancing">&lt;p&gt;We use Solr 4.6 with SolrCloud configuration in a production system. You may say: “It is hight time you upgraded to the latest version, isn’t it?”. And you will be absolute right! But currently this is not the case because full reindexing costs! Our SolrCloud consists of one shard and five replicas as seen in the screenshot bellow:&lt;/p&gt;
 
 &lt;figure&gt;
     &lt;a href=&quot;/images/2017-11-15-haproxy-docker-and-solr/2017-11-15-solrcloud.png&quot;&gt;&lt;img src=&quot;/images/2017-11-15-haproxy-docker-and-solr/2017-11-15-solrcloud.png&quot; alt=&quot;SolrCloud with one shard and five replicas&quot; /&gt;&lt;/a&gt;
@@ -499,10 +735,10 @@ Tue Nov 24 11:00:34 EEST 2017
 &lt;p&gt;Now our search queries are handled better and we have already noticed an increase in query performance, faster response times and no downtime! This is a sample output from HAProxy statistics page:&lt;/p&gt;
 
 &lt;figure&gt;
-    &lt;a href=&quot;/images/2017-11-15-haproxy-docker-and-solr/2017-11-15-haproxy-stats.png&quot;&gt;&lt;img src=&quot;/images/2017-11-15-haproxy-docker-and-solr/2017-11-15-haproxy-stats.png&quot; alt=&quot;HAProxy as a load balancer to Solr and SolrCloud with one shard and five replicas using leastconn algorithn&quot; /&gt;&lt;/a&gt;
+    &lt;a href=&quot;/images/2017-11-15-haproxy-docker-and-solr/2017-11-15-haproxy-stats.png&quot;&gt;&lt;img src=&quot;/images/2017-11-15-haproxy-docker-and-solr/2017-11-15-haproxy-stats.png&quot; alt=&quot;HAProxy as a load balancer to Solr and SolrCloud with one shard and five replicas using leastconn algorithm&quot; /&gt;&lt;/a&gt;
 &lt;/figure&gt;
 
-&lt;p&gt;We hope you find this article helpful!&lt;/p&gt;</content><author><name>cmanios</name></author><category term="haproxy" /><category term="solr" /><category term="solrcloud" /><category term="docker" /><category term="linux" /><category term="install" /><category term="load" /><category term="balancing" /><summary type="html">We use Solr 4.6 with SolrCloud configuration in a production system. You may say: “It is hight time you upgraded to the latest version, isn’t it?”. And you will be absolute right! But currently this is not the case because full reindexing costs! Our SolrCloud consists of one shard and five replicas as seen in the screenshot bellow:</summary></entry><entry><title type="html">SublimeText 3 Fix greek (and other languages) accented chars input</title><link href="https://manios.org/2017/10/17/sublime-3-fix-greek-accented-characters" rel="alternate" type="text/html" title="SublimeText 3 Fix greek (and other languages) accented chars input" /><published>2017-10-17T20:27:48+02:00</published><updated>2017-10-17T20:27:48+02:00</updated><id>https://manios.org/2017/10/17/sublime-3-fix-greek-accented-characters</id><content type="html" xml:base="https://manios.org/2017/10/17/sublime-3-fix-greek-accented-characters">&lt;p&gt;Yesterday I installed SublimeText 3 editor (build 3143) in my PC and the first thing I realised was that I could not type any Greek accented characters. Thus when I wanted to type:
+&lt;p&gt;We hope you find this article helpful!&lt;/p&gt;</content><author><name>cmanios</name></author><category term="haproxy" /><category term="solr" /><category term="solrcloud" /><category term="docker" /><category term="linux" /><category term="install" /><category term="load" /><category term="balancing" /><summary type="html">We use Solr 4.6 with SolrCloud configuration in a production system. You may say: “It is hight time you upgraded to the latest version, isn’t it?”. And you will be absolute right! But currently this is not the case because full reindexing costs! Our SolrCloud consists of one shard and five replicas as seen in the screenshot bellow:</summary></entry><entry><title type="html">SublimeText 3 Fix greek (and other languages) accented chars input</title><link href="https://manios.org/2017/10/17/sublime-3-fix-greek-accented-characters" rel="alternate" type="text/html" title="SublimeText 3 Fix greek (and other languages) accented chars input" /><published>2017-10-17T21:27:48+03:00</published><updated>2017-10-17T21:27:48+03:00</updated><id>https://manios.org/2017/10/17/sublime-3-fix-greek-accented-characters</id><content type="html" xml:base="https://manios.org/2017/10/17/sublime-3-fix-greek-accented-characters">&lt;p&gt;Yesterday I installed SublimeText 3 editor (build 3143) in my PC and the first thing I realised was that I could not type any Greek accented characters. Thus when I wanted to type:
 ex&lt;/p&gt;
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Το γοργόν και χάριν έχει.
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
@@ -535,7 +771,7 @@ ex&lt;/p&gt;
     &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;keys&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;´&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Υ&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;command&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;insert&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;args&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;characters&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Ύ&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}},&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
     &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;keys&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;´&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Ω&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;command&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;insert&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;args&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;characters&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Ώ&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}},&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
 &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name>cmanios</name></author><category term="sublimetext" /><category term="sublime" /><category term="text" /><category term="editor" /><category term="linux" /><category term="accented" /><category term="accent" /><category term="char" /><category term="character" /><category term="greek" /><category term="fix" /><summary type="html">Yesterday I installed SublimeText 3 editor (build 3143) in my PC and the first thing I realised was that I could not type any Greek accented characters. Thus when I wanted to type: ex Το γοργόν και χάριν έχει. , Sublime actually showed Το γοργ´ον και χ´αριν ´εχει</summary></entry><entry><title type="html">Configure Eclipse in order to build MapStruct in Java projects</title><link href="https://manios.org/2017/08/09/configure-eclipse-in-order-to-build-mapstruct-in-java-projects" rel="alternate" type="text/html" title="Configure Eclipse in order to build MapStruct in Java projects" /><published>2017-08-09T12:14:00+02:00</published><updated>2017-08-09T12:14:00+02:00</updated><id>https://manios.org/2017/08/09/configure-eclipse-in-order-to-build-mapstruct-in-java-projects</id><content type="html" xml:base="https://manios.org/2017/08/09/configure-eclipse-in-order-to-build-mapstruct-in-java-projects">&lt;p&gt;Today I was working on a Java Spring MVC project which uses Maven. My editor was the Eclipse IDE, with the current version of the &lt;a href=&quot;http://www.eclipse.org/m2e/&quot;&gt;M2E plug-in&lt;/a&gt;. When I pulled the latest commits from the Git repository, my colleagues informed me that we will be using &lt;a href=&quot;http://mapstruct.org/&quot;&gt;MapStruct&lt;/a&gt; as a bean mapper between Entities and DTOs.&lt;/p&gt;
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name>cmanios</name></author><category term="sublimetext" /><category term="sublime" /><category term="text" /><category term="editor" /><category term="linux" /><category term="accented" /><category term="accent" /><category term="char" /><category term="character" /><category term="greek" /><category term="fix" /><summary type="html">Yesterday I installed SublimeText 3 editor (build 3143) in my PC and the first thing I realised was that I could not type any Greek accented characters. Thus when I wanted to type: ex Το γοργόν και χάριν έχει. , Sublime actually showed Το γοργ´ον και χ´αριν ´εχει</summary></entry><entry><title type="html">Configure Eclipse in order to build MapStruct in Java projects</title><link href="https://manios.org/2017/08/09/configure-eclipse-in-order-to-build-mapstruct-in-java-projects" rel="alternate" type="text/html" title="Configure Eclipse in order to build MapStruct in Java projects" /><published>2017-08-09T13:14:00+03:00</published><updated>2017-08-09T13:14:00+03:00</updated><id>https://manios.org/2017/08/09/configure-eclipse-in-order-to-build-mapstruct-in-java-projects</id><content type="html" xml:base="https://manios.org/2017/08/09/configure-eclipse-in-order-to-build-mapstruct-in-java-projects">&lt;p&gt;Today I was working on a Java Spring MVC project which uses Maven. My editor was the Eclipse IDE, with the current version of the &lt;a href=&quot;http://www.eclipse.org/m2e/&quot;&gt;M2E plug-in&lt;/a&gt;. When I pulled the latest commits from the Git repository, my colleagues informed me that we will be using &lt;a href=&quot;http://mapstruct.org/&quot;&gt;MapStruct&lt;/a&gt; as a bean mapper between Entities and DTOs.&lt;/p&gt;
 
 &lt;p&gt;I read a little bit about it and I Ran the project in Eclipse. The Pivotal Tc Server started, but the deployment failed with the following error:&lt;/p&gt;
 
@@ -664,7 +900,7 @@ Caused by: org.springframework.beans.factory.NoSuchBeanDefinitionException: No q
 &lt;span class=&quot;nt&quot;&gt;&amp;lt;/plugin&amp;gt;&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;That’s it! I hope it helped you!&lt;/p&gt;</content><author><name>cmanios</name></author><category term="eclipse" /><category term="java" /><category term="spring" /><category term="maven" /><category term="m2e" /><category term="m2e-apt" /><category term="plugin" /><category term="compile" /><category term="annotation" /><category term="mapper" /><summary type="html">Today I was working on a Java Spring MVC project which uses Maven. My editor was the Eclipse IDE, with the current version of the M2E plug-in. When I pulled the latest commits from the Git repository, my colleagues informed me that we will be using MapStruct as a bean mapper between Entities and DTOs.</summary></entry><entry><title type="html">Let’s Encrypt SSL certificate without root or sudo privileges</title><link href="https://manios.org/2016/07/12/lets-encrypt-ssl-certificate-without-root-or-sudo-privileges" rel="alternate" type="text/html" title="Let's Encrypt SSL certificate without root or sudo privileges" /><published>2016-07-12T21:32:53+02:00</published><updated>2016-07-12T21:32:53+02:00</updated><id>https://manios.org/2016/07/12/lets-encrypt-ssl-certificate-without-root-or-sudo-privileges</id><content type="html" xml:base="https://manios.org/2016/07/12/lets-encrypt-ssl-certificate-without-root-or-sudo-privileges">&lt;p&gt;Five days ago we had to renew a number of SSL certificates using free &lt;a href=&quot;http://letsencrypt.org/&quot;&gt;Let’s Encrypt&lt;/a&gt; SSL authority to a few Apache servers which were installed in &lt;a href=&quot;http://www.layershift.com/&quot;&gt;Jelastic PaaS environment&lt;/a&gt;. The Apache servers were installed in an environment where:&lt;/p&gt;
+&lt;p&gt;That’s it! I hope it helped you!&lt;/p&gt;</content><author><name>cmanios</name></author><category term="eclipse" /><category term="java" /><category term="spring" /><category term="maven" /><category term="m2e" /><category term="m2e-apt" /><category term="plugin" /><category term="compile" /><category term="annotation" /><category term="mapper" /><summary type="html">Today I was working on a Java Spring MVC project which uses Maven. My editor was the Eclipse IDE, with the current version of the M2E plug-in. When I pulled the latest commits from the Git repository, my colleagues informed me that we will be using MapStruct as a bean mapper between Entities and DTOs.</summary></entry><entry><title type="html">Let’s Encrypt SSL certificate without root or sudo privileges</title><link href="https://manios.org/2016/07/12/lets-encrypt-ssl-certificate-without-root-or-sudo-privileges" rel="alternate" type="text/html" title="Let's Encrypt SSL certificate without root or sudo privileges" /><published>2016-07-12T22:32:53+03:00</published><updated>2016-07-12T22:32:53+03:00</updated><id>https://manios.org/2016/07/12/lets-encrypt-ssl-certificate-without-root-or-sudo-privileges</id><content type="html" xml:base="https://manios.org/2016/07/12/lets-encrypt-ssl-certificate-without-root-or-sudo-privileges">&lt;p&gt;Five days ago we had to renew a number of SSL certificates using free &lt;a href=&quot;http://letsencrypt.org/&quot;&gt;Let’s Encrypt&lt;/a&gt; SSL authority to a few Apache servers which were installed in &lt;a href=&quot;http://www.layershift.com/&quot;&gt;Jelastic PaaS environment&lt;/a&gt;. The Apache servers were installed in an environment where:&lt;/p&gt;
 
 &lt;ol&gt;
   &lt;li&gt;
@@ -861,403 +1097,4 @@ lrwxrwxrwx 1 apache apache   22 Jul  7 06:50 privkey.pem -&amp;gt; privkey-14573
 
 &lt;p&gt;Finally we reload &lt;code class=&quot;highlighter-rouge&quot;&gt;sudo /etc/init.d/apache2 reload&lt;/code&gt; or restart (&lt;code class=&quot;highlighter-rouge&quot;&gt;sudo /etc/init.d/apache2 restart&lt;/code&gt;) Apache web server and verify that &lt;code class=&quot;highlighter-rouge&quot;&gt;https://bobos.org&lt;/code&gt; works.&lt;/p&gt;
 
-&lt;p&gt;That is all folks! Greetings from a hot and striving for the best Greece!&lt;/p&gt;</content><author><name>cmanios</name></author><category term="bash" /><category term="centos" /><category term="certificate" /><category term="encrypt" /><category term="free" /><category term="install" /><category term="jelastic" /><category term="let's encrypt" /><category term="lets" /><category term="linux" /><category term="root" /><category term="ssh" /><category term="ssl" /><category term="sudo" /><summary type="html">Five days ago we had to renew a number of SSL certificates using free Let’s Encrypt SSL authority to a few Apache servers which were installed in Jelastic PaaS environment. The Apache servers were installed in an environment where:</summary></entry><entry><title type="html">Migrate a Gitlab Docker container from version 8.0.4 to 8.2.0</title><link href="https://manios.org/2015/12/04/migrate-a-gitlab-docker-container-from-version-8-0-4-to-8-2-0" rel="alternate" type="text/html" title="Migrate a Gitlab Docker container from version 8.0.4 to 8.2.0" /><published>2015-12-04T22:47:06+02:00</published><updated>2015-12-04T22:47:06+02:00</updated><id>https://manios.org/2015/12/04/migrate-a-gitlab-docker-container-from-version-8-0-4-to-8-2-0</id><content type="html" xml:base="https://manios.org/2015/12/04/migrate-a-gitlab-docker-container-from-version-8-0-4-to-8-2-0">&lt;p&gt;&lt;strong&gt;Update 2016-05-13&lt;/strong&gt;: The following procedure works perfectly for migrations from version 8.0.4 to 8.7.5&lt;/p&gt;
-
-&lt;p&gt;A few days ago, I had to migrate a Gitlab instance installed in Docker from version 8.04 to 8.2.0. I followed the exact steps described in GitLab &lt;a href=&quot;http://doc.gitlab.com/omnibus/docker/&quot;&gt;Docker images&lt;/a&gt; documentation. But it was not so easy! Of cource, it required some more! Thus, after 4 hours of errors, searching and trials I found the way! Thank god!&lt;/p&gt;
-
-&lt;p&gt;In this article we will make the assumption that Gitlab volumes are stored in &lt;code class=&quot;highlighter-rouge&quot;&gt;/home/bob/docker-data/gitlab&lt;/code&gt; directory. Here are the exact steps I followed to make a successful migration:&lt;/p&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;Stop docker container
-    &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;docker stop gitlab
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
-  &lt;/li&gt;
-  &lt;li&gt;Backup docker volumes (all gitlab files)
-    &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;backupDate&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;$(&lt;/span&gt;date +&lt;span class=&quot;s2&quot;&gt;&quot;%Y%m%d%H%M%S&quot;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;cd&lt;/span&gt; /home/bob/docker-data/ &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;sudo tar &lt;/span&gt;zvcf gitlab-data-&lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;backupDate&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;.tar.gz gitlab/
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
-  &lt;/li&gt;
-  &lt;li&gt;Optionally backup docker image
-    &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;docker save &lt;span class=&quot;nt&quot;&gt;-o&lt;/span&gt; /home/bob/gitlab-ce-image.tar gitlab/gitlab-ce:latest
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
-  &lt;/li&gt;
-  &lt;li&gt;Remove docker container
-    &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;docker rm gitlab
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
-  &lt;/li&gt;
-  &lt;li&gt;Download the latest Gitlab docker image
-    &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;docker pull gitlab/gitlab-ce:latest
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
-  &lt;/li&gt;
-  &lt;li&gt;After the image is downloaded create and run the container
-    &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;docker run &lt;span class=&quot;nt&quot;&gt;-d&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;--hostname&lt;/span&gt; 192.168.1.1 &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;--publish&lt;/span&gt; 8443:443 &lt;span class=&quot;nt&quot;&gt;--publish&lt;/span&gt; 8082:80 &lt;span class=&quot;nt&quot;&gt;--publish&lt;/span&gt; 2224:22 &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;--name&lt;/span&gt; gitlab &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;--restart&lt;/span&gt; always &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;--volume&lt;/span&gt; /etc/localtime:/etc/localtime &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;--volume&lt;/span&gt; /home/bob/docker-data/gitlab/config:/etc/gitlab &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;--volume&lt;/span&gt; /home/bob/docker-data/gitlab/logs:/var/log/gitlab &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;--volume&lt;/span&gt; /home/bob/docker-data/gitlab/data:/var/opt/gitlab &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
-gitlab/gitlab-ce:latest
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
-  &lt;/li&gt;
-  &lt;li&gt;The container starts and we observer the logs via:
-    &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;docker logs &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--tail&lt;/span&gt; 10 gitlab
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
-  &lt;/li&gt;
-  &lt;li&gt;The docker container started and we observed in the logs:
-    &lt;div class=&quot;language-text highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;[2015-11-26T15:12:26+02:00] INFO: Retrying execution of execute[create gitlab database user], 19 attempt(s) left
-[2015-11-26T15:12:28+02:00] INFO: Retrying execution of execute[create gitlab database user], 18 attempt(s) left
-... (some lines omitted) ...
-[2015-11-26T15:13:09+02:00] INFO: Retrying execution of execute[create gitlab database user], 0 attempt(s) left
-
-
-Error executing action `run` on resource 'execute[create gitlab database user]'
-
-
-Mixlib::ShellOut::ShellCommandFailed
-
-Expected process to exit with [0], but received '2'
----- Begin output of /opt/gitlab/embedded/bin/psql --port 5432 -h /var/opt/gitlab/postgresql -d template1 -c &quot;CREATE USER gitlab&quot; ----
-STDOUT: 
-STDERR: psql: could not connect to server: No such file or directory
-Is the server running locally and accepting
-connections on Unix domain socket &quot;/var/opt/gitlab/postgresql/.s.PGSQL.5432&quot;?
----- End output of /opt/gitlab/embedded/bin/psql --port 5432 -h /var/opt/gitlab/postgresql -d template1 -c &quot;CREATE USER gitlab&quot; ----
-Ran /opt/gitlab/embedded/bin/psql --port 5432 -h /var/opt/gitlab/postgresql -d template1 -c &quot;CREATE USER gitlab&quot; returned 2
-
-Resource Declaration:
-
-# In /opt/gitlab/embedded/cookbooks/cache/cookbooks/gitlab/recipes/postgresql.rb
-
-153:   execute &quot;create #{sql_user} database user&quot; do
-154:     command &quot;#{bin_dir}/psql --port #{pg_port} -h #{postgresql_socket_dir} -d template1 -c \&quot;CREATE USER #{sql_user}\&quot;&quot;
-155:     user postgresql_user
-156:     # Added retries to give the service time to start on slower systems
-157:     retries 20
-158:     not_if { !pg_helper.is_running? || pg_helper.user_exists?(sql_user) }
-159:   end
-160: 
-
-Compiled Resource:
-
-# Declared in /opt/gitlab/embedded/cookbooks/cache/cookbooks/gitlab/recipes/postgresql.rb:153:in `block in from_file'
-
-execute(&quot;create gitlab database user&quot;) do
-action [:run]
-retries 20
-retry_delay 2
-default_guard_interpreter :execute
-command &quot;/opt/gitlab/embedded/bin/psql --port 5432 -h /var/opt/gitlab/postgresql -d template1 -c \&quot;CREATE USER gitlab\&quot;&quot;
-backup 5
-returns 0
-user &quot;gitlab-psql&quot;
-declared_type :execute
-cookbook_name &quot;gitlab&quot;
-recipe_name &quot;postgresql&quot;
-not_if { #code block }
-end
-
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
-    &lt;p&gt;These are two known permission issues described in official &lt;a href=&quot;http://doc.gitlab.com/omnibus/docker/&quot;&gt;documentation&lt;/a&gt; and in &lt;a href=&quot;https://github.com/gitlabhq/gitlabhq/issues/9611&quot;&gt;issue #9611&lt;/a&gt;. In order to overcome them, we execute:&lt;/p&gt;
-    &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;docker &lt;span class=&quot;nb&quot;&gt;exec&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-it&lt;/span&gt; gitlab update-permissions
-docker &lt;span class=&quot;nb&quot;&gt;exec &lt;/span&gt;gitlab chown &lt;span class=&quot;nt&quot;&gt;-R&lt;/span&gt; gitlab-redis /var/opt/gitlab/redis
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
-    &lt;p&gt;and finally we restart the docker container:&lt;/p&gt;
-    &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;docker restart gitlab
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
-  &lt;/li&gt;
-  &lt;li&gt;Then we have to check if the database migration was successfull and avoid &lt;a href=&quot;https://gitlab.com/gitlab-org/gitlab-ce/issues/3255&quot;&gt;issue #3255&lt;/a&gt;. Thus, we log into bash shell:
-    &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;docker &lt;span class=&quot;nb&quot;&gt;exec&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-t&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-i&lt;/span&gt; gitlab /bin/bash
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
-    &lt;p&gt;and we check the db migration status:&lt;/p&gt;
-    &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;gitlab-rake db:migrate:status
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
-    &lt;p&gt;If everything is stated as &lt;code class=&quot;highlighter-rouge&quot;&gt;up&lt;/code&gt;, we are OK. However, if we notice &lt;code class=&quot;highlighter-rouge&quot;&gt;down&lt;/code&gt; migrations like this&lt;/p&gt;
-    &lt;div class=&quot;language-text highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;up     20150920161119  Add line code to sent notification
-down    20150924125150  Add project id to ci commit
-down    20150924125436  Migrate project id for ci commits
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
-    &lt;p&gt;we have to rerun the database migration ourserlves:&lt;/p&gt;
-    &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;gitlab-rake db:migrate
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
-    &lt;p&gt;When it finishes we have to check that everything went ok:&lt;/p&gt;
-    &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;gitlab-rake db:migrate:status
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
-  &lt;/li&gt;
-  &lt;li&gt;While being inside the container bash shell, we reconfigure the installation:
-    &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;gitlab-ctl reconfigure
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
-    &lt;p&gt;and then check that everything went ok:&lt;/p&gt;
-    &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;gitlab-rake gitlab:check
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
-  &lt;/li&gt;
-  &lt;li&gt;If everything is OK, then the command:
-    &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;gitlab-rake gitlab:env:info &lt;span class=&quot;nv&quot;&gt;RAILS_ENV&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;production
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
-    &lt;p&gt;must return something like this:&lt;/p&gt;
-    &lt;div class=&quot;language-text highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;System information
-System:   Ubuntu 14.04
-Current User: git
-Using RVM:  no
-Ruby Version: 2.1.7p400
-Gem Version:  2.2.5
-Bundler Version:1.10.6
-Rake Version: 10.4.2
-Sidekiq Version:3.3.0
-
-GitLab information
-Version:  8.2.0
-Revision: d6bcf44
-Directory:  /opt/gitlab/embedded/service/gitlab-rails
-DB Adapter: postgresql
-URL:    http://192.168.1.1:8082
-HTTP Clone URL: http://192.168.1.1:8082/some-group/some-project.git
-SSH Clone URL:  git@192.168.1.1:some-group/some-project.git
-Using LDAP: yes
-Using Omniauth: no
-
-GitLab Shell
-Version:  2.6.7
-Repositories: /var/opt/gitlab/git-data/repositories
-Hooks:    /opt/gitlab/embedded/service/gitlab-shell/hooks/
-Git:    /opt/gitlab/embedded/bin/git
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
-  &lt;/li&gt;
-  &lt;li&gt;Finally we have to clear Redis cache, or we will face the &lt;a href=&quot;https://gitlab.com/gitlab-org/gitlab-ce/issues/3619&quot;&gt;issue #3619&lt;/a&gt; or &lt;a href=&quot;https://gitlab.com/gitlab-org/gitlab-ce/issues/3609&quot;&gt;issue #3609&lt;/a&gt;:
-    &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;gitlab-rake cache:clear
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
-  &lt;/li&gt;
-  &lt;li&gt;After that you will be able to login properly to &lt;a href=&quot;http://localhost:8082&quot;&gt;http://localhost:8082&lt;/a&gt;&lt;/li&gt;
-&lt;/ol&gt;</content><author><name>cmanios</name></author><category term="container" /><category term="docker" /><category term="git" /><category term="gitlab" /><category term="image" /><category term="linux" /><category term="migrate" /><summary type="html">Update 2016-05-13: The following procedure works perfectly for migrations from version 8.0.4 to 8.7.5</summary></entry><entry><title type="html">JSON remove new lines via Linux and use it as string variable and as param in cURL POST request</title><link href="https://manios.org/2014/12/30/json-remove-new-lines-via-linux-and-use-it-as-string-variable-and-as-param-in-curl-post-request" rel="alternate" type="text/html" title="JSON remove new lines via Linux and use it as string variable and as param in cURL POST request" /><published>2014-12-30T23:58:16+02:00</published><updated>2014-12-30T23:58:16+02:00</updated><id>https://manios.org/2014/12/30/json-remove-new-lines-via-linux-and-use-it-as-string-variable-and-as-param-in-curl-post-request</id><content type="html" xml:base="https://manios.org/2014/12/30/json-remove-new-lines-via-linux-and-use-it-as-string-variable-and-as-param-in-curl-post-request">&lt;p&gt;Today I had to parse a JSON response in a &lt;a href=&quot;http://junit.org/&quot;&gt;JUnit test&lt;/a&gt; and then reuse it in a &lt;a href=&quot;http://curl.haxx.se/&quot;&gt;cURL&lt;/a&gt; command line call. Unfortunately I could not read the JSON response from a file or from an HTTP request, so I had to place it inline as a String variable. My JSON looked like this:&lt;/p&gt;
-
-&lt;div class=&quot;language-javascript highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;s2&quot;&gt;&quot;responseHeader&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;s2&quot;&gt;&quot;status&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-        &lt;span class=&quot;s2&quot;&gt;&quot;QTime&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;193&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;
-    &lt;span class=&quot;s2&quot;&gt;&quot;defaultCoreName&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;collection1&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;s2&quot;&gt;&quot;initFailures&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{},&lt;/span&gt;
-    &lt;span class=&quot;s2&quot;&gt;&quot;status&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;s2&quot;&gt;&quot;jet2pilot_shard1_replica2&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-            &lt;span class=&quot;s2&quot;&gt;&quot;name&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;jet2pilot_shard1_replica2&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-            &lt;span class=&quot;s2&quot;&gt;&quot;isDefaultCore&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-            &lt;span class=&quot;s2&quot;&gt;&quot;instanceDir&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;/opt/solr-4.8.1/example/solr/jet2pilot_shard1_replica2/&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-            &lt;span class=&quot;s2&quot;&gt;&quot;dataDir&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;/opt/solr-4.8.1/example/solr/jet2pilot_shard1_replica2/data/&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-            &lt;span class=&quot;s2&quot;&gt;&quot;config&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;solrconfig.xml&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-            &lt;span class=&quot;s2&quot;&gt;&quot;schema&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;schema.xml&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-            &lt;span class=&quot;s2&quot;&gt;&quot;startTime&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;2014-12-31T19:12:41.633Z&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-            &lt;span class=&quot;s2&quot;&gt;&quot;uptime&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1350610415&lt;/span&gt;
-        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;h2 id=&quot;1-use-json-in-a-java-string-variable&quot;&gt;1. Use JSON in a Java string variable&lt;/h2&gt;
-
-&lt;p&gt;In order to parse JSON from a Java String variable, I had to:&lt;/p&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;remove &lt;strong&gt;\t,\n,\r&lt;/strong&gt; characters and&lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;escape single and double quotes (',&quot;)
-Thus, Linux shell came to the rescue! So, write your JSON to a file, for example &lt;strong&gt;myresponse.json&lt;/strong&gt; and execute the following command:&lt;/p&gt;
-
-    &lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;cat &lt;/span&gt;myresponse.json | tr &lt;span class=&quot;s1&quot;&gt;'\r'&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;' '&lt;/span&gt; |  tr &lt;span class=&quot;s1&quot;&gt;'\n'&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;' '&lt;/span&gt; | sed &lt;span class=&quot;s2&quot;&gt;&quot;s/[']/&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\\\'&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;/g&quot;&lt;/span&gt; | sed &lt;span class=&quot;s1&quot;&gt;'s/\&quot;/\\&quot;/g'&lt;/span&gt; | sed &lt;span class=&quot;s1&quot;&gt;'s/ \{3,\}/ /g'&lt;/span&gt; | sed &lt;span class=&quot;s1&quot;&gt;'s/   / /g'&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; onelinejson.txt
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
-
-    &lt;p&gt;Then you can use JSON as a simple Java String variable like the following:&lt;/p&gt;
-
-    &lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nd&quot;&gt;@Test&lt;/span&gt;
-&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;testAktiston&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(){&lt;/span&gt;
-   &lt;span class=&quot;n&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;jsonString&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;{ \&quot;responseHeader\&quot;: { \&quot;status\&quot;: 0, \&quot;QTime\&quot;: 193 }, \&quot;defaultCoreName\&quot;: \&quot;collection1\&quot;, \&quot;initFailures\&quot;: {}, \&quot;status\&quot;: { \&quot;jet2pilot_shard1_replica2\&quot;: { \&quot;name\&quot;: \&quot;jet2pilot_shard1_replica2\&quot;, \&quot;isDefaultCore\&quot;: false, \&quot;instanceDir\&quot;: \&quot;/opt/solr-4.8.1/example/solr/jet2pilot_shard1_replica2/\&quot;, \&quot;dataDir\&quot;: \&quot;/opt/solr-4.8.1/example/solr/jet2pilot_shard1_replica2/data/\&quot;, \&quot;config\&quot;: \&quot;solrconfig.xml\&quot;, \&quot;schema\&quot;: \&quot;schema.xml\&quot;, \&quot;startTime\&quot;: \&quot;2014-12-31T19:12:41.633Z\&quot;, \&quot;uptime\&quot;: 1350610415 } } }&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
-      
-   &lt;span class=&quot;c1&quot;&gt;// test code&lt;/span&gt;
-   &lt;span class=&quot;c1&quot;&gt;// parsing and other chaotic code&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
-  &lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h2 id=&quot;2-use-json-to-perform-a-post-request-using-curl&quot;&gt;2. Use JSON to perform a POST request using cURL&lt;/h2&gt;
-
-&lt;p&gt;In order to parse JSON from a Java String variable, I had to:&lt;/p&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;
-    &lt;p&gt;remove &lt;strong&gt;\t,\n,\r&lt;/strong&gt; characters and
-Again, Linux shell makes the world go round! So, write your JSON to a file, for example &lt;strong&gt;myresponse.json&lt;/strong&gt; and execute the following command:&lt;/p&gt;
-
-    &lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;cat &lt;/span&gt;myresponse.json | tr &lt;span class=&quot;s1&quot;&gt;'\r'&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;' '&lt;/span&gt; |  tr &lt;span class=&quot;s1&quot;&gt;'\n'&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;' '&lt;/span&gt; | sed &lt;span class=&quot;s1&quot;&gt;'s/ \{3,\}/ /g'&lt;/span&gt; | sed &lt;span class=&quot;s1&quot;&gt;'s/   / /g'&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; onelinejson.txt
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
-
-    &lt;p&gt;Then use it in your POST request via cURL command (the command is multilined in order to be legible):&lt;/p&gt;
-
-    &lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;curl &lt;span class=&quot;nt&quot;&gt;-v&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;-X&lt;/span&gt; POST
-&lt;span class=&quot;nt&quot;&gt;-H&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Cookie: JSESSIONID=00213719A12D07F7E67BE8B580CD9BBC&quot;&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;-H&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Content-Type: multipart/form-data&quot;&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;-H&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Accept: application/json&quot;&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;-F&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'repEx={ &quot;responseHeader&quot;: { &quot;status&quot;: 0, &quot;QTime&quot;: 193 }, &quot;defaultCoreName&quot;: &quot;collection1&quot;, &quot;initFailures&quot;: {}, &quot;status&quot;: { &quot;jet2pilot_shard1_replica2&quot;: { &quot;name&quot;: &quot;jet2pilot_shard1_replica2&quot;, &quot;isDefaultCore&quot;: false, &quot;instanceDir&quot;: &quot;/opt/solr-4.8.1/example/solr/jet2pilot_shard1_replica2/&quot;, &quot;dataDir&quot;: &quot;/opt/solr-4.8.1/example/solr/jet2pilot_shard1_replica2/data/&quot;, &quot;config&quot;: &quot;solrconfig.xml&quot;, &quot;schema&quot;: &quot;schema.xml&quot;, &quot;startTime&quot;: &quot;2014-12-31T19:12:41.633Z&quot;, &quot;uptime&quot;: 1350610415 } } }'&lt;/span&gt;
-&lt;span class=&quot;s2&quot;&gt;&quot;http://192.168.1.89:8080/apios/insertios&quot;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
-  &lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;That is all about καρντάσια (kardasia is translated as “folks” in Thessaloniki, Greece)! Have a nice year!&lt;/p&gt;</content><author><name>cmanios</name></author><category term="curl" /><category term="java" /><category term="json" /><category term="junit" /><category term="linux" /><category term="newline" /><category term="parse" /><category term="shell" /><summary type="html">Today I had to parse a JSON response in a JUnit test and then reuse it in a cURL command line call. Unfortunately I could not read the JSON response from a file or from an HTTP request, so I had to place it inline as a String variable. My JSON looked like this:</summary></entry><entry><title type="html">Solr fix corrupted index using Lucene</title><link href="https://manios.org/2014/11/01/solr-fix-corrupted-index-using-lucene" rel="alternate" type="text/html" title="Solr fix corrupted index using Lucene" /><published>2014-11-01T16:40:40+02:00</published><updated>2014-11-01T16:40:40+02:00</updated><id>https://manios.org/2014/11/01/solr-fix-corrupted-index-using-lucene</id><content type="html" xml:base="https://manios.org/2014/11/01/solr-fix-corrupted-index-using-lucene">&lt;p&gt;A few days ago, a Solr server in our SolrCloud installation stopped unexpectedly. After examining solr.log file I spotted that it could not start again because &lt;strong&gt;index.20140510031827076&lt;/strong&gt; file was corrupted. After some searching I found this &lt;a href=&quot;https://support.lucidworks.com/hc/en-us/articles/202091128-How-to-deal-with-Index-Corruption&quot;&gt;Lucidworks article&lt;/a&gt; which described how to deal with a corrupted index file. So I proceeded to the following steps:&lt;/p&gt;
-
-&lt;h3 id=&quot;warning&quot;&gt;WARNING!!&lt;/h3&gt;
-
-&lt;p&gt;&lt;strong&gt;This procedure may result in unrecoverable data loss. &lt;em&gt;It is vital that you backup your index before performing index checking and repair&lt;/em&gt;.&lt;/strong&gt;&lt;/p&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;Find the guilty index file containing the corrupted segment. For me it was located in:
-    &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;C:/Program Files/apache-solr-4.6.0/example/solr/hellaserver_shard1_replica4/data/index.20140510031827076
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
-  &lt;/li&gt;
-  &lt;li&gt;Find Lucene core .jar file. I work with Apache Solr 4.6.0 so it is a file named lucene-core-4.6.0.jar. It is usually in &lt;code class=&quot;highlighter-rouge&quot;&gt;$SOLR_HOME/example/solr-webapp/webapp/WEB-INF/lib/lucene-core-4.6.0.jar&lt;/code&gt;. So, switch to the directory where it exists:
-    &lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;cd &lt;/span&gt;C:/Program Files/apache-solr-4.6.0/example/solr-webapp/webapp/WEB-INF/lib
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
-  &lt;/li&gt;
-  &lt;li&gt;Check the segments of the corrupted index file in order to identify the problematic segment. To accomplish that, run:
-    &lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;java &lt;span class=&quot;nt&quot;&gt;-cp&lt;/span&gt; lucene-core-4.6.0.jar &lt;span class=&quot;nt&quot;&gt;-ea&lt;/span&gt;:org.apache.lucene... org.apache.lucene.index.CheckIndex &lt;span class=&quot;s2&quot;&gt;&quot;C:/Program Files/apache-solr-4.6.0/example/solr/hellaserver_shard1_replica4/data/index.20140510031827076&quot;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
-    &lt;p&gt;The check results for a &lt;strong&gt;healthy&lt;/strong&gt; segment look like the following:&lt;/p&gt;
-    &lt;div class=&quot;language-text highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;1 of 37: name=_48r7 docCount=3021717
-   codec=Lucene46
-   compound=false
-   numFiles=11
-   size (MB)=5,020.87
-   diagnostics = {timestamp=1403095380034, os=Windows Server 2012, os.version=6
-.2, mergeFactor=10, source=merge, lucene.version=4.6.0 1543363 - simon - 2013-11
--19 11:05:50, os.arch=amd64, mergeMaxNumSegments=-1, java.version=1.7.0_51, java
-.vendor=Oracle Corporation}
-   has deletions [delGen=170]
-   test: open reader.........OK [196 deleted docs]
-   test: fields..............OK [135 fields]
-   test: field norms.........OK [52 fields]
-   test: terms, freq, prox...OK [16644025 terms; 441992389 terms/docs pairs; 39
-0271915 tokens]
-   test (ignoring deletes): terms, freq, prox...OK [16646658 terms; 442060892 t
-erms/docs pairs; 390381979 tokens]
-   test: stored fields.......OK [107214499 total field count; avg 35.484 fields
-per doc]
-   test: term vectors........OK [0 total vector count; avg 0 term/freq vector f
-ields per doc]
-   test: docvalues...........OK [0 docvalues fields; 0 BINARY; 0 NUMERIC; 0 SOR
-TED; 0 SORTED_SET]
-
-2 of 37: name=_3b16 docCount=2449309
-   codec=Lucene46
-   compound=false
-   numFiles=11
-   size (MB)=3,831.743
-   diagnostics = {timestamp=1402370404453, os=Windows Server 2012, os.version=6
-.2, mergeFactor=10, source=merge, lucene.version=4.6.0 1543363 - simon - 2013-11
--19 11:05:50, os.arch=amd64, mergeMaxNumSegments=-1, java.version=1.7.0_51, java
-.vendor=Oracle Corporation}
-   has deletions [delGen=426]
-   test: open reader.........OK [20262 deleted docs]
-   test: fields..............OK [92 fields]
-   test: field norms.........OK [35 fields]
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
-    &lt;p&gt;When the index checker encounters a &lt;strong&gt;corrupted&lt;/strong&gt; segment, the output looks like the following:&lt;/p&gt;
-    &lt;div class=&quot;language-text highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;37 of 37: name=_4gxr docCount=11
-   codec=Lucene46
-   compound=false
-   numFiles=10
-   size (MB)=75.71
-   diagnostics = {timestamp=1403212995547, os=Windows Server 2012, os.version=6
-.2, source=flush, lucene.version=4.6.0 1543363 - simon - 2013-11-19 11:05:50, os
-.arch=amd64, java.version=1.7.0_51, java.vendor=Oracle Corporation}
-   no deletions
-   test: open reader.........FAILED
-   WARNING: fixIndex() would remove reference to this segment; full exception:
-org.apache.lucene.index.CorruptIndexException: invalid docCount: 48066 maxDoc: 1
-1 (resource=MMapIndexInput(path=&quot;C:\Program Files\apache-solr-4.6.0\example\solr
-\hellasever_shard1_replica4\data\index.20140510031827076\_4gxr_Lucene41_0.ti
-m&quot;))
-      at org.apache.lucene.codecs.BlockTreeTermsReader.(BlockTreeTermsRe
-ader.java:166)
-      at org.apache.lucene.codecs.lucene41.Lucene41PostingsFormat.fieldsProduc
-er(Lucene41PostingsFormat.java:437)
-      at org.apache.lucene.codecs.perfield.PerFieldPostingsFormat$FieldsReader
-.(PerFieldPostingsFormat.java:195)
-      at org.apache.lucene.codecs.perfield.PerFieldPostingsFormat.fieldsProduc
-er(PerFieldPostingsFormat.java:244)
-      at org.apache.lucene.index.SegmentCoreReaders.(SegmentCoreReaders.
-java:115)
-      at org.apache.lucene.index.SegmentReader.(SegmentReader.java:95)
-      at org.apache.lucene.index.CheckIndex.checkIndex(CheckIndex.java:554)
-      at org.apache.lucene.index.CheckIndex.main(CheckIndex.java:1941)
-
-WARNING: 1 broken segments (containing 11 documents) detected
-WARNING: would write new segments file, and 11 documents would be lost, if -fix
-were specified
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
-  &lt;/li&gt;
-  &lt;li&gt;After the reconnaissance of the corrupted segment, rerun the command with &lt;strong&gt;-fix&lt;/strong&gt; parameter:
-    &lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;java &lt;span class=&quot;nt&quot;&gt;-cp&lt;/span&gt; lucene-core-4.6.0.jar &lt;span class=&quot;nt&quot;&gt;-ea&lt;/span&gt;:org.apache.lucene... org.apache.lucene.index.CheckIndex &lt;span class=&quot;s2&quot;&gt;&quot;C:/Program Files/apache-solr-4.6.0/example/solr/hellaserver_shard1_replica4/data/index.20140510031827076&quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-fix&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
-    &lt;p&gt;When the checker fixes the segment, the output will look like the following:&lt;/p&gt;
-    &lt;div class=&quot;language-text highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;37 of 37: name=_4gxr docCount=11
-   codec=Lucene46
-   compound=false
-   numFiles=10
-   size (MB)=75.71
-   diagnostics = {timestamp=1403212995547, os=Windows Server 2012, os.version=6
-.2, source=flush, lucene.version=4.6.0 1543363 - simon - 2013-11-19 11:05:50, os
-.arch=amd64, java.version=1.7.0_51, java.vendor=Oracle Corporation}
-   no deletions
-   test: open reader.........FAILED
-   WARNING: fixIndex() would remove reference to this segment; full exception:
-org.apache.lucene.index.CorruptIndexException: invalid docCount: 48066 maxDoc: 1
-1 (resource=MMapIndexInput(path=&quot;C:\Program Files\apache-solr-4.6.0\example\solr
-\hellasever_shard1_replica4\data\index.20140510031827076\_4gxr_Lucene41_0.ti
-m&quot;))
-      at org.apache.lucene.codecs.BlockTreeTermsReader.&amp;lt;init&amp;gt;(BlockTreeTermsRe
-ader.java:166)
-      at org.apache.lucene.codecs.lucene41.Lucene41PostingsFormat.fieldsProduc
-er(Lucene41PostingsFormat.java:437)
-      at org.apache.lucene.codecs.perfield.PerFieldPostingsFormat$FieldsReader
-.&amp;lt;init&amp;gt;(PerFieldPostingsFormat.java:195)
-      at org.apache.lucene.codecs.perfield.PerFieldPostingsFormat.fieldsProduc
-er(PerFieldPostingsFormat.java:244)
-      at org.apache.lucene.index.SegmentCoreReaders.&amp;lt;init&amp;gt;(SegmentCoreReaders.
-java:115)
-      at org.apache.lucene.index.SegmentReader.&amp;lt;init&amp;gt;(SegmentReader.java:95)
-      at org.apache.lucene.index.CheckIndex.checkIndex(CheckIndex.java:554)
-      at org.apache.lucene.index.CheckIndex.main(CheckIndex.java:1941)
-
-WARNING: 1 broken segments (containing 11 documents) detected
-WARNING: 11 documents will be lost
-
-NOTE: will write new segments file in 5 seconds; this will remove 11 docs from t
-he index. THIS IS YOUR LAST CHANCE TO CTRL+C!
-5...
-4...
-3...
-2...
-1...
-Writing...
-OK
-Wrote new segments file &quot;segments_y5e&quot;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
-  &lt;/li&gt;
-  &lt;li&gt;Finally, restart Solr server in order to resynchronise with the shard leader.&lt;/li&gt;
-&lt;/ol&gt;</content><author><name>cmanios</name></author><category term="apache" /><category term="check" /><category term="core" /><category term="corrupt" /><category term="fix" /><category term="index" /><category term="java" /><category term="linux" /><category term="lucene" /><category term="repair" /><category term="segment" /><category term="solr" /><category term="windows" /><summary type="html">A few days ago, a Solr server in our SolrCloud installation stopped unexpectedly. After examining solr.log file I spotted that it could not start again because index.20140510031827076 file was corrupted. After some searching I found this Lucidworks article which described how to deal with a corrupted index file. So I proceeded to the following steps:</summary></entry><entry><title type="html">Linux: Extract audio and video using ffmpeg</title><link href="https://manios.org/2014/07/28/linux-extract-audio-and-video-using-ffmpeg" rel="alternate" type="text/html" title="Linux: Extract audio and video using ffmpeg " /><published>2014-07-28T13:21:08+02:00</published><updated>2014-07-28T13:21:08+02:00</updated><id>https://manios.org/2014/07/28/linux-extract-audio-and-video-using-ffmpeg</id><content type="html" xml:base="https://manios.org/2014/07/28/linux-extract-audio-and-video-using-ffmpeg">&lt;p&gt;Today I had some mp4 video files and I wanted to extract the audio and video into separate files. So to do that you can do the following:&lt;/p&gt;
-
-&lt;h4 id=&quot;extract-audio-from-video-file-and-convert-it-to-mp3&quot;&gt;Extract audio from video file and convert it to mp3&lt;/h4&gt;
-
-&lt;p&gt;To accomplish that, execute the command:&lt;/p&gt;
-
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;ffmpeg &lt;span class=&quot;nt&quot;&gt;-i&lt;/span&gt; logothetis-bureaucracy.mp4  &lt;span class=&quot;nt&quot;&gt;-ab&lt;/span&gt; 128k &lt;span class=&quot;nt&quot;&gt;-ac&lt;/span&gt; 2 &lt;span class=&quot;nt&quot;&gt;-ar&lt;/span&gt; 44100 &lt;span class=&quot;nt&quot;&gt;-vn&lt;/span&gt; logothetis-bureaucracy.mp3
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;h4 id=&quot;extract-only-the-video-segment-from-a-video&quot;&gt;Extract only the video segment from a video&lt;/h4&gt;
-
-&lt;p&gt;To accomplish that, execute the command:&lt;/p&gt;
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;ffmpeg &lt;span class=&quot;nt&quot;&gt;-i&lt;/span&gt; video.wmv &lt;span class=&quot;nt&quot;&gt;-vcodec&lt;/span&gt; copy &lt;span class=&quot;nt&quot;&gt;-an&lt;/span&gt; onlyvideo.wmv 
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name>cmanios</name></author><category term="audio" /><category term="extract" /><category term="ffmpeg" /><category term="linux" /><category term="mp3" /><category term="mp4" /><category term="shell" /><category term="video" /><summary type="html">Today I had some mp4 video files and I wanted to extract the audio and video into separate files. So to do that you can do the following:</summary></entry></feed>
+&lt;p&gt;That is all folks! Greetings from a hot and striving for the best Greece!&lt;/p&gt;</content><author><name>cmanios</name></author><category term="bash" /><category term="centos" /><category term="certificate" /><category term="encrypt" /><category term="free" /><category term="install" /><category term="jelastic" /><category term="let's encrypt" /><category term="lets" /><category term="linux" /><category term="root" /><category term="ssh" /><category term="ssl" /><category term="sudo" /><summary type="html">Five days ago we had to renew a number of SSL certificates using free Let’s Encrypt SSL authority to a few Apache servers which were installed in Jelastic PaaS environment. The Apache servers were installed in an environment where:</summary></entry></feed>

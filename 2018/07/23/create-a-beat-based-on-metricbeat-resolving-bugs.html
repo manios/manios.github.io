@@ -1,0 +1,767 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.2.2 by Michael Rose
+  Copyright 2017 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE.txt
+-->
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin SEO -->
+
+
+
+
+
+
+
+
+
+<title>Creating a Beat based on Metricbeat resolving Init and create metricset failures - cmanios</title>
+
+
+
+
+<meta name="description" content="I suspect that you are reading this post after having trouble creating a new Elastic Beat based on Metricbeat. Bud do not worry! We have you covered and solved the issues for you!">
+
+
+
+
+<meta name="author" content="cmanios">
+
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="cmanios">
+<meta property="og:title" content="Creating a Beat based on Metricbeat resolving Init and create metricset failures">
+
+
+  <link rel="canonical" href="https://manios.org/2018/07/23/create-a-beat-based-on-metricbeat-resolving-bugs">
+  <meta property="og:url" content="https://manios.org/2018/07/23/create-a-beat-based-on-metricbeat-resolving-bugs">
+
+
+
+  <meta property="og:description" content="I suspect that you are reading this post after having trouble creating a new Elastic Beat based on Metricbeat. Bud do not worry! We have you covered and solved the issues for you!">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+
+
+
+  <meta property="og:type" content="article">
+  <meta property="article:published_time" content="2018-07-23T22:31:00+03:00">
+
+
+
+
+
+
+
+
+  <script type="application/ld+json">
+    {
+      "@context" : "http://schema.org",
+      "@type" : "Person",
+      "name" : "Christos Manios",
+      "url" : "https://manios.org",
+      "sameAs" : null
+    }
+  </script>
+
+
+
+
+
+
+
+<!-- end SEO -->
+
+
+<link href="https://manios.org/feed.xml" type="application/atom+xml" rel="alternate" title="cmanios Feed">
+
+<!-- http://t.co/dKP3o1e -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="https://manios.org/assets/css/main.css">
+
+<!--[if lte IE 9]>
+  <style>
+    /* old IE unsupported flexbox fixes */
+    .greedy-nav .site-title {
+      padding-right: 3em;
+    }
+    .greedy-nav button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+    }
+  </style>
+<![endif]-->
+
+
+    <!-- start custom head snippets -->
+
+<!-- insert favicons. use http://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+  </head>
+
+  <body class="layout--single">
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    <div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        <a class="site-title" href="https://manios.org/">cmanios</a>
+        <ul class="visible-links">
+          
+            
+            <li class="masthead__menu-item"><a href="https://manios.org/year-archive/">Posts archive</a></li>
+          
+            
+            <li class="masthead__menu-item"><a href="https://manios.org/categories/">Categories</a></li>
+          
+            
+            <li class="masthead__menu-item"><a href="https://manios.org/tags/">Tags</a></li>
+          
+            
+            <li class="masthead__menu-item"><a href="https://manios.org/about/">About</a></li>
+          
+        </ul>
+        <button type="button">
+          <span class="visually-hidden">Toggle Menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+    
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+<div itemscope itemtype="http://schema.org/Person">
+
+  
+
+  <div class="author__content">
+    <h3 class="author__name" itemprop="name">Christos Manios</h3>
+    
+      <p class="author__bio" itemprop="description">
+        Developer life is a NullPointerException
+      </p>
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+        <li itemprop="homeLocation" itemscope itemtype="http://schema.org/Place">
+          <i class="fa fa-fw fa-map-marker" aria-hidden="true"></i> <span itemprop="name">Thessaloniki, GR</span>
+        </li>
+      
+
+      
+
+      
+
+      
+
+      
+        <li>
+          <a href="https://twitter.com/maniosolr" itemprop="sameAs">
+            <i class="fa fa-fw fa-twitter-square" aria-hidden="true"></i> Twitter
+          </a>
+        </li>
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+        <li>
+          <a href="https://github.com/manios" itemprop="sameAs">
+            <i class="fa fa-fw fa-github" aria-hidden="true"></i> GitHub
+          </a>
+        </li>
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs">
+      <i class="fa fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+  <article class="page" itemscope itemtype="http://schema.org/CreativeWork">
+    <meta itemprop="headline" content="Creating a Beat based on Metricbeat resolving Init and create metricset failures">
+    <meta itemprop="description" content="I suspect that you are reading this post after having trouble creating a new Elastic Beat based on Metricbeat. Bud do not worry! We have you covered and solved the issues for you!">
+    <meta itemprop="datePublished" content="July 23, 2018">
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 class="page__title" itemprop="headline">Creating a Beat based on Metricbeat resolving Init and create metricset failures
+</h1>
+          
+            <p class="page__meta"><i class="fa fa-clock-o" aria-hidden="true"></i> 
+
+
+
+
+  4 minute read
+</p>
+          
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+        <p>I suspect that you are reading this post after having trouble creating a new Elastic Beat based on Metricbeat. Bud do not worry! We have you covered and solved the issues for you!</p>
+
+<p>Long story short, a few days ago we wanted to create a new Metricbeat. After reading and executing step by step the official guide “<a href="https://www.elastic.co/guide/en/beats/devguide/current/creating-beat-from-metricbeat.html">Creating a Beat based on Metricbeat</a>” we stumpled upon a series of issues like <a href="https://discuss.elastic.co/t/step-3-init-and-create-the-metricset-failure/112046/12">Step 3 - Init and create the metricset failure</a>. After spending 2 days trying to resolve our local dependencies and solve the issues in our development environment, we decided to make everything in a sterilized environment, hence a Docker container.</p>
+
+<p>To begin with, we used Go language <a href="https://hub.docker.com/_/golang/">official Docker image</a> with tag <code class="highlighter-rouge">golang:1.10.2-stretch</code> and we run everything in it. So in a shell, we executed:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker run -it --rm --name go1.10 golang:1.10.2-stretch /bin/bash
+</code></pre></div></div>
+
+<p>When the container is started, a new shell is loaded and we can download all the dependencies needed, by executing inside it:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>apt-get update <span class="se">\</span>
+ <span class="o">&amp;&amp;</span> apt-get install <span class="nt">-y</span> wget curl git vim <span class="se">\</span>
+ <span class="o">&amp;&amp;</span> <span class="nb">echo</span> <span class="s2">"set number"</span> | tee <span class="nt">-a</span> /etc/vim/vimrc <span class="se">\</span>
+ <span class="o">&amp;&amp;</span> <span class="nb">echo</span> <span class="s2">"syntax on"</span> | tee <span class="nt">-a</span> /etc/vim/vimrc <span class="se">\</span>
+ <span class="o">&amp;&amp;</span> <span class="nb">echo</span> <span class="s2">"colorscheme evening"</span> | tee <span class="nt">-a</span> /etc/vim/vimrc  <span class="se">\</span>
+ <span class="o">&amp;&amp;</span> wget https://bootstrap.pypa.io/get-pip.py <span class="se">\</span>
+ <span class="o">&amp;&amp;</span> python get-pip.py <span class="se">\</span>
+ <span class="o">&amp;&amp;</span> rm get-pip.py <span class="se">\</span>
+ <span class="o">&amp;&amp;</span> pip install virtualenv <span class="se">\</span>
+ <span class="o">&amp;&amp;</span> <span class="nb">echo</span> <span class="nt">-n</span> <span class="nt">-e</span> <span class="s2">"</span><span class="se">\n\n</span><span class="s2">Our environment:</span><span class="se">\n</span><span class="s2">===================================</span><span class="se">\n</span><span class="s2">"</span> <span class="se">\</span>
+ <span class="o">&amp;&amp;</span> go version <span class="se">\</span>
+ <span class="o">&amp;&amp;</span> <span class="nb">echo</span> <span class="nt">-n</span> <span class="s2">"Python version: "</span> <span class="se">\</span>
+ <span class="o">&amp;&amp;</span> python <span class="nt">--version</span> <span class="se">\</span>
+ <span class="o">&amp;&amp;</span> <span class="nb">echo</span> <span class="nt">-n</span> <span class="s2">"virtualenv version: "</span> <span class="se">\</span>
+ <span class="o">&amp;&amp;</span> virtualenv <span class="nt">--version</span> <span class="se">\</span>
+ <span class="o">&amp;&amp;</span> <span class="nb">echo</span> <span class="s2">"==================================="</span> <span class="se">\</span>
+ <span class="o">&amp;&amp;</span> <span class="nb">echo</span> <span class="nt">-n</span> <span class="s2">"Fetching metricbeat source code: "</span> <span class="se">\</span>
+ <span class="o">&amp;&amp;</span> go get github.com/elastic/beats/metricbeat <span class="se">\</span>
+ <span class="o">&amp;&amp;</span> <span class="nb">echo</span> <span class="s2">"[OK]"</span> <span class="se">\</span>
+ <span class="o">&amp;&amp;</span> <span class="nb">cd</span> <span class="k">${</span><span class="nv">GOPATH</span><span class="k">}</span>/src/github.com/elastic/beats <span class="se">\</span>
+ <span class="o">&amp;&amp;</span> <span class="nb">echo</span> <span class="s2">"Checking out commit 2619e137c1f7eb031fc89132045117a85c7ef818 to new branch in order to avoid bug"</span> <span class="se">\</span>
+ <span class="o">&amp;&amp;</span> git checkout <span class="nt">-b</span> working 2619e137c1f7eb031fc89132045117a85c7ef818 <span class="se">\</span>
+ <span class="o">&amp;&amp;</span> <span class="nb">cd</span> <span class="nv">$GOPATH</span> <span class="se">\</span>
+ <span class="o">&amp;&amp;</span> sed <span class="nt">-i</span> <span class="s1">'s/@-cp -r module\/[*]\/_meta\/kibana _meta\//@-cp -r ${GOPATH}\/src\/github.com\/elastic\/beats\/metricbeat\/module\/*\/_meta\/kibana _meta\//'</span> <span class="k">${</span><span class="nv">GOPATH</span><span class="k">}</span>/src/github.com/elastic/beats/metricbeat/Makefile <span class="se">\</span>
+ <span class="o">&amp;&amp;</span> <span class="nb">echo</span> <span class="s2">"Elastic beats environment has been initialised successfully! You can now generate a new Metricbeat!"</span>
+</code></pre></div></div>
+
+<p>If everything works as expected you should see something like this in the output:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Our environment:
+===================================
+go version go1.10.2 linux/amd64
+Python version: Python 2.7.13
+virtualenv version: 16.0.0
+===================================
+Fetching metricbeat source code: [OK]
+Checking out commit 2619e137c1f7eb031fc89132045117a85c7ef818 to new branch in order to avoid bug
+Switched to a new branch 'working'
+Elastic beats environment has been initialised successfully! You can now generate a new Metricbeat!
+</code></pre></div></div>
+
+<p>The environment is set up correctly. Let’s create a new Metricbeat. So execute:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>python ${GOPATH}/src/github.com/elastic/beats/script/generate.py --type=metricbeat
+</code></pre></div></div>
+
+<p>and respond to the input as the example:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>root@1e407b4d73a7:/go# python ${GOPATH}/src/github.com/elastic/beats/script/generate.py --type=metricbeat
+Beat Name [Examplebeat]: weatherbeat
+Your Github Name [your-github-name]: manios
+Beat Path [github.com/manios/weatherbeat]:
+Firstname Lastname: Christos Manios
+</code></pre></div></div>
+<p>The newly created Metricbeat will be stored in <code class="highlighter-rouge">${GOPATH}/src/github.com/manios/weatherbeat/</code>.</p>
+
+<p>Navigate to the Metricbeat directory. Execute the following to avoid weird errors when creating a metricset:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cd</span>  <span class="k">${</span><span class="nv">GOPATH</span><span class="k">}</span>/src/github.com/manios/weatherbeat <span class="se">\</span>
+<span class="o">&amp;&amp;</span> cp <span class="nt">-r</span> <span class="nv">$GOPATH</span>/src/github.com/elastic/beats/metricbeat/scripts <span class="nb">.</span> 
+</code></pre></div></div>
+
+<p>Now we are ready to create a new Metricset. The metricset module will be called <code class="highlighter-rouge">skgtemperatures</code> and the metricset itself <code class="highlighter-rouge">hydro</code>. According to the official guide we execute <code class="highlighter-rouge">make setup</code> and the output will be the following:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mkdir -p vendor/github.com/elastic/
+cp -R /go/src/github.com/elastic/beats vendor/github.com/elastic/
+rm -rf vendor/github.com/elastic/beats/.git
+make create-metricset
+make[1]: Entering directory '/go/src/github.com/manios/weatherbeat'
+New python executable in /go/src/github.com/manios/weatherbeat/build/python-env/bin/python
+Installing setuptools, pip, wheel...done.
+docker-compose 1.22.0 has requirement requests!=2.11.0,!=2.12.2,!=2.18.0,&lt;2.19,&gt;=2.6.1, but you'll have requests 2.19.1 which is incompatible.
+# Work around pip bug. See: https://github.com/pypa/pip/issues/4464
+find /go/src/github.com/manios/weatherbeat/build/python-env -type d -name 'dist-packages' -exec sh -c "echo dist-packages &gt; {}.pth" ';'
+Module name: skgtemperature
+Metricset name: hydro
+Module skgtemperature created.
+Metricset hydro created.
+make[1]: Leaving directory '/go/src/github.com/manios/weatherbeat'
+make collect
+make[1]: Entering directory '/go/src/github.com/manios/weatherbeat'
+# Work around pip bug. See: https://github.com/pypa/pip/issues/4464
+find /go/src/github.com/manios/weatherbeat/build/python-env -type d -name 'dist-packages' -exec sh -c "echo dist-packages &gt; {}.pth" ';'
+make[1]: Leaving directory '/go/src/github.com/manios/weatherbeat'
+</code></pre></div></div>
+
+<p>If everything works as expected then if you execute a <code class="highlighter-rouge">tree</code> command, to <code class="highlighter-rouge">module</code> directory you will probably have the following structure:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>-- skgtemperature
+    |-- _meta
+    |   |-- config.yml
+    |   |-- docs.asciidoc
+    |   `-- fields.yml
+    |-- doc.go
+    `-- hydro
+        |-- _meta
+        |   |-- data.json
+        |   |-- docs.asciidoc
+        |   `-- fields.yml
+        `-- hydro.go
+</code></pre></div></div>
+
+<p>That’s it! I hope it helps!</p>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+  
+
+
+  
+  
+  
+
+  <p class="page__taxonomy">
+    <strong><i class="fa fa-fw fa-tags" aria-hidden="true"></i> Tags: </strong>
+    <span itemprop="keywords">
+    
+      
+      
+      <a href="https://manios.org/tags/#beats" class="page__taxonomy-item" rel="tag">beats</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#create" class="page__taxonomy-item" rel="tag">create</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#elastic" class="page__taxonomy-item" rel="tag">elastic</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#elasticsearch" class="page__taxonomy-item" rel="tag">elasticsearch</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#elk" class="page__taxonomy-item" rel="tag">elk</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#generator" class="page__taxonomy-item" rel="tag">generator</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#go" class="page__taxonomy-item" rel="tag">go</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#golang" class="page__taxonomy-item" rel="tag">golang</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#index" class="page__taxonomy-item" rel="tag">index</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#kibana" class="page__taxonomy-item" rel="tag">kibana</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#metricbeat" class="page__taxonomy-item" rel="tag">metricbeat</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#monitor" class="page__taxonomy-item" rel="tag">monitor</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/tags/#search" class="page__taxonomy-item" rel="tag">search</a>
+    
+    </span>
+  </p>
+
+
+
+
+  
+
+
+  
+  
+  
+
+  <p class="page__taxonomy">
+    <strong><i class="fa fa-fw fa-folder-open" aria-hidden="true"></i> Categories: </strong>
+    <span itemprop="keywords">
+    
+      
+      
+      <a href="https://manios.org/categories/#elasticsearch" class="page__taxonomy-item" rel="tag">Elasticsearch</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/categories/#go" class="page__taxonomy-item" rel="tag">Go</a><span class="sep">, </span>
+    
+      
+      
+      <a href="https://manios.org/categories/#golang" class="page__taxonomy-item" rel="tag">Golang</a>
+    
+    </span>
+  </p>
+
+
+        
+          <p class="page__date"><strong><i class="fa fa-fw fa-calendar" aria-hidden="true"></i> Updated:</strong> <time datetime="2018-07-23T22:31:00+03:00">July 23, 2018</time></p>
+        
+      </footer>
+
+      <section class="page__share">
+  
+    <h4 class="page__share-title">Share on</h4>
+  
+
+  <a href="https://twitter.com/intent/tweet?text=Creating+a+Beat+based+on+Metricbeat+resolving+Init+and+create+metricset+failures%20https%3A%2F%2Fmanios.org%2F2018%2F07%2F23%2Fcreate-a-beat-based-on-metricbeat-resolving-bugs" class="btn btn--twitter" title="Share on Twitter"><i class="fa fa-fw fa-twitter" aria-hidden="true"></i><span> Twitter</span></a>
+
+  <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fmanios.org%2F2018%2F07%2F23%2Fcreate-a-beat-based-on-metricbeat-resolving-bugs" class="btn btn--facebook" title="Share on Facebook"><i class="fa fa-fw fa-facebook" aria-hidden="true"></i><span> Facebook</span></a>
+
+  <a href="https://plus.google.com/share?url=https%3A%2F%2Fmanios.org%2F2018%2F07%2F23%2Fcreate-a-beat-based-on-metricbeat-resolving-bugs" class="btn btn--google-plus" title="Share on Google Plus"><i class="fa fa-fw fa-google-plus" aria-hidden="true"></i><span> Google+</span></a>
+
+  <a href="https://www.linkedin.com/shareArticle?mini=true&url=https%3A%2F%2Fmanios.org%2F2018%2F07%2F23%2Fcreate-a-beat-based-on-metricbeat-resolving-bugs" class="btn btn--linkedin" title="Share on LinkedIn"><i class="fa fa-fw fa-linkedin" aria-hidden="true"></i><span> LinkedIn</span></a>
+</section>
+
+
+      
+  <nav class="pagination">
+    
+      <a href="https://manios.org/2018/05/30/git-merge-conflicts-using-tortoise-git-merge-windows" class="pagination--pager" title="Git merge conflicts using Tortoise Git merge in Windows
+">Previous</a>
+    
+    
+      <a href="#" class="pagination--pager disabled">Next</a>
+    
+  </nav>
+
+    </div>
+
+    
+      <div class="page__comments">
+  
+  
+      <h4 class="page__comments-title">Leave a Comment</h4>
+      <section id="disqus_thread"></section>
+    
+</div>
+    
+  </article>
+
+  
+  
+    <div class="page__related">
+      <h4 class="page__related-title">You May Also Enjoy</h4>
+      <div class="grid__wrapper">
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="http://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="https://manios.org/2018/05/30/git-merge-conflicts-using-tortoise-git-merge-windows" rel="permalink">Git merge conflicts using Tortoise Git merge in Windows
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="fa fa-clock-o" aria-hidden="true"></i> 
+
+
+
+
+  2 minute read
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Today we wanted to use Tortoise Git Merge, a Windows Git utility which comes with Tortoise Git. It helps us do a 3 way merge and solve our conflicts easily. ...</p>
+  </article>
+</div>
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="http://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="https://manios.org/2018/04/03/java-soap-service-client-debug-http-message" rel="permalink">Debug HTTP request of Java SOAP JAX-WS web service client
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="fa fa-clock-o" aria-hidden="true"></i> 
+
+
+
+
+  less than 1 minute read
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Today I wanted to debug in Java a JAX-WS SOAP web service client and see the exact message that is send as an HTTP request. So after searching, I found in th...</p>
+  </article>
+</div>
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="http://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="https://manios.org/2018/03/30/java-soap-jax-ws-client-basic-auth" rel="permalink">HTTP Basic Authentication in Java SOAP JAX-WS web service client
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="fa fa-clock-o" aria-hidden="true"></i> 
+
+
+
+
+  1 minute read
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Today I had to create a Java client for a SOAP web service. So I opened Netbeans IDE and used the great tool which generates JAX-WS client code using the res...</p>
+  </article>
+</div>
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="http://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="https://manios.org/2017/12/14/install-and-configure-and-troubleshoot-ntp-servers-in-debian-linux" rel="permalink">Install, configure and troubleshoot NTP servers in Debian Linux
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="fa fa-clock-o" aria-hidden="true"></i> 
+
+
+
+
+  13 minute read
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">If you are reading this article, perhaps you have searched a lot about NTP server installation in Linux, issues and problems encountered and how to troublesh...</p>
+  </article>
+</div>
+        
+      </div>
+    </div>
+  
+  
+</div>
+
+
+	<!-- TODO add Google AdSense -->
+    <!--<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <div align="center" style="margin: 1em 0;">
+    <ins class="adsbygoogle"
+         style="display:block; border-bottom: initial;"
+         data-ad-client="ca-pub-7328585512091257"
+         data-ad-slot="3049671934"
+         data-ad-format="auto"></ins>
+    </div>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>-->
+
+    <div class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+      <li><strong>Follow:</strong></li>
+    
+    
+    
+    
+      <li><a href="https://github.com/manios"><i class="fa fa-fw fa-github" aria-hidden="true"></i> GitHub</a></li>
+    
+    
+    
+    <li><a href="https://manios.org/feed.xml"><i class="fa fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2018 Christos Manios. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="https://manios.org/assets/js/main.min.js"></script>
+
+
+
+
+
+
+
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-96500199-2', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+    
+  <script>
+    var disqus_config = function () {
+      this.page.url = "https://manios.org/2018/07/23/create-a-beat-based-on-metricbeat-resolving-bugs";  // Replace PAGE_URL with your page's canonical URL variable
+      this.page.identifier = "/2018/07/23/create-a-beat-based-on-metricbeat-resolving-bugs"; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+    (function() { // DON'T EDIT BELOW THIS LINE
+      var d = document, s = d.createElement('script');
+      s.src = 'https://manios-org.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  </script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+  
+
+
+
+  </body>
+</html>
