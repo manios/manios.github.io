@@ -487,6 +487,24 @@ var idx = lunr(function () {
     });
     
   
+    idx.add({
+      title: "Logstash - Enrich IP with Geolocation using Maxmind GeoLite2 City and ISP",
+      excerpt: "Today we wanted to parse some json logs which we had in a file using Logstash and enrich them with...",
+      categories: ["Logstash","Elasticsearch"],
+      tags: ["logstash","geolocation","ip","geoip","maxmind","geo","geolite","geolite2","database","json","parse","message","log"],
+      id: 53
+    });
+    
+  
+    idx.add({
+      title: "Rsyslog - Parse Json and enrich IP with Geolocation using Maxmind GeoLite2 City and ISP",
+      excerpt: "Today we wanted to parse some json logs which we had in a file using Rsyslog and enrich them with...",
+      categories: ["Rsyslog","Elasticsearch"],
+      tags: ["rsyslog","mmdblookup","omelasticsearch","geolocation","ip","geoip","maxmind","geo","geoip","geolite","geolite2","database","json","parse","message","log"],
+      id: 54
+    });
+    
+  
 
 
 console.log( jQuery.type(idx) );
@@ -1073,6 +1091,28 @@ var store = [
         "title": "Creating a Beat based on Metricbeat resolving Init and create metricset failures",
         "url": "https://manios.org/2018/07/23/create-a-beat-based-on-metricbeat-resolving-bugs",
         "excerpt": "I suspect that you are reading this post after having trouble creating a new Elastic Beat based on Metricbeat. Bud...",
+        "teaser":
+          
+            null
+          
+      },
+    
+      
+      {
+        "title": "Logstash - Enrich IP with Geolocation using Maxmind GeoLite2 City and ISP",
+        "url": "https://manios.org/2018/08/14/logstash-geoip-json-logs-maxmint-geolite-docker",
+        "excerpt": "Today we wanted to parse some json logs which we had in a file using Logstash and enrich them with...",
+        "teaser":
+          
+            null
+          
+      },
+    
+      
+      {
+        "title": "Rsyslog - Parse Json and enrich IP with Geolocation using Maxmind GeoLite2 City and ISP",
+        "url": "https://manios.org/2018/08/18/logstash-geoip-json-logs-maxmint-geolite-docker",
+        "excerpt": "Today we wanted to parse some json logs which we had in a file using Rsyslog and enrich them with...",
         "teaser":
           
             null

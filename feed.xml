@@ -1,4 +1,441 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="https://manios.org/feed.xml" rel="self" type="application/atom+xml" /><link href="https://manios.org/" rel="alternate" type="text/html" /><updated>2018-07-25T22:44:10+03:00</updated><id>https://manios.org/</id><title type="html">cmanios</title><subtitle>Developer life is a NullPointerException</subtitle><author><name>Christos Manios</name></author><entry><title type="html">Creating a Beat based on Metricbeat resolving Init and create metricset failures</title><link href="https://manios.org/2018/07/23/create-a-beat-based-on-metricbeat-resolving-bugs" rel="alternate" type="text/html" title="Creating a Beat based on Metricbeat resolving Init and create metricset failures" /><published>2018-07-23T22:31:00+03:00</published><updated>2018-07-23T22:31:00+03:00</updated><id>https://manios.org/2018/07/23/create-a-beat-based-on-metricbeat-resolving-bugs</id><content type="html" xml:base="https://manios.org/2018/07/23/create-a-beat-based-on-metricbeat-resolving-bugs">&lt;p&gt;I suspect that you are reading this post after having trouble creating a new Elastic Beat based on Metricbeat. Bud do not worry! We have you covered and solved the issues for you!&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="https://manios.org/feed.xml" rel="self" type="application/atom+xml" /><link href="https://manios.org/" rel="alternate" type="text/html" /><updated>2018-08-18T10:55:41+03:00</updated><id>https://manios.org/</id><title type="html">cmanios</title><subtitle>Developer life is a NullPointerException</subtitle><author><name>Christos Manios</name></author><entry><title type="html">Rsyslog - Parse Json and enrich IP with Geolocation using Maxmind GeoLite2 City and ISP</title><link href="https://manios.org/2018/08/18/logstash-geoip-json-logs-maxmint-geolite-docker" rel="alternate" type="text/html" title="Rsyslog - Parse Json and enrich IP with Geolocation using Maxmind GeoLite2 City and ISP" /><published>2018-08-18T10:13:44+03:00</published><updated>2018-08-18T10:13:44+03:00</updated><id>https://manios.org/2018/08/18/logstash-geoip-json-logs-maxmint-geolite-docker</id><content type="html" xml:base="https://manios.org/2018/08/18/logstash-geoip-json-logs-maxmint-geolite-docker">&lt;p&gt;Today we wanted to parse some json logs which we had in a file using &lt;a href=&quot;http://rsyslog.com/&quot;&gt;Rsyslog&lt;/a&gt; and enrich  them with Geolocation information regarding the city and the ISP an IP belongs. We initially tried with Logstash (see relevant &lt;a href=&quot;/2018/08/14/logstash-geoip-json-logs-maxmint-geolite-docker&quot;&gt;previous blog post&lt;/a&gt;) but it was too slow. Thus we decided to try with parsing with Rsyslog. The file, let’s call it &lt;code class=&quot;highlighter-rouge&quot;&gt;/var/log/input-geo.json&lt;/code&gt; had the following structure and content. (It is the same as in Logstash post):&lt;/p&gt;
+
+&lt;div class=&quot;language-json highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;name&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Christos&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;src_ip&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;63.145.248.101&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;age&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;12&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;name&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Nikos&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;src_ip&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;98.158.156.175&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;age&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Rsyslog has &lt;a href=&quot;https://www.rsyslog.com/doc/v8-stable/configuration/modules/mmdblookup.html&quot;&gt;MaxMind/GeoIP DB lookup (mmdblookup)&lt;/a&gt; module which adds information about the geographical location of IP addresses, based on data from the Maxmind GeoLite2 databases. In our case we used:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;https://dev.maxmind.com/geoip/geoip2/geolite2/&quot;&gt;GeoLite2 City&lt;/a&gt; database (free)&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://www.maxmind.com/en/geoip2-isp-database&quot;&gt;GeoIP2 ISP &lt;/a&gt; Database (commercial licence)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;We wanted to parse the JSON file enrich the &lt;code class=&quot;highlighter-rouge&quot;&gt;src_ip&lt;/code&gt; field and store the geolocation information to &lt;code class=&quot;highlighter-rouge&quot;&gt;src_geoip&lt;/code&gt;. Then we forward the message to Elasticsearch using &lt;a href=&quot;https://www.rsyslog.com/doc/v8-stable/configuration/modules/omelasticsearch.html&quot;&gt;omelasticsearch: Elasticsearch Output Module&lt;/a&gt;. For debugging purposes we also enabled &lt;a href=&quot;https://www.elastic.co/guide/en/logstash/current/plugins-outputs-file.html&quot;&gt;file output&lt;/a&gt;. Thus , the configuration (&lt;code class=&quot;highlighter-rouge&quot;&gt;rsyslog.conf&lt;/code&gt;) looked like the following:&lt;/p&gt;
+
+&lt;div class=&quot;language-conf highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;#  /etc/rsyslog.conf	Configuration file for rsyslog.
+#
+#			For more information see
+#			/usr/share/doc/rsyslog-doc/html/rsyslog_conf.html
+#
+#  Default logging rules can be found in /etc/rsyslog.d/50-default.conf
+&lt;/span&gt;
+
+&lt;span class=&quot;c&quot;&gt;#################
+#### MODULES ####
+#################
+&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;module&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;load&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;imuxsock&quot;&lt;/span&gt;) &lt;span class=&quot;c&quot;&gt;# provides support for local system logging
+# module(load=&quot;imklog&quot;)   # provides kernel logging support
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;module&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;load&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;immark&quot;&lt;/span&gt;)  &lt;span class=&quot;c&quot;&gt;# provides --MARK-- message capability
+# $ModLoad imuxsock # provides support for local system logging
+# $ModLoad imklog   # provides kernel logging support (previously done by rklogd)
+#$ModLoad immark  # provides --MARK-- message capability
+&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;# provides UDP syslog reception
+# $ModLoad imudp
+# $UDPServerRun 514
+&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;# provides TCP syslog reception
+# $ModLoad imtcp
+# $InputTCPServerRun 514
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;module&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;load&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;builtin:omfile&quot;&lt;/span&gt;)
+&lt;span class=&quot;n&quot;&gt;module&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;load&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;mmnormalize&quot;&lt;/span&gt;) &lt;span class=&quot;c&quot;&gt;# parser using liblognorm
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;module&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;load&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;mmjsonparse&quot;&lt;/span&gt;) &lt;span class=&quot;c&quot;&gt;#for parsing CEE-enhanced syslog messages
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;module&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;load&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;imfile&quot;&lt;/span&gt;)
+&lt;span class=&quot;n&quot;&gt;module&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;load&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;mmdblookup&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;container&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;!src_geo&quot;&lt;/span&gt;)
+
+&lt;span class=&quot;c&quot;&gt;###########################
+#### GLOBAL DIRECTIVES ####
+###########################
+&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;#
+# Use traditional timestamp format.
+# To enable high precision timestamps, comment out the following line.
+#
+&lt;/span&gt;$&lt;span class=&quot;n&quot;&gt;ActionFileDefaultTemplate&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;RSYSLOG_TraditionalFileFormat&lt;/span&gt;
+
+&lt;span class=&quot;c&quot;&gt;# Filter duplicated messages
+&lt;/span&gt;$&lt;span class=&quot;n&quot;&gt;RepeatedMsgReduction&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;on&lt;/span&gt;
+
+&lt;span class=&quot;c&quot;&gt;#
+# Set the default permissions for all log files.
+#
+&lt;/span&gt;$&lt;span class=&quot;n&quot;&gt;FileOwner&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;root&lt;/span&gt;
+$&lt;span class=&quot;n&quot;&gt;FileGroup&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;root&lt;/span&gt;
+$&lt;span class=&quot;n&quot;&gt;FileCreateMode&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;0640&lt;/span&gt;
+$&lt;span class=&quot;n&quot;&gt;DirCreateMode&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;0755&lt;/span&gt;
+$&lt;span class=&quot;n&quot;&gt;Umask&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;0022&lt;/span&gt;
+$&lt;span class=&quot;n&quot;&gt;PrivDropToUser&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;syslog&lt;/span&gt;
+$&lt;span class=&quot;n&quot;&gt;PrivDropToGroup&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;syslog&lt;/span&gt;
+
+&lt;span class=&quot;c&quot;&gt;# General globals
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;global&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;net&lt;/span&gt;.&lt;span class=&quot;n&quot;&gt;enableDNS&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;off&quot;&lt;/span&gt;)
+
+&lt;span class=&quot;c&quot;&gt;# Remove Control Chars
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;global&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;parser&lt;/span&gt;.&lt;span class=&quot;n&quot;&gt;escapeControlCharactersOnReceive&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;off&quot;&lt;/span&gt; )
+
+&lt;span class=&quot;c&quot;&gt;#
+# Where to place spool files
+#
+&lt;/span&gt;$&lt;span class=&quot;n&quot;&gt;WorkDirectory&lt;/span&gt; /&lt;span class=&quot;n&quot;&gt;var&lt;/span&gt;/&lt;span class=&quot;n&quot;&gt;spool&lt;/span&gt;/&lt;span class=&quot;n&quot;&gt;rsyslog&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;global&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;workDirectory&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;/var/spool/rsyslog&quot;&lt;/span&gt;)
+&lt;span class=&quot;c&quot;&gt;#
+# Include all config files in /etc/rsyslog.d/
+#
+# $IncludeConfig /etc/rsyslog.d/*.conf
+&lt;/span&gt;
+
+
+&lt;span class=&quot;c&quot;&gt;#################
+#### Inputs  ####
+#################
+&lt;/span&gt;
+
+&lt;span class=&quot;c&quot;&gt;# provides UDP syslog reception
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;module&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;load&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;imudp&quot;&lt;/span&gt;)
+&lt;span class=&quot;n&quot;&gt;input&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;type&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;imudp&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;port&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;514&quot;&lt;/span&gt;)
+
+&lt;span class=&quot;c&quot;&gt;# provides TCP syslog reception
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;module&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;load&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;imtcp&quot;&lt;/span&gt;)
+&lt;span class=&quot;n&quot;&gt;input&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;type&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;imtcp&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;port&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;514&quot;&lt;/span&gt; )
+
+&lt;span class=&quot;c&quot;&gt;# File 1
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;input&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;type&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;imfile&quot;&lt;/span&gt;
+      &lt;span class=&quot;n&quot;&gt;File&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;/opt/input-geo.json&quot;&lt;/span&gt;
+      &lt;span class=&quot;n&quot;&gt;Tag&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;geoip&quot;&lt;/span&gt;
+      &lt;span class=&quot;n&quot;&gt;PersistStateInterval&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;1&quot;&lt;/span&gt;
+      &lt;span class=&quot;n&quot;&gt;freshStartTail&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;off&quot;&lt;/span&gt;)
+
+&lt;span class=&quot;c&quot;&gt;#################
+### Templates ###
+#################
+&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;# this is for formatting our syslog in JSON with @timestamp for Json messages
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;template&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;geoip&quot;&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;type&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;list&quot;&lt;/span&gt;) {
+    &lt;span class=&quot;n&quot;&gt;constant&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;{&quot;&lt;/span&gt;)
+      &lt;span class=&quot;n&quot;&gt;constant&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;\&quot;&lt;/span&gt;@&lt;span class=&quot;n&quot;&gt;version&lt;/span&gt;\&lt;span class=&quot;s2&quot;&gt;&quot;:\&quot;&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;&quot;&lt;/span&gt;)
+      &lt;span class=&quot;n&quot;&gt;constant&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;\&quot;&lt;/span&gt;,\&lt;span class=&quot;s2&quot;&gt;&quot;@timestamp\&quot;&lt;/span&gt;:\&lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;)		&lt;span class=&quot;n&quot;&gt;property&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;timegenerated&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dateFormat&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;rfc3339&quot;&lt;/span&gt;)
+      &lt;span class=&quot;n&quot;&gt;constant&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;\&quot;&lt;/span&gt;,\&lt;span class=&quot;s2&quot;&gt;&quot;host\&quot;&lt;/span&gt;:\&lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;)			    &lt;span class=&quot;n&quot;&gt;property&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;hostname&quot;&lt;/span&gt;) 
+      &lt;span class=&quot;n&quot;&gt;constant&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;\&quot;&lt;/span&gt;,\&lt;span class=&quot;s2&quot;&gt;&quot;type\&quot;&lt;/span&gt;:\&lt;span class=&quot;s2&quot;&gt;&quot;syslog&quot;&lt;/span&gt;)
+      &lt;span class=&quot;n&quot;&gt;constant&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;\&quot;&lt;/span&gt;,\&lt;span class=&quot;s2&quot;&gt;&quot;syslog_timestamp\&quot;&lt;/span&gt;:\&lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;)	&lt;span class=&quot;n&quot;&gt;property&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;timereported&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dateFormat&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;rfc3164&quot;&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;format&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;json&quot;&lt;/span&gt;)
+      &lt;span class=&quot;n&quot;&gt;constant&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;\&quot;&lt;/span&gt;,\&lt;span class=&quot;s2&quot;&gt;&quot;syslog_hostname\&quot;&lt;/span&gt;:\&lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;)	&lt;span class=&quot;n&quot;&gt;property&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;hostname&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;format&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;json&quot;&lt;/span&gt;)
+      &lt;span class=&quot;n&quot;&gt;constant&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;\&quot;&lt;/span&gt;,\&lt;span class=&quot;s2&quot;&gt;&quot;syslog_program\&quot;&lt;/span&gt;:\&lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;)	&lt;span class=&quot;n&quot;&gt;property&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;programname&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;format&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;json&quot;&lt;/span&gt;)
+      &lt;span class=&quot;n&quot;&gt;constant&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;\&quot;&lt;/span&gt;,\&lt;span class=&quot;s2&quot;&gt;&quot;syslog_message\&quot;&lt;/span&gt;:\&lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;)	&lt;span class=&quot;n&quot;&gt;property&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;msg&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;format&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;json&quot;&lt;/span&gt;)
+      &lt;span class=&quot;n&quot;&gt;constant&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;\&quot;&lt;/span&gt;,\&lt;span class=&quot;s2&quot;&gt;&quot;received_at\&quot;&lt;/span&gt;:\&lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;)		&lt;span class=&quot;n&quot;&gt;property&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;timegenerated&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dateFormat&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;rfc3339&quot;&lt;/span&gt;)
+      &lt;span class=&quot;n&quot;&gt;constant&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;\&quot;&lt;/span&gt;,\&lt;span class=&quot;s2&quot;&gt;&quot;received_from\&quot;&lt;/span&gt;:\&lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;)	    &lt;span class=&quot;n&quot;&gt;property&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;fromhost&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;format&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;json&quot;&lt;/span&gt;)
+      &lt;span class=&quot;n&quot;&gt;constant&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;\&quot;&lt;/span&gt;,\&lt;span class=&quot;s2&quot;&gt;&quot;path\&quot;&lt;/span&gt;:\&lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;)      	    &lt;span class=&quot;n&quot;&gt;property&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;$!metadata!filename&quot;&lt;/span&gt;)
+      &lt;span class=&quot;n&quot;&gt;constant&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;\&quot;&lt;/span&gt;,\&lt;span class=&quot;s2&quot;&gt;&quot;name\&quot;&lt;/span&gt;:\&lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;)              &lt;span class=&quot;n&quot;&gt;property&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;$!name&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;format&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;json&quot;&lt;/span&gt;)
+      &lt;span class=&quot;n&quot;&gt;constant&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;\&quot;&lt;/span&gt;,\&lt;span class=&quot;s2&quot;&gt;&quot;src_ip\&quot;&lt;/span&gt;:\&lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;)            &lt;span class=&quot;n&quot;&gt;property&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;$!src_ip&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;format&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;json&quot;&lt;/span&gt;)
+      &lt;span class=&quot;n&quot;&gt;constant&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;\&quot;&lt;/span&gt;,\&lt;span class=&quot;s2&quot;&gt;&quot;src_geoip\&quot;&lt;/span&gt;:{&lt;span class=&quot;s2&quot;&gt;&quot;)          property(name=&quot;&lt;/span&gt;$!&lt;span class=&quot;n&quot;&gt;src_geo&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot; position.from=&quot;&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;&quot;&lt;/span&gt;)
+      &lt;span class=&quot;n&quot;&gt;constant&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;}\n&quot;&lt;/span&gt;)
+}
+
+
+&lt;span class=&quot;c&quot;&gt;#################
+#### Actions ####
+#################
+&lt;/span&gt;
+
+&lt;span class=&quot;c&quot;&gt;###Fix text to utf8, disabled for now
+###action(type=&quot;mmutf8fix&quot;)
+&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;#action(type=&quot;omfile&quot; file=&quot;/tmp/logtesting&quot; template=&quot;RSYSLOG_DebugFormat&quot;)
+&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;if&lt;/span&gt; ($&lt;span class=&quot;n&quot;&gt;syslogtag&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;contains&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'geoip'&lt;/span&gt;) &lt;span class=&quot;n&quot;&gt;then&lt;/span&gt; {
+    
+    
+    &lt;span class=&quot;n&quot;&gt;action&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;type&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;mmjsonparse&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cookie&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;)
+    
+    &lt;span class=&quot;n&quot;&gt;if&lt;/span&gt; $&lt;span class=&quot;n&quot;&gt;parsesuccess&lt;/span&gt; == &lt;span class=&quot;s2&quot;&gt;&quot;OK&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;then&lt;/span&gt; {
+
+        &lt;span class=&quot;c&quot;&gt;# https://github.com/rsyslog/rsyslog/issues/1650
+&lt;/span&gt;
+        &lt;span class=&quot;c&quot;&gt;# Add MaxMind/GeoIP DB lookup information
+&lt;/span&gt;        &lt;span class=&quot;n&quot;&gt;action&lt;/span&gt;( &lt;span class=&quot;n&quot;&gt;type&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;mmdblookup&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;mmdbfile&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;/etc/rsyslog.d/GeoLite2-City.mmdb&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;key&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;!src_ip&quot;&lt;/span&gt; 
+                &lt;span class=&quot;n&quot;&gt;fields&lt;/span&gt;=[&lt;span class=&quot;s2&quot;&gt;&quot;:timezone:!location!time_zone&quot;&lt;/span&gt;,
+                        &lt;span class=&quot;s2&quot;&gt;&quot;:latitude:!location!latitude&quot;&lt;/span&gt;,
+                        &lt;span class=&quot;s2&quot;&gt;&quot;:longitude:!location!longitude&quot;&lt;/span&gt;,
+                        &lt;span class=&quot;s2&quot;&gt;&quot;:dma_code:!location!metro_code&quot;&lt;/span&gt;,
+                        &lt;span class=&quot;s2&quot;&gt;&quot;:city_name:!names!en&quot;&lt;/span&gt;,
+                        &lt;span class=&quot;s2&quot;&gt;&quot;:continent_code:!continent!code&quot;&lt;/span&gt;,
+                        &lt;span class=&quot;s2&quot;&gt;&quot;:country_code2:!country!iso_code&quot;&lt;/span&gt;,
+                        &lt;span class=&quot;s2&quot;&gt;&quot;:country_code3:!country!iso_code&quot;&lt;/span&gt;,
+                        &lt;span class=&quot;s2&quot;&gt;&quot;:country_name:!country!names!en&quot;&lt;/span&gt;,
+                        &lt;span class=&quot;s2&quot;&gt;&quot;:postal_code:!postal!code&quot;&lt;/span&gt;,
+                        &lt;span class=&quot;s2&quot;&gt;&quot;:region_code:!subdivisions!iso_code&quot;&lt;/span&gt;,
+                        &lt;span class=&quot;s2&quot;&gt;&quot;:region_name:!subdivisions!names!en&quot;&lt;/span&gt;
+                        ]
+        )
+
+        &lt;span class=&quot;c&quot;&gt;# Add MaxMind/GeoIP ISP DB lookup information
+&lt;/span&gt;        &lt;span class=&quot;n&quot;&gt;action&lt;/span&gt;( &lt;span class=&quot;n&quot;&gt;type&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;mmdblookup&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;mmdbfile&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;/etc/rsyslog.d/GeoIP2-ISP.mmdb&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;key&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;!src_ip&quot;&lt;/span&gt; 
+                &lt;span class=&quot;n&quot;&gt;fields&lt;/span&gt;=[&lt;span class=&quot;s2&quot;&gt;&quot;:asn:!autonomous_system_number&quot;&lt;/span&gt;,
+                        &lt;span class=&quot;s2&quot;&gt;&quot;:as_org:!autonomous_system_organization&quot;&lt;/span&gt;,
+                        &lt;span class=&quot;s2&quot;&gt;&quot;!isp&quot;&lt;/span&gt;,
+                        &lt;span class=&quot;s2&quot;&gt;&quot;!organization&quot;&lt;/span&gt;
+                        ]
+        )
+        
+        &lt;span class=&quot;c&quot;&gt;# Add IP to src_geo object
+&lt;/span&gt;        &lt;span class=&quot;n&quot;&gt;set&lt;/span&gt; $!&lt;span class=&quot;n&quot;&gt;src_geo&lt;/span&gt;!&lt;span class=&quot;n&quot;&gt;ip&lt;/span&gt; = $!&lt;span class=&quot;n&quot;&gt;src_ip&lt;/span&gt;;
+
+        &lt;span class=&quot;c&quot;&gt;# If geolocation was successful, add lat,lon in a special location object
+&lt;/span&gt;        &lt;span class=&quot;n&quot;&gt;if&lt;/span&gt; $! &lt;span class=&quot;n&quot;&gt;contains&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'latitude'&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;then&lt;/span&gt; {
+            &lt;span class=&quot;n&quot;&gt;set&lt;/span&gt; $!&lt;span class=&quot;n&quot;&gt;src_geo&lt;/span&gt;!&lt;span class=&quot;n&quot;&gt;location&lt;/span&gt;!&lt;span class=&quot;n&quot;&gt;lat&lt;/span&gt; = $!&lt;span class=&quot;n&quot;&gt;src_geo&lt;/span&gt;!&lt;span class=&quot;n&quot;&gt;latitude&lt;/span&gt;;
+            &lt;span class=&quot;n&quot;&gt;set&lt;/span&gt; $!&lt;span class=&quot;n&quot;&gt;src_geo&lt;/span&gt;!&lt;span class=&quot;n&quot;&gt;location&lt;/span&gt;!&lt;span class=&quot;n&quot;&gt;lon&lt;/span&gt; = $!&lt;span class=&quot;n&quot;&gt;src_geo&lt;/span&gt;!&lt;span class=&quot;n&quot;&gt;longitude&lt;/span&gt;;
+        }
+
+        &lt;span class=&quot;c&quot;&gt;# Output to a new file
+&lt;/span&gt;        &lt;span class=&quot;n&quot;&gt;action&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;type&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;omfile&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;File&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;/tmp/json-output&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;template&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;geoip&quot;&lt;/span&gt;)
+
+        &lt;span class=&quot;c&quot;&gt;# Output to Elasticsearch
+&lt;/span&gt;        &lt;span class=&quot;n&quot;&gt;action&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;type&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;omelasticsearch&quot;&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;server&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;192.168.1.10&quot;&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;serverport&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;9200&quot;&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;template&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;geoip&quot;&lt;/span&gt;  
+            &lt;span class=&quot;n&quot;&gt;searchIndex&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;geoindex&quot;&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;dynSearchIndex&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;on&quot;&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;searchType&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;syslog&quot;&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;bulkmode&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;on&quot;&lt;/span&gt;                   &lt;span class=&quot;c&quot;&gt;# use the Bulk API
+&lt;/span&gt;            &lt;span class=&quot;n&quot;&gt;queue&lt;/span&gt;.&lt;span class=&quot;n&quot;&gt;dequeuebatchsize&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;5000&quot;&lt;/span&gt;   &lt;span class=&quot;c&quot;&gt;# ES bulk size
+&lt;/span&gt;            &lt;span class=&quot;n&quot;&gt;queue&lt;/span&gt;.&lt;span class=&quot;n&quot;&gt;size&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;100000&quot;&lt;/span&gt;   &lt;span class=&quot;c&quot;&gt;# capacity of the action queue
+&lt;/span&gt;            &lt;span class=&quot;n&quot;&gt;queue&lt;/span&gt;.&lt;span class=&quot;n&quot;&gt;workerthreads&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;5&quot;&lt;/span&gt;   &lt;span class=&quot;c&quot;&gt;# 5 workers for the action
+&lt;/span&gt;            &lt;span class=&quot;n&quot;&gt;action&lt;/span&gt;.&lt;span class=&quot;n&quot;&gt;resumeretrycount&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;-1&quot;&lt;/span&gt;  &lt;span class=&quot;c&quot;&gt;# retry indefinitely if ES is unreachable
+&lt;/span&gt;            &lt;span class=&quot;n&quot;&gt;errorfile&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;/var/log/omelasticsearch.log&quot;&lt;/span&gt;
+        )
+
+    } &lt;span class=&quot;n&quot;&gt;else&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;if&lt;/span&gt; $&lt;span class=&quot;n&quot;&gt;parsesuccess&lt;/span&gt; == &lt;span class=&quot;s2&quot;&gt;&quot;FAIL&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;then&lt;/span&gt; {
+        &lt;span class=&quot;n&quot;&gt;action&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;type&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;omfile&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;File&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;/tmp/json-parse-failure&quot;&lt;/span&gt;)
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;To run Logstash we chose the quickest way, hence run it in Docker , so we have put all required Logstash configuration, logs and Maxmind databases in a directory:&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;linux@linux-VM:~&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;ls&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-l&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;-rwxrwxr-x&lt;/span&gt; 1 linux linux 26331174 Aug   6 19:11 GeoIP2-ISP.mmdb
+&lt;span class=&quot;nt&quot;&gt;-rwxrwxr-x&lt;/span&gt; 1 linux linux 51469823 Aug   6 19:11 GeoLite2-City.mmdb
+&lt;span class=&quot;nt&quot;&gt;-rw-rw-r--&lt;/span&gt; 1 linux linux      107 Aug  18 19:13 input-geo.json
+&lt;span class=&quot;nt&quot;&gt;-rwxrwxr-x&lt;/span&gt; 1 linux linux     2244 Aug  18 19:32 rsyslog.conf
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Running Rsyslog on Docker is not so relatively easy as the Docker images are a work in progress in &lt;a href=&quot;https://github.com/rsyslog/rsyslog-docker/&quot;&gt;Github&lt;/a&gt; (last checked 2018-08-18). So we created a custom image in our personal account, called &lt;a href=&quot;https://hub.docker.com/r/manios/rsyslog/&quot;&gt;manios/rsyslog&lt;/a&gt;. Let’s run a Docker container with Rsyslog 8.37.0:&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;docker run &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;-d&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;--name&lt;/span&gt; myrsyslog &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;-v&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;pwd&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;)&lt;/span&gt;/GeoLite2-City.mmdb:/etc/rsyslog.d/GeoLite2-City.mmdb &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;-v&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;pwd&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;)&lt;/span&gt;/GeoIP2-ISP.mmdb:/etc/rsyslog.d/GeoIP2-ISP.mmdb &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;-v&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;pwd&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;)&lt;/span&gt;/input-geo.json:/opt/input-geo.json &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;-v&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;pwd&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;)&lt;/span&gt;/rsyslog.conf:/etc/rsyslog.conf &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+    manios/rsyslog:8.37.0
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Now Rsyslog is running. Let’s run a Bash shell inside the container:&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;docker &lt;span class=&quot;nb&quot;&gt;exec&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-it&lt;/span&gt; myrsyslog /bin/bash
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;While Rsyslog is running, if you examine the contents of &lt;code class=&quot;highlighter-rouge&quot;&gt;/tmp/json-output&lt;/code&gt; file, you will notice that the messages contain a lot of geolocation information and they will resemble to the following:&lt;/p&gt;
+
+&lt;div class=&quot;language-json highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;@version&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;1&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;@timestamp&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;2018-08-18T06:59:14.640903+00:00&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;host&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;b576d0a6022b&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;type&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;syslog&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;syslog_timestamp&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Aug 18 06:59:14&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;syslog_hostname&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;b576d0a6022b&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;syslog_program&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;geoip&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;syslog_message&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;{&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;Christos&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;src_ip&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;63.145.248.101&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;age&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;:12}&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;received_at&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;2018-08-18T06:59:14.640903+00:00&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;received_from&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;path&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;/opt/input-geo.json&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;name&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Christos&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;src_ip&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;63.145.248.101&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;src_geoip&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;timezone&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;America&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\/&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;Los_Angeles&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;latitude&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;37.925500&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;longitude&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;-122.343700&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;dma_code&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;807&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;city_name&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;continent_code&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;NA&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;country_code2&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;US&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;country_code3&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;US&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;country_name&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;UnitedStates&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;postal_code&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;94804&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;region_code&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;region_name&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;asn&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;209&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;as_org&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;QwestCommunicationsCompany,LLC&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;isp&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;CenturyLink&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;organization&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;CenturyLink&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;ip&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;63.145.248.101&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;location&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+            &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;lat&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;37.9255&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+            &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;lon&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;-122.3437&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Unfortunately, current version of Rsyslog contains a known bug (&lt;a href=&quot;https://github.com/rsyslog/rsyslog/issues/1650&quot;&gt;#1650&lt;/a&gt;) which strips the space characters from strings. Notice that&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&quot;country_name&quot;: &quot;UnitedStates&quot;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;should be&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&quot;country_name&quot;: &quot;United States&quot;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;for example. Also, if you compare to our previous post (&lt;code class=&quot;highlighter-rouge&quot;&gt;TODO add link here&lt;/code&gt;), &lt;code class=&quot;highlighter-rouge&quot;&gt;region_code&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;region_name&lt;/code&gt; should have a value. You can easily spot the differences between Rsyslog and Logstash output in the following image:&lt;/p&gt;
+
+&lt;figure&gt;
+    &lt;a href=&quot;/images/2018-08-18-rsyslog-geo-maxmind/maxmind-output-logstash-rsyslog.png&quot;&gt;&lt;img src=&quot;/images/2018-08-18-rsyslog-geo-maxmind/maxmind-output-logstash-rsyslog.png&quot; alt=&quot;Rsyslog and Logstash output diff when using Maxmind GeoIP City and ISP lookup databases&quot; /&gt;&lt;/a&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;We hope this article helped you get up and running with Rsyslog and the use of &lt;a href=&quot;https://www.rsyslog.com/doc/v8-stable/configuration/modules/mmdblookup.html&quot;&gt;MaxMind/GeoIP DB lookup (mmdblookup)&lt;/a&gt; module!&lt;/p&gt;</content><author><name>cmanios</name></author><category term="rsyslog" /><category term="mmdblookup" /><category term="omelasticsearch" /><category term="geolocation" /><category term="ip" /><category term="geoip" /><category term="maxmind" /><category term="geo" /><category term="geoip" /><category term="geolite" /><category term="geolite2" /><category term="database" /><category term="json" /><category term="parse" /><category term="message" /><category term="log" /><summary type="html">Today we wanted to parse some json logs which we had in a file using Rsyslog and enrich them with Geolocation information regarding the city and the ISP an IP belongs. We initially tried with Logstash (see relevant previous blog post) but it was too slow. Thus we decided to try with parsing with Rsyslog. The file, let’s call it /var/log/input-geo.json had the following structure and content. (It is the same as in Logstash post):</summary></entry><entry><title type="html">Logstash - Enrich IP with Geolocation using Maxmind GeoLite2 City and ISP</title><link href="https://manios.org/2018/08/14/logstash-geoip-json-logs-maxmint-geolite-docker" rel="alternate" type="text/html" title="Logstash - Enrich IP with Geolocation using Maxmind GeoLite2 City and ISP" /><published>2018-08-14T18:35:00+03:00</published><updated>2018-08-14T18:35:00+03:00</updated><id>https://manios.org/2018/08/14/logstash-geoip-json-logs-maxmint-geolite-docker</id><content type="html" xml:base="https://manios.org/2018/08/14/logstash-geoip-json-logs-maxmint-geolite-docker">&lt;p&gt;Today we wanted to parse some json logs which we had in a file using Logstash and enrich  them with Geolocation information regarding the city and the ISP an IP belongs. The file, (let’s call it &lt;code class=&quot;highlighter-rouge&quot;&gt;/var/log/input-geo.json&lt;/code&gt;) had the following structure:&lt;/p&gt;
+
+&lt;div class=&quot;language-json highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;name&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Christos&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;src_ip&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;63.145.248.101&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;age&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;12&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;name&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Nikos&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;src_ip&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;98.158.156.175&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;age&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Logstash has &lt;a href=&quot;https://www.elastic.co/guide/en/logstash/current/plugins-filters-geoip.html&quot;&gt;GeoIP filter&lt;/a&gt; which adds information about the geographical location of IP addresses, based on data from the Maxmind GeoLite2 databases. In our case we used:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;https://dev.maxmind.com/geoip/geoip2/geolite2/&quot;&gt;GeoLite2 City&lt;/a&gt; database (free)&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://www.maxmind.com/en/geoip2-isp-database&quot;&gt;GeoIP2 ISP &lt;/a&gt; Database (commercial licence)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;We wanted to parse the JSON file enrich the &lt;code class=&quot;highlighter-rouge&quot;&gt;src_ip&lt;/code&gt; and then forward it to &lt;a href=&quot;https://www.elastic.co/guide/en/logstash/current/plugins-outputs-elasticsearch.html&quot;&gt;Elasticsearch&lt;/a&gt;. For debugging purposes we also enabled &lt;a href=&quot;https://www.elastic.co/guide/en/logstash/current/plugins-outputs-file.html&quot;&gt;file output&lt;/a&gt;. Thus , the configuration (&lt;code class=&quot;highlighter-rouge&quot;&gt;logstash.conf&lt;/code&gt;) looked like the following:&lt;/p&gt;
+
+&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;input&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;file&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; 
+    &lt;span class=&quot;n&quot;&gt;path&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;/var/log/input-geo.json&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;sincedb_path&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;/usr/share/logstash/geo-sincedb1&quot;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;start_position&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;beginning&quot;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;codec&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;json&quot;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;type&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;mygeo&quot;&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+
+&lt;span class=&quot;n&quot;&gt;filter&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    
+    &lt;span class=&quot;c1&quot;&gt;# Enhance with City geolocation information using free GeoLite2 City database&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;src_ip&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;geoip&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;source&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;src_ip&quot;&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;target&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;src_geoip&quot;&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;database&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;/usr/share/logstash/GeoLite2-City.mmdb&quot;&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+    &lt;span class=&quot;c1&quot;&gt;# Enhance with ISP geolocation information using free GeoIP2 ISP Database&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;src_ip&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;geoip&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;source&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;src_ip&quot;&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;target&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;src_geoip&quot;&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;database&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;/usr/share/logstash/GeoIP2-ISP.mmdb&quot;&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;  
+
+&lt;span class=&quot;n&quot;&gt;output&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;# stdout  { codec =&amp;gt; rubydebug }&lt;/span&gt;
+     
+    &lt;span class=&quot;c1&quot;&gt;# Output successfull messages to a file&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;_grokparsefailure&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;not&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tags&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;file&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;path&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;  &lt;span class=&quot;s2&quot;&gt;&quot;/usr/share/logstash/success-debug.txt&quot;&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;codec&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;json_lines&lt;/span&gt;
+        &lt;span class=&quot;c1&quot;&gt;#  codec =&amp;gt; rubydebug&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+  
+    &lt;span class=&quot;c1&quot;&gt;# Output failed messages to a file &lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;_grokparsefailure&quot;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tags&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;file&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;path&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;  &lt;span class=&quot;s2&quot;&gt;&quot;/usr/share/logstash/failed-debug.txt&quot;&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;codec&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rubydebug&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+ 
+    &lt;span class=&quot;c1&quot;&gt;# Output successfull messages to Elasticsearch&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;elasticsearch&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;hosts&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;192.168.1.3:9200&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;index&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;json_logs-%{+YYYY.MM.dd}&quot;&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;index&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;192.168.1.3_login_events-%{+YYYY.MM.dd}&quot;&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;manage_template&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;true&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;template_name&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;login_events&quot;&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;template_overwrite&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;true&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;protocol&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;http&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;flush_size&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;512&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;workers&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;8&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;To run Logstash we chose the quickest way, hence run it in Docker , so we have put all required Logstash configuration, logs and Maxmind databases in a directory:&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;linux@linux-VM:~&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;ls&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-l&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;-rwxrwxr-x&lt;/span&gt; 1 linux linux 26331174 Aug   6 19:11 GeoIP2-ISP.mmdb
+&lt;span class=&quot;nt&quot;&gt;-rwxrwxr-x&lt;/span&gt; 1 linux linux 51469823 Aug   6 19:11 GeoLite2-City.mmdb
+&lt;span class=&quot;nt&quot;&gt;-rw-rw-r--&lt;/span&gt; 1 linux linux      107 Aug  13 19:13 input-geo.json
+&lt;span class=&quot;nt&quot;&gt;-rwxrwxr-x&lt;/span&gt; 1 linux linux     2244 Aug  13 19:32 logstash.conf
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Running Logstash on Docker is relatively easy as Docker images for are available from the &lt;a href=&quot;https://www.docker.elastic.co/&quot;&gt;Elastic Docker registry&lt;/a&gt;. You can find more information &lt;a href=&quot;https://www.elastic.co/guide/en/logstash/current/docker.html&quot;&gt;here&lt;/a&gt;. Let’s run and interactive Docker container with Logstash 6.3.2:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;docker run -it \
+    --rm \
+    --name logstash \
+    -v $(pwd)/GeoIP2-ISP.mmdb:/usr/share/logstash/GeoIP2-ISP.mmdb \
+    -v $(pwd)/GeoLite2-City.mmdb:/usr/share/logstash/GeoLite2-City.mmdb \
+    -v $(pwd)/input-geo.json:/var/log/input-geo.json \
+    -v $(pwd)/logstash.conf:/usr/share/logstash/pipeline/logstash.conf \
+    docker.elastic.co/logstash/logstash-oss:6.3.2
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;While Logstash is running, if you examine Elasticsearch or &lt;code class=&quot;highlighter-rouge&quot;&gt;/usr/share/logstash/success-debug.txt&lt;/code&gt;, you will notice that the messages contain a lot of geolocation information and they will resemble to the following:&lt;/p&gt;
+
+&lt;div class=&quot;language-json highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;src_ip&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;63.145.248.101&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;path&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;/var/log/input-geo.json&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;host&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;a14a2394ba12&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;@timestamp&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;2018-08-13T17:33:05.894Z&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;type&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;mygeo&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;src_geoip&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;postal_code&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;94804&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;country_code3&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;US&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;dma_code&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;807&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;continent_code&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;NA&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;region_name&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;California&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;longitude&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;-122.3437&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;ip&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;63.145.248.101&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;isp&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;CenturyLink&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;region_code&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;CA&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;latitude&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;37.9255&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;as_org&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Qwest Communications Company, LLC&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;country_code2&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;US&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;asn&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;209&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;location&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+            &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;lon&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;-122.3437&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+            &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;lat&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;37.9255&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;organization&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;CenturyLink&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;city_name&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Richmond&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;country_name&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;United States&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;timezone&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;America/Los_Angeles&quot;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;name&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Christos&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;age&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;12&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;@version&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;1&quot;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Thank God we have a geolocation result! We hope this article helped you get up and running!&lt;/p&gt;</content><author><name>cmanios</name></author><category term="logstash" /><category term="geolocation" /><category term="ip" /><category term="geoip" /><category term="maxmind" /><category term="geo" /><category term="geolite" /><category term="geolite2" /><category term="database" /><category term="json" /><category term="parse" /><category term="message" /><category term="log" /><summary type="html">Today we wanted to parse some json logs which we had in a file using Logstash and enrich them with Geolocation information regarding the city and the ISP an IP belongs. The file, (let’s call it /var/log/input-geo.json) had the following structure:</summary></entry><entry><title type="html">Creating a Beat based on Metricbeat resolving Init and create metricset failures</title><link href="https://manios.org/2018/07/23/create-a-beat-based-on-metricbeat-resolving-bugs" rel="alternate" type="text/html" title="Creating a Beat based on Metricbeat resolving Init and create metricset failures" /><published>2018-07-23T22:31:00+03:00</published><updated>2018-07-23T22:31:00+03:00</updated><id>https://manios.org/2018/07/23/create-a-beat-based-on-metricbeat-resolving-bugs</id><content type="html" xml:base="https://manios.org/2018/07/23/create-a-beat-based-on-metricbeat-resolving-bugs">&lt;p&gt;I suspect that you are reading this post after having trouble creating a new Elastic Beat based on Metricbeat. Bud do not worry! We have you covered and solved the issues for you!&lt;/p&gt;
 
 &lt;p&gt;Long story short, a few days ago we wanted to create a new Metricbeat. After reading and executing step by step the official guide “&lt;a href=&quot;https://www.elastic.co/guide/en/beats/devguide/current/creating-beat-from-metricbeat.html&quot;&gt;Creating a Beat based on Metricbeat&lt;/a&gt;” we stumpled upon a series of issues like &lt;a href=&quot;https://discuss.elastic.co/t/step-3-init-and-create-the-metricset-failure/112046/12&quot;&gt;Step 3 - Init and create the metricset failure&lt;/a&gt;. After spending 2 days trying to resolve our local dependencies and solve the issues in our development environment, we decided to make everything in a sterilized environment, hence a Docker container.&lt;/p&gt;
 
@@ -771,330 +1208,4 @@ ex&lt;/p&gt;
     &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;keys&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;´&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Υ&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;command&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;insert&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;args&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;characters&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Ύ&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}},&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
     &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;keys&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;´&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Ω&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;command&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;insert&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;args&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;characters&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Ώ&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}},&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
 &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name>cmanios</name></author><category term="sublimetext" /><category term="sublime" /><category term="text" /><category term="editor" /><category term="linux" /><category term="accented" /><category term="accent" /><category term="char" /><category term="character" /><category term="greek" /><category term="fix" /><summary type="html">Yesterday I installed SublimeText 3 editor (build 3143) in my PC and the first thing I realised was that I could not type any Greek accented characters. Thus when I wanted to type: ex Το γοργόν και χάριν έχει. , Sublime actually showed Το γοργ´ον και χ´αριν ´εχει</summary></entry><entry><title type="html">Configure Eclipse in order to build MapStruct in Java projects</title><link href="https://manios.org/2017/08/09/configure-eclipse-in-order-to-build-mapstruct-in-java-projects" rel="alternate" type="text/html" title="Configure Eclipse in order to build MapStruct in Java projects" /><published>2017-08-09T13:14:00+03:00</published><updated>2017-08-09T13:14:00+03:00</updated><id>https://manios.org/2017/08/09/configure-eclipse-in-order-to-build-mapstruct-in-java-projects</id><content type="html" xml:base="https://manios.org/2017/08/09/configure-eclipse-in-order-to-build-mapstruct-in-java-projects">&lt;p&gt;Today I was working on a Java Spring MVC project which uses Maven. My editor was the Eclipse IDE, with the current version of the &lt;a href=&quot;http://www.eclipse.org/m2e/&quot;&gt;M2E plug-in&lt;/a&gt;. When I pulled the latest commits from the Git repository, my colleagues informed me that we will be using &lt;a href=&quot;http://mapstruct.org/&quot;&gt;MapStruct&lt;/a&gt; as a bean mapper between Entities and DTOs.&lt;/p&gt;
-
-&lt;p&gt;I read a little bit about it and I Ran the project in Eclipse. The Pivotal Tc Server started, but the deployment failed with the following error:&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;2017-08-09 13:23:07,364 ERROR ContextLoader - Context initialization failed
-org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'driverProviderServiceImpl': Injection of autowired dependencies failed; nested exception is org.springframework.beans.factory.BeanCreationException: Could not autowire field: private com.mycompany.bobproject.mapper.DriverMapper com.mycompany.bobproject.service.impl.DriverProviderServiceImpl.DriverMapper; nested exception is org.springframework.beans.factory.NoSuchBeanDefinitionException: No qualifying bean of type [com.mycompany.bobproject.mapper.DriverMapper] found for dependency: expected at least 1 bean which qualifies as autowire candidate for this dependency. Dependency annotations: {@org.springframework.beans.factory.annotation.Autowired(required=true)}
-	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessPropertyValues(AutowiredAnnotationBeanPostProcessor.java:334)
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.populateBean(AbstractAutowireCapableBeanFactory.java:1214)
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:543)
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:482)
-	at org.springframework.beans.factory.support.AbstractBeanFactory$1.getObject(AbstractBeanFactory.java:306)
-	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:230)
-	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:302)
-	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:197)
-	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:772)
-	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:839)
-	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:538)
-	at org.springframework.web.context.ContextLoader.configureAndRefreshWebApplicationContext(ContextLoader.java:444)
-	at org.springframework.web.context.ContextLoader.initWebApplicationContext(ContextLoader.java:326)
-	at org.springframework.web.context.ContextLoaderListener.contextInitialized(ContextLoaderListener.java:107)
-	at org.apache.catalina.core.StandardContext.listenerStart(StandardContext.java:4745)
-	at org.apache.catalina.core.StandardContext.startInternal(StandardContext.java:5207)
-	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:150)
-	at org.apache.catalina.core.ContainerBase.addChildInternal(ContainerBase.java:752)
-	at org.apache.catalina.core.ContainerBase.addChild(ContainerBase.java:728)
-	at org.apache.catalina.core.StandardHost.addChild(StandardHost.java:734)
-	at org.apache.catalina.startup.HostConfig.deployDescriptor(HostConfig.java:596)
-	at org.apache.catalina.startup.HostConfig$DeployDescriptor.run(HostConfig.java:1805)
-	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511)
-	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
-	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
-	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
-	at java.lang.Thread.run(Thread.java:745)
-Caused by: org.springframework.beans.factory.BeanCreationException: Could not autowire field: private com.mycompany.bobproject.mapper.DriverMapper com.mycompany.bobproject.service.impl.DriverProviderServiceImpl.DriverMapper; nested exception is org.springframework.beans.factory.NoSuchBeanDefinitionException: No qualifying bean of type [com.mycompany.bobproject.mapper.DriverMapper] found for dependency: expected at least 1 bean which qualifies as autowire candidate for this dependency. Dependency annotations: {@org.springframework.beans.factory.annotation.Autowired(required=true)}
-	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.inject(AutowiredAnnotationBeanPostProcessor.java:573)
-	at org.springframework.beans.factory.annotation.InjectionMetadata.inject(InjectionMetadata.java:88)
-	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessPropertyValues(AutowiredAnnotationBeanPostProcessor.java:331)
-	... 26 more
-Caused by: org.springframework.beans.factory.NoSuchBeanDefinitionException: No qualifying bean of type [com.mycompany.bobproject.mapper.DriverMapper] found for dependency: expected at least 1 bean which qualifies as autowire candidate for this dependency. Dependency annotations: {@org.springframework.beans.factory.annotation.Autowired(required=true)}
-	at org.springframework.beans.factory.support.DefaultListableBeanFactory.raiseNoSuchBeanDefinitionException(DefaultListableBeanFactory.java:1373)
-	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1119)
-	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1014)
-	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.inject(AutowiredAnnotationBeanPostProcessor.java:545)
-	... 28 more
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;After a lot of searching I found out that Eclipse does not automatically recognise and run the &lt;code class=&quot;highlighter-rouge&quot;&gt;mapstruct-processor&lt;/code&gt; which is declared in &lt;code class=&quot;highlighter-rouge&quot;&gt;pom.xml&lt;/code&gt;:&lt;/p&gt;
-
-&lt;div class=&quot;language-xml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;plugin&amp;gt;&lt;/span&gt;
-    &lt;span class=&quot;nt&quot;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;org.apache.maven.plugins&lt;span class=&quot;nt&quot;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
-    &lt;span class=&quot;nt&quot;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;maven-compiler-plugin&lt;span class=&quot;nt&quot;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
-    &lt;span class=&quot;nt&quot;&gt;&amp;lt;version&amp;gt;&lt;/span&gt;3.6.1&lt;span class=&quot;nt&quot;&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
-    &lt;span class=&quot;nt&quot;&gt;&amp;lt;configuration&amp;gt;&lt;/span&gt;
-        &lt;span class=&quot;nt&quot;&gt;&amp;lt;source&amp;gt;&lt;/span&gt;${java-version}&lt;span class=&quot;nt&quot;&gt;&amp;lt;/source&amp;gt;&lt;/span&gt;
-        &lt;span class=&quot;nt&quot;&gt;&amp;lt;target&amp;gt;&lt;/span&gt;${java-version}&lt;span class=&quot;nt&quot;&gt;&amp;lt;/target&amp;gt;&lt;/span&gt;
-        &lt;span class=&quot;nt&quot;&gt;&amp;lt;encoding&amp;gt;&lt;/span&gt;UTF-8&lt;span class=&quot;nt&quot;&gt;&amp;lt;/encoding&amp;gt;&lt;/span&gt;
-        &lt;span class=&quot;nt&quot;&gt;&amp;lt;showWarnings&amp;gt;&lt;/span&gt;true&lt;span class=&quot;nt&quot;&gt;&amp;lt;/showWarnings&amp;gt;&lt;/span&gt;
-        &lt;span class=&quot;nt&quot;&gt;&amp;lt;showDeprecation&amp;gt;&lt;/span&gt;true&lt;span class=&quot;nt&quot;&gt;&amp;lt;/showDeprecation&amp;gt;&lt;/span&gt;
-        &lt;span class=&quot;nt&quot;&gt;&amp;lt;annotationProcessorPaths&amp;gt;&lt;/span&gt;
-            &lt;span class=&quot;nt&quot;&gt;&amp;lt;path&amp;gt;&lt;/span&gt;
-                &lt;span class=&quot;nt&quot;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;org.mapstruct&lt;span class=&quot;nt&quot;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
-                &lt;span class=&quot;nt&quot;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;mapstruct-processor&lt;span class=&quot;nt&quot;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
-                &lt;span class=&quot;nt&quot;&gt;&amp;lt;version&amp;gt;&lt;/span&gt;${org.mapstruct.version}&lt;span class=&quot;nt&quot;&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
-            &lt;span class=&quot;nt&quot;&gt;&amp;lt;/path&amp;gt;&lt;/span&gt;
-        &lt;span class=&quot;nt&quot;&gt;&amp;lt;/annotationProcessorPaths&amp;gt;&lt;/span&gt;
-    &lt;span class=&quot;nt&quot;&gt;&amp;lt;/configuration&amp;gt;&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;&amp;lt;/plugin&amp;gt;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;However, if when I issued &lt;code class=&quot;highlighter-rouge&quot;&gt;mvn clean package&lt;/code&gt; the maven-compiler-plugin ran the processor and generated a &lt;code class=&quot;highlighter-rouge&quot;&gt;DriverMapperImpl&lt;/code&gt; located in &lt;code class=&quot;highlighter-rouge&quot;&gt;target/generated-sources/com.mycompany.bobproject.mapper&lt;/code&gt; directory.&lt;/p&gt;
-
-&lt;p&gt;Thus, after a lot of searching I found out in MapStruct &lt;a href=&quot;http://mapstruct.org/documentation/stable/reference/html/#_apache_maven&quot;&gt;documentation&lt;/a&gt;, that in order to use Eclipse and run the processor when project is build (automatically or manually), we have to install the &lt;a href=&quot;https://marketplace.eclipse.org/content/m2e-apt&quot;&gt;m2e-apt&lt;/a&gt; plugin using Eclipse Marketplace and configure the project using the following steps:&lt;/p&gt;
-
-&lt;h2 id=&quot;1-install-m2e-apt-plugin&quot;&gt;1. Install m2e-apt plugin&lt;/h2&gt;
-
-&lt;p&gt;Using Eclipse menu we go to &lt;code class=&quot;highlighter-rouge&quot;&gt;Help &amp;gt; Eclipse Marketplace ...&lt;/code&gt; and we search for &lt;code class=&quot;highlighter-rouge&quot;&gt;m2e-apt&lt;/code&gt;. When search completes it will look like the following:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;https://manios.org/images/2017-08-09-configure-eclipse-in-order-to-build-mapstruct-in-java-projects/eclipse-marketplace-m2e-apt-install.png&quot; alt=&quot;Eclipse install m2e-apt plugin from Eclipse Marketplace&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;When installation is complete, restart Eclipse. When started you will have to click on “Installed” tab of Eclipse Marketplace and verify that it looks like the following:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;https://manios.org/images/2017-08-09-configure-eclipse-in-order-to-build-mapstruct-in-java-projects/eclipse-marketplace-m2e-apt-installed.png&quot; alt=&quot;Eclipse installed m2e-apt plugin&quot; /&gt;&lt;/p&gt;
-
-&lt;h2 id=&quot;2-configure-eclipse-to-run-apt-automatically-when-building-the-project&quot;&gt;2. Configure Eclipse to run apt automatically when building the project&lt;/h2&gt;
-
-&lt;p&gt;In order to configure Eclipse to run &lt;code class=&quot;highlighter-rouge&quot;&gt;apt&lt;/code&gt; automatically when building the project and generate MaptStruct mappings in Package or Project Explorer, we make a right click on our Project and select &lt;code class=&quot;highlighter-rouge&quot;&gt;Properties&lt;/code&gt;. Then we navigate to Maven &amp;gt; Annotation Processing and Enable Project Specific Settings as shown in the following picture:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;https://manios.org/images/2017-08-09-configure-eclipse-in-order-to-build-mapstruct-in-java-projects/eclipse-project-auto-annotation-processing.png&quot; alt=&quot;Eclipse enable auto annotation processing using apt and m2e-apt plugin&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;We hit “Apply” and “Apply and Close”&lt;/p&gt;
-
-&lt;h2 id=&quot;3-clean-target-directory-and-build-project&quot;&gt;3. Clean target directory and Build project&lt;/h2&gt;
-
-&lt;p&gt;Finally Clean &lt;code class=&quot;highlighter-rouge&quot;&gt;target&lt;/code&gt; directory by deleting it or by issuing the command:&lt;/p&gt;
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;mvn clean
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;and build the project. Now it has to run fine.&lt;/p&gt;
-
-&lt;p&gt;Finally, if Eclipse throws the following error:&lt;/p&gt;
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;The declared package &quot;com.mycompany.bobproject.mapper&quot; does not match the expected package &quot;annotations.com.mycompany.bobproject.mapper&quot;	DriverMapperImpl.java	/parkalot/target/generated-sources/annotations/com/ots/mycompany/bobproject/mapper	line 1
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;then you have to add&lt;/p&gt;
-&lt;div class=&quot;language-xml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;generatedSourcesDirectory&amp;gt;&lt;/span&gt;${project.build.directory}/generated-sources&lt;span class=&quot;nt&quot;&gt;&amp;lt;/generatedSourcesDirectory&amp;gt;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;after the MapStruct declaration. By default, &lt;a href=&quot;https://maven.apache.org/plugins/maven-compiler-plugin/compile-mojo.html#generatedSourcesDirectory&quot;&gt;generatedSourcesDirectory&lt;/a&gt; property is configured to &lt;code class=&quot;highlighter-rouge&quot;&gt;${project.build.directory}/generated-sources/annotations&lt;/code&gt;. Thus the generated class resides inside &lt;code class=&quot;highlighter-rouge&quot;&gt;annotations.com.mycompany.bobproject.mapper&lt;/code&gt; package and produces an error. After the addition, your &lt;code class=&quot;highlighter-rouge&quot;&gt;pom.xml&lt;/code&gt; will look like the following:&lt;/p&gt;
-
-&lt;div class=&quot;language-xml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;plugin&amp;gt;&lt;/span&gt;
-    &lt;span class=&quot;nt&quot;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;org.apache.maven.plugins&lt;span class=&quot;nt&quot;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
-    &lt;span class=&quot;nt&quot;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;maven-compiler-plugin&lt;span class=&quot;nt&quot;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
-    &lt;span class=&quot;nt&quot;&gt;&amp;lt;version&amp;gt;&lt;/span&gt;3.6.1&lt;span class=&quot;nt&quot;&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
-    &lt;span class=&quot;nt&quot;&gt;&amp;lt;configuration&amp;gt;&lt;/span&gt;
-        &lt;span class=&quot;nt&quot;&gt;&amp;lt;source&amp;gt;&lt;/span&gt;${java-version}&lt;span class=&quot;nt&quot;&gt;&amp;lt;/source&amp;gt;&lt;/span&gt;
-        &lt;span class=&quot;nt&quot;&gt;&amp;lt;target&amp;gt;&lt;/span&gt;${java-version}&lt;span class=&quot;nt&quot;&gt;&amp;lt;/target&amp;gt;&lt;/span&gt;
-        &lt;span class=&quot;nt&quot;&gt;&amp;lt;encoding&amp;gt;&lt;/span&gt;UTF-8&lt;span class=&quot;nt&quot;&gt;&amp;lt;/encoding&amp;gt;&lt;/span&gt;
-        &lt;span class=&quot;nt&quot;&gt;&amp;lt;showWarnings&amp;gt;&lt;/span&gt;true&lt;span class=&quot;nt&quot;&gt;&amp;lt;/showWarnings&amp;gt;&lt;/span&gt;
-        &lt;span class=&quot;nt&quot;&gt;&amp;lt;showDeprecation&amp;gt;&lt;/span&gt;true&lt;span class=&quot;nt&quot;&gt;&amp;lt;/showDeprecation&amp;gt;&lt;/span&gt;
-        &lt;span class=&quot;nt&quot;&gt;&amp;lt;annotationProcessorPaths&amp;gt;&lt;/span&gt;
-            &lt;span class=&quot;nt&quot;&gt;&amp;lt;path&amp;gt;&lt;/span&gt;
-                &lt;span class=&quot;nt&quot;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;org.mapstruct&lt;span class=&quot;nt&quot;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
-                &lt;span class=&quot;nt&quot;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;mapstruct-processor&lt;span class=&quot;nt&quot;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
-                &lt;span class=&quot;nt&quot;&gt;&amp;lt;version&amp;gt;&lt;/span&gt;${org.mapstruct.version}&lt;span class=&quot;nt&quot;&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
-            &lt;span class=&quot;nt&quot;&gt;&amp;lt;/path&amp;gt;&lt;/span&gt;
-        &lt;span class=&quot;nt&quot;&gt;&amp;lt;/annotationProcessorPaths&amp;gt;&lt;/span&gt;
-        &lt;span class=&quot;nt&quot;&gt;&amp;lt;generatedSourcesDirectory&amp;gt;&lt;/span&gt;${project.build.directory}/generated-sources&lt;span class=&quot;nt&quot;&gt;&amp;lt;/generatedSourcesDirectory&amp;gt;&lt;/span&gt;
-    &lt;span class=&quot;nt&quot;&gt;&amp;lt;/configuration&amp;gt;&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;&amp;lt;/plugin&amp;gt;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;That’s it! I hope it helped you!&lt;/p&gt;</content><author><name>cmanios</name></author><category term="eclipse" /><category term="java" /><category term="spring" /><category term="maven" /><category term="m2e" /><category term="m2e-apt" /><category term="plugin" /><category term="compile" /><category term="annotation" /><category term="mapper" /><summary type="html">Today I was working on a Java Spring MVC project which uses Maven. My editor was the Eclipse IDE, with the current version of the M2E plug-in. When I pulled the latest commits from the Git repository, my colleagues informed me that we will be using MapStruct as a bean mapper between Entities and DTOs.</summary></entry><entry><title type="html">Let’s Encrypt SSL certificate without root or sudo privileges</title><link href="https://manios.org/2016/07/12/lets-encrypt-ssl-certificate-without-root-or-sudo-privileges" rel="alternate" type="text/html" title="Let's Encrypt SSL certificate without root or sudo privileges" /><published>2016-07-12T22:32:53+03:00</published><updated>2016-07-12T22:32:53+03:00</updated><id>https://manios.org/2016/07/12/lets-encrypt-ssl-certificate-without-root-or-sudo-privileges</id><content type="html" xml:base="https://manios.org/2016/07/12/lets-encrypt-ssl-certificate-without-root-or-sudo-privileges">&lt;p&gt;Five days ago we had to renew a number of SSL certificates using free &lt;a href=&quot;http://letsencrypt.org/&quot;&gt;Let’s Encrypt&lt;/a&gt; SSL authority to a few Apache servers which were installed in &lt;a href=&quot;http://www.layershift.com/&quot;&gt;Jelastic PaaS environment&lt;/a&gt;. The Apache servers were installed in an environment where:&lt;/p&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;
-    &lt;p&gt;We did have SSH access.&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;We &lt;strong&gt;did not have any root privileges or sudo command permission&lt;/strong&gt;.&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;The SSH access was done using a limited &lt;code class=&quot;highlighter-rouge&quot;&gt;apache&lt;/code&gt; user.&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;The underlying operating system was CentOS release 6.6 (Final) . (found out about it by running: &lt;code class=&quot;highlighter-rouge&quot;&gt;cat /etc/centos-release&lt;/code&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;Thus we could not use the official &lt;a href=&quot;https://github.com/letsencrypt/letsencrypt&quot;&gt;Let’s Encrypt client&lt;/a&gt; as it requires root privileges. After 3 hours of searching and striving to use &lt;a href=&quot;https://community.letsencrypt.org/t/list-of-client-implementations/2103&quot;&gt;multiple client implementations&lt;/a&gt;, we stumbled upon &lt;a href=&quot;https://github.com/lukas2511/letsencrypt.sh&quot;&gt;letsencrypt.sh&lt;/a&gt;. With the guidance of a &lt;a href=&quot;https://knallisworld.de/blog/2016/02/06/next-level-step-2-renewal-a-la-cron/&quot;&gt;tutorial written in German!!&lt;/a&gt; we finally managed to create our SSL certificates. So today, at last, we will show you how!!!&lt;/p&gt;
-
-&lt;p&gt;In this example, we assume that our domain name is &lt;code class=&quot;highlighter-rouge&quot;&gt;bobos.org&lt;/code&gt;. We want to create a certificate for &lt;a href=&quot;http://bobos.org&quot;&gt;bobos.org&lt;/a&gt; and &lt;a href=&quot;http://www.bobos.org&quot;&gt;www.bobos.org&lt;/a&gt;. Note that Let’s Encrypt &lt;strong&gt;does not generate wildcard certificates yet!!&lt;/strong&gt;.&lt;/p&gt;
-
-&lt;h3 id=&quot;prerequisites&quot;&gt;Prerequisites&lt;/h3&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;
-    &lt;p&gt;No root access or sudo is required.&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;We Obtain an A record for bobos.org and www.bobos.org which points to the IP of the server you are using.&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Inside the aforementioned server we have to run a web server which listens to port 80. Listening to port 443 is optional.&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Shell access to the server.&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;If you want to have a thourough understanding of why we are going to perform the following steps, you can refer to &lt;a href=&quot;https://letsencrypt.org/how-it-works/&quot;&gt;How it works&lt;/a&gt; official article. Few! It is high time we started. Shall we?&lt;/p&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;Know thy environment.&lt;/li&gt;
-  &lt;li&gt;Clone letsecrypt.sh script.&lt;/li&gt;
-  &lt;li&gt;Configure the script.&lt;/li&gt;
-  &lt;li&gt;Configure your web server.&lt;/li&gt;
-  &lt;li&gt;Run the script.&lt;/li&gt;
-  &lt;li&gt;Find the certificates.&lt;/li&gt;
-  &lt;li&gt;Configure your web server to use the certificates&lt;/li&gt;
-  &lt;li&gt;Upload SSL certificates to Jelastic Administration Panel&lt;/li&gt;
-  &lt;li&gt;Reload or restart web server and test configuration&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h3 id=&quot;know-thy-environment&quot;&gt;Know thy environment&lt;/h3&gt;
-
-&lt;p&gt;After login via SSH we are in &lt;code class=&quot;highlighter-rouge&quot;&gt;/var/www/&lt;/code&gt; directory:&lt;/p&gt;
-
-&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;apache@apache2 ~ &lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;pwd&lt;/span&gt;
-/var/www
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Then we check CentOS version, because we can!&lt;/p&gt;
-
-&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;apache@apache2 ~ &lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;cat&lt;/span&gt; /etc/centos-release 
-CentOS release 6.6 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;Final&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;h3 id=&quot;clone-letsecryptsh-script&quot;&gt;Clone letsecrypt.sh script&lt;/h3&gt;
-
-&lt;p&gt;While being in that directory we clone &lt;a href=&quot;https://github.com/lukas2511/letsencrypt.sh&quot;&gt;letsencrypt.sh&lt;/a&gt;:&lt;/p&gt;
-
-&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;apache@apache2 ~ &lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;git clone https://github.com/lukas2511/letsencrypt.sh.git
-Cloning into &lt;span class=&quot;s1&quot;&gt;'letsencrypt.sh'&lt;/span&gt;...
-remote: Counting objects: 873, &lt;span class=&quot;k&quot;&gt;done&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;.&lt;/span&gt;
-remote: Total 873 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;delta 0&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;, reused 0 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;delta 0&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;, pack-reused 873
-Receiving objects: 100% &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;873/873&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;, 223.44 KiB | 0 bytes/s, &lt;span class=&quot;k&quot;&gt;done&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;.&lt;/span&gt;
-Resolving deltas: 100% &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;530/530&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;, &lt;span class=&quot;k&quot;&gt;done&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;.&lt;/span&gt;
-Checking connectivity... &lt;span class=&quot;k&quot;&gt;done&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;.&lt;/span&gt;
-apache@apache2 ~ &lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;chown &lt;span class=&quot;nt&quot;&gt;-R&lt;/span&gt; apache:apache letsencrypt.sh
-apache@apache2 ~ &lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;cd &lt;/span&gt;letsencrypt.sh
-apache@apache2 ~ &lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;pwd&lt;/span&gt;
-/var/www/etsencrypt.sh
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;h3 id=&quot;configure-the-script&quot;&gt;Configure the script&lt;/h3&gt;
-
-&lt;p&gt;Then, we have perform a little configuration so the script is aware of our environment and the domains for which we want to generate free SSL certificates:&lt;/p&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;Prepare &lt;code class=&quot;highlighter-rouge&quot;&gt;base&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;conf&lt;/code&gt; directories:
-    &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;apache@apache2 ~/letsencrypt.sh &lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;mkdir conf 
-apache@apache2 ~/letsencrypt.sh &lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;mkdir base
-apache@apache2 ~/letsencrypt.sh &lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;cp config.sh.example conf/config.sh
-apache@apache2 ~/letsencrypt.sh &lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;cp domains.txt.exampleconfig.sh.example conf/domains.txt
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
-  &lt;/li&gt;
-  &lt;li&gt;Edit configuration in &lt;code class=&quot;highlighter-rouge&quot;&gt;/var/www/letsencrypt.sh/conf/config.sh&lt;/code&gt;:
-    &lt;div class=&quot;language-ini highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;py&quot;&gt;CONFIG_D&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;/var/www/letsencrypt.sh&quot;&lt;/span&gt;
-&lt;span class=&quot;py&quot;&gt;BASEDIR&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;/var/www/letsencrypt.sh/base&quot;&lt;/span&gt;
-&lt;span class=&quot;py&quot;&gt;WELLKNOWN&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;${BASEDIR}/.acme-challenges&quot;&lt;/span&gt;
-&lt;span class=&quot;py&quot;&gt;CONTACT_EMAIL&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;aValidEmail@whateverServer.com&quot;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
-  &lt;/li&gt;
-  &lt;li&gt;Add the domain names in /var/www/letsencrypt.sh/conf/domains.txt```:
-    &lt;div class=&quot;language-text highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;bobos.org www.bobos.org
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
-  &lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h3 id=&quot;configure-your-web-server&quot;&gt;Configure your web server&lt;/h3&gt;
-
-&lt;p&gt;Now we have to put the following lines in your site’s special apache conf i.e. &lt;code class=&quot;highlighter-rouge&quot;&gt;/etc/httpd/sites-available/bobos.conf&lt;/code&gt; or in &lt;code class=&quot;highlighter-rouge&quot;&gt;/etc/httpd/conf/httpd.conf&lt;/code&gt;. This will help Let’s Encrypt to access your server, perform domain validation and perform some challenges in order to generate our SSL certificate.&lt;/p&gt;
-
-&lt;div class=&quot;language-text highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;   Alias /.well-known/acme-challenge /var/www/letsencrypt.sh/base/.acme-challenges
-
-   &amp;lt;Directory /var/www/letsencrypt.sh/base/.acme-challenges&amp;gt;
-         Options None
-         AllowOverride None
-         Order allow,deny
-         Allow from all
-   &amp;lt;/Directory&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;h3 id=&quot;run-the-script&quot;&gt;Run the script&lt;/h3&gt;
-
-&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;apache@apache2 ~/letsencrypt.sh &lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;./letsencrypt.sh &lt;span class=&quot;nt&quot;&gt;--config&lt;/span&gt; /var/www/letsencrypt.sh/conf/config.sh &lt;span class=&quot;nt&quot;&gt;-c&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# INFO: Using main config file /var/www/letsencrypt.sh/conf/config.sh&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# INFO: Using additional config file /var/www/letsencrypt.sh/conf/config.sh&lt;/span&gt;
-Processing bobos.org with alternative names: www.bobos.org
- + Signing domains...
- + Creating new directory /var/www/letsencrypt.sh/base/certs/bobos.org ...
- + Generating private key...
- + Generating signing request...
- + Requesting challenge &lt;span class=&quot;k&quot;&gt;for &lt;/span&gt;bobos.org...
- + Requesting challenge &lt;span class=&quot;k&quot;&gt;for &lt;/span&gt;www.bobos.org...
- + Responding to challenge &lt;span class=&quot;k&quot;&gt;for &lt;/span&gt;bobos.org...
- + Challenge is valid!
- + Responding to challenge &lt;span class=&quot;k&quot;&gt;for &lt;/span&gt;www.bobos.org...
- + Challenge is valid!
- + Requesting certificate...
- + Checking certificate...
- + Done!
- + Creating fullchain.pem...
- + Done!
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;h3 id=&quot;find-the-certificates&quot;&gt;Find the certificates&lt;/h3&gt;
-
-&lt;p&gt;The certificates are created in &lt;code class=&quot;highlighter-rouge&quot;&gt;$BASE/certs//&lt;/code&gt; directory:&lt;/p&gt;
-
-&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;apache@apache2 ~/letsencrypt.sh &lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;ls&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-l&lt;/span&gt; base/certs/bobos.org/
-total 20
-&lt;span class=&quot;nt&quot;&gt;-rw-------&lt;/span&gt; 1 apache apache 1655 Jul  7 06:49 cert-1457333387.csr
-&lt;span class=&quot;nt&quot;&gt;-rw-------&lt;/span&gt; 1 apache apache 2143 Jul  7 06:49 cert-1457333387.pem
-lrwxrwxrwx 1 apache apache   19 Jul  7 06:50 cert.csr -&amp;gt; cert-1457333387.csr
-lrwxrwxrwx 1 apache apache   19 Jul  7 06:50 cert.pem -&amp;gt; cert-1457333387.pem
-&lt;span class=&quot;nt&quot;&gt;-rw-------&lt;/span&gt; 1 apache apache 1675 Jul  7 06:50 chain-1457333387.pem
-lrwxrwxrwx 1 apache apache   20 Jul  7 06:50 chain.pem -&amp;gt; chain-1457333387.pem
-&lt;span class=&quot;nt&quot;&gt;-rw-------&lt;/span&gt; 1 apache apache 3818 Jul  7 06:50 fullchain-1457333387.pem
-lrwxrwxrwx 1 apache apache   24 Jul  7 06:50 fullchain.pem -&amp;gt; fullchain-1457333387.pem
-&lt;span class=&quot;nt&quot;&gt;-rw-------&lt;/span&gt; 1 apache apache 3243 Jul  7 06:49 privkey-1457333387.pem
-lrwxrwxrwx 1 apache apache   22 Jul  7 06:50 privkey.pem -&amp;gt; privkey-1457333387.pem
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;h3 id=&quot;configure-your-web-server-to-use-the-certificates&quot;&gt;Configure your web server to use the certificates&lt;/h3&gt;
-
-&lt;p&gt;Configure Apache in order to use the created certificates. It might by your site’s special conf i.e. &lt;code class=&quot;highlighter-rouge&quot;&gt;/etc/httpd/sites-available/bobos.conf&lt;/code&gt; or global &lt;code class=&quot;highlighter-rouge&quot;&gt;/etc/httpd/conf/httpd.conf&lt;/code&gt;:&lt;/p&gt;
-
-&lt;div class=&quot;language-apache highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nc&quot;&gt;SSLEngine&lt;/span&gt; On
-&lt;span class=&quot;nc&quot;&gt;SSLCertificateFile&lt;/span&gt;      /var/www/letsencrypt.sh/base/certs/bobos.org/cert.pem
-&lt;span class=&quot;nc&quot;&gt;SSLCertificateKeyFile&lt;/span&gt;   /var/www/letsencrypt.sh/base/certs/bobos.org/privkey.pem
-&lt;span class=&quot;nc&quot;&gt;SSLCertificateChainFile&lt;/span&gt; /var/www/letsencrypt.sh/base/certs/bobos.org/chain.pem
-&lt;span class=&quot;nc&quot;&gt;SSLCACertificateFile&lt;/span&gt;    /var/www/letsencrypt.sh/base/certs/bobos.org/fullchain.pem
-&lt;span class=&quot;nc&quot;&gt;SSLHonorCipherOrder&lt;/span&gt; On
-&lt;span class=&quot;nc&quot;&gt;SSLCipherSuite&lt;/span&gt; ECDHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA256:ECDHE-RSA-AES256-SHA:ECDHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-RSA-AES128-SHA256:DHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA:ECDHE-RSA-DES-CBC3-SHA:EDH-RSA-DES-CBC3-SHA:AES256-GCM-SHA384:AES128-GCM-SHA256:AES256-SHA256:AES128-SHA256:AES256-SHA:AES128-SHA:DES-CBC3-SHA:HIGH:!aNULL:!eNULL:!EXPORT:!DES:!MD5:!PSK:!RC4
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;&lt;strong&gt;IMPORTANT NOTE!!&lt;/strong&gt; The previous configuration &lt;strong&gt;will not work&lt;/strong&gt; in Jelastic Paas environment, as it forces us to add the certificates via &lt;a href=&quot;https://app.j.layershift.co.uk/&quot;&gt;Jelastic Administration Panel&lt;/a&gt;. Jelastic puts the certificates to &lt;code class=&quot;highlighter-rouge&quot;&gt;/var/lib/jelastic/SSL&lt;/code&gt;.&lt;/p&gt;
-
-&lt;div class=&quot;language-apache highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nc&quot;&gt;SSLEngine&lt;/span&gt; &lt;span class=&quot;ss&quot;&gt;on&lt;/span&gt;
-
-&lt;span class=&quot;nc&quot;&gt;SSLProtocol&lt;/span&gt; ALL -SSLv2 -SSLv3
-&lt;span class=&quot;nc&quot;&gt;SSLHonorCipherOrder&lt;/span&gt; On
-&lt;span class=&quot;nc&quot;&gt;SSLCipherSuite&lt;/span&gt; ECDH+AESGCM:DH+AESGCM:ECDH+AES256:DH+AES256:ECDH+AES128:DH+AES:ECDH+3DES:DH+3DES:RSA+AESGCM:RSA+AES:RSA+3DES:!aNULL:!MD5:!DSS
-
-&lt;span class=&quot;nc&quot;&gt;SSLCertificateFile&lt;/span&gt; /var/lib/jelastic/SSL/jelastic.crt
-&lt;span class=&quot;nc&quot;&gt;SSLCertificateKeyFile&lt;/span&gt; /var/lib/jelastic/SSL/jelastic.key
-&lt;span class=&quot;nc&quot;&gt;SSLCACertificateFile&lt;/span&gt; /var/lib/jelastic/SSL/jelastic-ca.crt
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;h3 id=&quot;upload-ssl-certificates-to-jelastic-administration-panel&quot;&gt;Upload SSL certificates to Jelastic Administration Panel&lt;/h3&gt;
-
-&lt;p&gt;Then we have to upload SSL certificates to Jelastic Administration Panel. To achieve that you can use &lt;a href=&quot;https://docs.jelastic.com/custom-ssl#docs-internal-guid-ccfc9b2c-ad8f-bb9d-9503-26def475aa76&quot;&gt;this guide&lt;/a&gt;. Otherwise (i.e. putting files via SSH) it will not work.&lt;/p&gt;
-
-&lt;h3 id=&quot;reload-or-restart-web-server-and-test-configuration&quot;&gt;Reload or restart web server and test configuration&lt;/h3&gt;
-
-&lt;p&gt;Finally we reload &lt;code class=&quot;highlighter-rouge&quot;&gt;sudo /etc/init.d/apache2 reload&lt;/code&gt; or restart (&lt;code class=&quot;highlighter-rouge&quot;&gt;sudo /etc/init.d/apache2 restart&lt;/code&gt;) Apache web server and verify that &lt;code class=&quot;highlighter-rouge&quot;&gt;https://bobos.org&lt;/code&gt; works.&lt;/p&gt;
-
-&lt;p&gt;That is all folks! Greetings from a hot and striving for the best Greece!&lt;/p&gt;</content><author><name>cmanios</name></author><category term="bash" /><category term="centos" /><category term="certificate" /><category term="encrypt" /><category term="free" /><category term="install" /><category term="jelastic" /><category term="let's encrypt" /><category term="lets" /><category term="linux" /><category term="root" /><category term="ssh" /><category term="ssl" /><category term="sudo" /><summary type="html">Five days ago we had to renew a number of SSL certificates using free Let’s Encrypt SSL authority to a few Apache servers which were installed in Jelastic PaaS environment. The Apache servers were installed in an environment where:</summary></entry></feed>
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name>cmanios</name></author><category term="sublimetext" /><category term="sublime" /><category term="text" /><category term="editor" /><category term="linux" /><category term="accented" /><category term="accent" /><category term="char" /><category term="character" /><category term="greek" /><category term="fix" /><summary type="html">Yesterday I installed SublimeText 3 editor (build 3143) in my PC and the first thing I realised was that I could not type any Greek accented characters. Thus when I wanted to type: ex Το γοργόν και χάριν έχει. , Sublime actually showed Το γοργ´ον και χ´αριν ´εχει</summary></entry></feed>
