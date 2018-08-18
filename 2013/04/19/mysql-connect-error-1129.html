@@ -9,36 +9,16 @@
   <head>
     <meta charset="utf-8">
 
-<!-- begin SEO -->
-
-
-
-
-
-
-
-
-
-<title>MySQL connection ERROR 1129 - cmanios</title>
-
-
-
-
+<!-- begin _includes/seo.html --><title>MySQL connection ERROR 1129 - cmanios</title>
 <meta name="description" content="Today I had to configure a MySQL database cluster and I faced the following error">
 
 
 
-
-<meta name="author" content="cmanios">
-
+<meta property="og:type" content="article">
 <meta property="og:locale" content="en_US">
 <meta property="og:site_name" content="cmanios">
 <meta property="og:title" content="MySQL connection ERROR 1129">
-
-
-  <link rel="canonical" href="https://manios.org/2013/04/19/mysql-connect-error-1129">
-  <meta property="og:url" content="https://manios.org/2013/04/19/mysql-connect-error-1129">
-
+<meta property="og:url" content="https://manios.org/2013/04/19/mysql-connect-error-1129">
 
 
   <meta property="og:description" content="Today I had to configure a MySQL database cluster and I faced the following error">
@@ -49,27 +29,18 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-  
-
-  
-
-
-
-
-
-  <meta property="og:type" content="article">
   <meta property="article:published_time" content="2013-04-19T10:24:58+03:00">
 
+
+
+
+
+  
+
+  
+
+
+<link rel="canonical" href="https://manios.org/2013/04/19/mysql-connect-error-1129">
 
 
 
@@ -79,11 +50,11 @@
 
   <script type="application/ld+json">
     {
-      "@context" : "http://schema.org",
-      "@type" : "Person",
-      "name" : "Christos Manios",
-      "url" : "https://manios.org",
-      "sameAs" : null
+      "@context": "http://schema.org",
+      "@type": "Person",
+      "name": "Christos Manios",
+      "url": "https://manios.org",
+      "sameAs": null
     }
   </script>
 
@@ -93,10 +64,10 @@
 
 
 
-<!-- end SEO -->
+<!-- end _includes/seo.html -->
 
 
-<link href="https://manios.org/feed.xml" type="application/atom+xml" rel="alternate" title="cmanios Feed">
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="cmanios Feed">
 
 <!-- http://t.co/dKP3o1e -->
 <meta name="HandheldFriendly" content="True">
@@ -108,7 +79,7 @@
 </script>
 
 <!-- For all browsers -->
-<link rel="stylesheet" href="https://manios.org/assets/css/main.css">
+<link rel="stylesheet" href="/assets/css/main.css">
 
 <!--[if lte IE 9]>
   <style>
@@ -128,9 +99,10 @@
 
     <!-- start custom head snippets -->
 
-<!-- insert favicons. use http://realfavicongenerator.net/ -->
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
 
 <!-- end custom head snippets -->
+
   </head>
 
   <body class="layout--single">
@@ -143,23 +115,32 @@
   <div class="masthead__inner-wrap">
     <div class="masthead__menu">
       <nav id="site-nav" class="greedy-nav">
-        <a class="site-title" href="https://manios.org/">cmanios</a>
+        <a class="site-title" href="/">cmanios</a>
         <ul class="visible-links">
           
             
-            <li class="masthead__menu-item"><a href="https://manios.org/year-archive/">Posts archive</a></li>
+            <li class="masthead__menu-item">
+              <a href="https://manios.org/year-archive/" >Posts archive</a>
+            </li>
           
             
-            <li class="masthead__menu-item"><a href="https://manios.org/categories/">Categories</a></li>
+            <li class="masthead__menu-item">
+              <a href="https://manios.org/categories/" >Categories</a>
+            </li>
           
             
-            <li class="masthead__menu-item"><a href="https://manios.org/tags/">Tags</a></li>
+            <li class="masthead__menu-item">
+              <a href="https://manios.org/tags/" >Tags</a>
+            </li>
           
             
-            <li class="masthead__menu-item"><a href="https://manios.org/about/">About</a></li>
+            <li class="masthead__menu-item">
+              <a href="https://manios.org/about/" >About</a>
+            </li>
           
         </ul>
-        <button type="button">
+        
+        <button class="greedy-nav__toggle hidden" type="button">
           <span class="visually-hidden">Toggle Menu</span>
           <div class="navicon"></div>
         </button>
@@ -178,16 +159,15 @@
   <div class="sidebar sticky">
   
 
+
 <div itemscope itemtype="http://schema.org/Person">
 
   
 
   <div class="author__content">
-    <h3 class="author__name" itemprop="name">Christos Manios</h3>
     
-      <p class="author__bio" itemprop="description">
-        Developer life is a NullPointerException
-      </p>
+      <h3 class="author__name" itemprop="name"></h3>
+    
     
   </div>
 
@@ -195,23 +175,11 @@
     <button class="btn btn--inverse">Follow</button>
     <ul class="author__urls social-icons">
       
-        <li itemprop="homeLocation" itemscope itemtype="http://schema.org/Place">
-          <i class="fa fa-fw fa-map-marker" aria-hidden="true"></i> <span itemprop="name">Thessaloniki, GR</span>
-        </li>
-      
 
       
 
       
 
-      
-
-      
-        <li>
-          <a href="https://twitter.com/maniosolr" itemprop="sameAs">
-            <i class="fa fa-fw fa-twitter-square" aria-hidden="true"></i> Twitter
-          </a>
-        </li>
       
 
       
@@ -229,11 +197,7 @@
       
 
       
-        <li>
-          <a href="https://github.com/manios" itemprop="sameAs">
-            <i class="fa fa-fw fa-github" aria-hidden="true"></i> GitHub
-          </a>
-        </li>
+
       
 
       
@@ -265,7 +229,7 @@
       <!--
   <li>
     <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs">
-      <i class="fa fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
     </a>
   </li>
 -->
@@ -286,10 +250,10 @@
     <div class="page__inner-wrap">
       
         <header>
-          <h1 class="page__title" itemprop="headline">MySQL connection ERROR 1129
+          <h1 id="page-title" class="page__title" itemprop="headline">MySQL connection ERROR 1129
 </h1>
           
-            <p class="page__meta"><i class="fa fa-clock-o" aria-hidden="true"></i> 
+            <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
 
 
 
@@ -360,36 +324,36 @@ net start mysql
   
 
   <p class="page__taxonomy">
-    <strong><i class="fa fa-fw fa-tags" aria-hidden="true"></i> Tags: </strong>
+    <strong><i class="fas fa-fw fa-tags" aria-hidden="true"></i> Tags: </strong>
     <span itemprop="keywords">
     
       
       
-      <a href="https://manios.org/tags/#connection" class="page__taxonomy-item" rel="tag">connection</a><span class="sep">, </span>
+      <a href="/tags/#connection" class="page__taxonomy-item" rel="tag">connection</a><span class="sep">, </span>
     
       
       
-      <a href="https://manios.org/tags/#database" class="page__taxonomy-item" rel="tag">database</a><span class="sep">, </span>
+      <a href="/tags/#database" class="page__taxonomy-item" rel="tag">database</a><span class="sep">, </span>
     
       
       
-      <a href="https://manios.org/tags/#error" class="page__taxonomy-item" rel="tag">error</a><span class="sep">, </span>
+      <a href="/tags/#error" class="page__taxonomy-item" rel="tag">error</a><span class="sep">, </span>
     
       
       
-      <a href="https://manios.org/tags/#haproxy" class="page__taxonomy-item" rel="tag">haproxy</a><span class="sep">, </span>
+      <a href="/tags/#haproxy" class="page__taxonomy-item" rel="tag">haproxy</a><span class="sep">, </span>
     
       
       
-      <a href="https://manios.org/tags/#linux" class="page__taxonomy-item" rel="tag">linux</a><span class="sep">, </span>
+      <a href="/tags/#linux" class="page__taxonomy-item" rel="tag">linux</a><span class="sep">, </span>
     
       
       
-      <a href="https://manios.org/tags/#mysql" class="page__taxonomy-item" rel="tag">mysql</a><span class="sep">, </span>
+      <a href="/tags/#mysql" class="page__taxonomy-item" rel="tag">mysql</a><span class="sep">, </span>
     
       
       
-      <a href="https://manios.org/tags/#windows" class="page__taxonomy-item" rel="tag">windows</a>
+      <a href="/tags/#windows" class="page__taxonomy-item" rel="tag">windows</a>
     
     </span>
   </p>
@@ -405,31 +369,31 @@ net start mysql
   
 
   <p class="page__taxonomy">
-    <strong><i class="fa fa-fw fa-folder-open" aria-hidden="true"></i> Categories: </strong>
+    <strong><i class="fas fa-fw fa-folder-open" aria-hidden="true"></i> Categories: </strong>
     <span itemprop="keywords">
     
       
       
-      <a href="https://manios.org/categories/#databases" class="page__taxonomy-item" rel="tag">Databases</a><span class="sep">, </span>
+      <a href="/categories/#databases" class="page__taxonomy-item" rel="tag">Databases</a><span class="sep">, </span>
     
       
       
-      <a href="https://manios.org/categories/#haproxy" class="page__taxonomy-item" rel="tag">HaProxy</a><span class="sep">, </span>
+      <a href="/categories/#haproxy" class="page__taxonomy-item" rel="tag">HaProxy</a><span class="sep">, </span>
     
       
       
-      <a href="https://manios.org/categories/#linux" class="page__taxonomy-item" rel="tag">Linux</a><span class="sep">, </span>
+      <a href="/categories/#linux" class="page__taxonomy-item" rel="tag">Linux</a><span class="sep">, </span>
     
       
       
-      <a href="https://manios.org/categories/#mysql" class="page__taxonomy-item" rel="tag">mysql</a>
+      <a href="/categories/#mysql" class="page__taxonomy-item" rel="tag">mysql</a>
     
     </span>
   </p>
 
 
         
-          <p class="page__date"><strong><i class="fa fa-fw fa-calendar" aria-hidden="true"></i> Updated:</strong> <time datetime="2013-04-19T10:24:58+03:00">April 19, 2013</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="2013-04-19T10:24:58+03:00">April 19, 2013</time></p>
         
       </footer>
 
@@ -438,38 +402,30 @@ net start mysql
     <h4 class="page__share-title">Share on</h4>
   
 
-  <a href="https://twitter.com/intent/tweet?text=MySQL+connection+ERROR+1129%20https%3A%2F%2Fmanios.org%2F2013%2F04%2F19%2Fmysql-connect-error-1129" class="btn btn--twitter" title="Share on Twitter"><i class="fa fa-fw fa-twitter" aria-hidden="true"></i><span> Twitter</span></a>
+  <a href="https://twitter.com/intent/tweet?text=MySQL+connection+ERROR+1129%20https%3A%2F%2Fmanios.org%2F2013%2F04%2F19%2Fmysql-connect-error-1129" class="btn btn--twitter" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Twitter"><i class="fab fa-fw fa-twitter" aria-hidden="true"></i><span> Twitter</span></a>
 
-  <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fmanios.org%2F2013%2F04%2F19%2Fmysql-connect-error-1129" class="btn btn--facebook" title="Share on Facebook"><i class="fa fa-fw fa-facebook" aria-hidden="true"></i><span> Facebook</span></a>
+  <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fmanios.org%2F2013%2F04%2F19%2Fmysql-connect-error-1129" class="btn btn--facebook" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Facebook"><i class="fab fa-fw fa-facebook" aria-hidden="true"></i><span> Facebook</span></a>
 
-  <a href="https://plus.google.com/share?url=https%3A%2F%2Fmanios.org%2F2013%2F04%2F19%2Fmysql-connect-error-1129" class="btn btn--google-plus" title="Share on Google Plus"><i class="fa fa-fw fa-google-plus" aria-hidden="true"></i><span> Google+</span></a>
+  <a href="https://plus.google.com/share?url=https%3A%2F%2Fmanios.org%2F2013%2F04%2F19%2Fmysql-connect-error-1129" class="btn btn--google-plus" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Google Plus"><i class="fab fa-fw fa-google-plus" aria-hidden="true"></i><span> Google+</span></a>
 
-  <a href="https://www.linkedin.com/shareArticle?mini=true&url=https%3A%2F%2Fmanios.org%2F2013%2F04%2F19%2Fmysql-connect-error-1129" class="btn btn--linkedin" title="Share on LinkedIn"><i class="fa fa-fw fa-linkedin" aria-hidden="true"></i><span> LinkedIn</span></a>
+  <a href="https://www.linkedin.com/shareArticle?mini=true&url=https%3A%2F%2Fmanios.org%2F2013%2F04%2F19%2Fmysql-connect-error-1129" class="btn btn--linkedin" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on LinkedIn"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i><span> LinkedIn</span></a>
 </section>
 
 
       
   <nav class="pagination">
     
-      <a href="https://manios.org/2013/03/19/import-a-large-sql-dump-file-to-a-mysql-database-from-command-line" class="pagination--pager" title="Import a large sql dump file to a MySQL database from command line
+      <a href="/2013/03/19/import-a-large-sql-dump-file-to-a-mysql-database-from-command-line" class="pagination--pager" title="Import a large sql dump file to a MySQL database from command line
 ">Previous</a>
     
     
-      <a href="https://manios.org/2013/04/23/vi-set-color-scheme-line-numbers-and-syntax-highlighting" class="pagination--pager" title="Vi set color scheme , line numbers and syntax highlighting
+      <a href="/2013/04/23/vi-set-color-scheme-line-numbers-and-syntax-highlighting" class="pagination--pager" title="Vi set color scheme , line numbers and syntax highlighting
 ">Next</a>
     
   </nav>
 
     </div>
 
-    
-      <div class="page__comments">
-  
-  
-      <h4 class="page__comments-title">Leave a Comment</h4>
-      <section id="disqus_thread"></section>
-    
-</div>
     
   </article>
 
@@ -488,12 +444,12 @@ net start mysql
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/2018/08/18/logstash-geoip-json-logs-maxmint-geolite-docker" rel="permalink">Rsyslog - Parse Json and enrich IP with Geolocation using Maxmind GeoLite2 City and ISP
+        <a href="/2018/08/18/logstash-geoip-json-logs-maxmint-geolite-docker" rel="permalink">Rsyslog - Parse Json and enrich IP with Geolocation using Maxmind GeoLite2 City and ISP
 </a>
       
     </h2>
     
-      <p class="page__meta"><i class="fa fa-clock-o" aria-hidden="true"></i> 
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
 
 
 
@@ -514,12 +470,12 @@ net start mysql
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/2018/08/14/logstash-geoip-json-logs-maxmint-geolite-docker" rel="permalink">Logstash - Enrich IP with Geolocation using Maxmind GeoLite2 City and ISP
+        <a href="/2018/08/14/logstash-geoip-json-logs-maxmint-geolite-docker" rel="permalink">Logstash - Enrich IP with Geolocation using Maxmind GeoLite2 City and ISP
 </a>
       
     </h2>
     
-      <p class="page__meta"><i class="fa fa-clock-o" aria-hidden="true"></i> 
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
 
 
 
@@ -540,12 +496,12 @@ net start mysql
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/2018/07/23/create-a-beat-based-on-metricbeat-resolving-bugs" rel="permalink">Creating a Beat based on Metricbeat resolving Init and create metricset failures
+        <a href="/2018/07/23/create-a-beat-based-on-metricbeat-resolving-bugs" rel="permalink">Creating a Beat based on Metricbeat resolving Init and create metricset failures
 </a>
       
     </h2>
     
-      <p class="page__meta"><i class="fa fa-clock-o" aria-hidden="true"></i> 
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
 
 
 
@@ -566,12 +522,12 @@ net start mysql
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/2018/05/30/git-merge-conflicts-using-tortoise-git-merge-windows" rel="permalink">Git merge conflicts using Tortoise Git merge in Windows
+        <a href="/2018/05/30/git-merge-conflicts-using-tortoise-git-merge-windows" rel="permalink">Git merge conflicts using Tortoise Git merge in Windows
 </a>
       
     </h2>
     
-      <p class="page__meta"><i class="fa fa-clock-o" aria-hidden="true"></i> 
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
 
 
 
@@ -586,8 +542,8 @@ net start mysql
       </div>
     </div>
   
+  
 </div>
-
 
 	<!-- TODO add Google AdSense -->
     <!--<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
@@ -615,11 +571,11 @@ net start mysql
     
     
     
-      <li><a href="https://github.com/manios"><i class="fa fa-fw fa-github" aria-hidden="true"></i> GitHub</a></li>
+      <li><a href="https://github.com/manios"><i class="fab fa-fw fa-github" aria-hidden="true"></i> GitHub</a></li>
     
     
     
-    <li><a href="https://manios.org/feed.xml"><i class="fa fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+    <li><a href="/feed.xml"><i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
   </ul>
 </div>
 
@@ -629,23 +585,9 @@ net start mysql
     </div>
 
     
-  <script src="https://manios.org/assets/js/main.min.js"></script>
+  <script src="/assets/js/main.min.js"></script>
+  <script src="https://use.fontawesome.com/releases/v5.2.0/js/all.js"></script>
 
-
-
-
-
-
-
-  <script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-  ga('create', 'UA-96500199-2', 'auto');
-  ga('send', 'pageview');
-</script>
 
 
 

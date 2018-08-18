@@ -9,36 +9,16 @@
   <head>
     <meta charset="utf-8">
 
-<!-- begin SEO -->
-
-
-
-
-
-
-
-
-
-<title>Install, configure and troubleshoot NTP servers in Debian Linux - cmanios</title>
-
-
-
-
+<!-- begin _includes/seo.html --><title>Install, configure and troubleshoot NTP servers in Debian Linux - cmanios</title>
 <meta name="description" content="If you are reading this article, perhaps you have searched a lot about NTP server installation in Linux, issues and problems encountered and how to troubleshoot them! We know that there are so many articles about how to configure NTP servers but we could not find any which contains all the issues we faced in the same place!">
 
 
 
-
-<meta name="author" content="cmanios">
-
+<meta property="og:type" content="article">
 <meta property="og:locale" content="en_US">
 <meta property="og:site_name" content="cmanios">
 <meta property="og:title" content="Install, configure and troubleshoot NTP servers in Debian Linux">
-
-
-  <link rel="canonical" href="https://manios.org/2017/12/14/install-and-configure-and-troubleshoot-ntp-servers-in-debian-linux">
-  <meta property="og:url" content="https://manios.org/2017/12/14/install-and-configure-and-troubleshoot-ntp-servers-in-debian-linux">
-
+<meta property="og:url" content="https://manios.org/2017/12/14/install-and-configure-and-troubleshoot-ntp-servers-in-debian-linux">
 
 
   <meta property="og:description" content="If you are reading this article, perhaps you have searched a lot about NTP server installation in Linux, issues and problems encountered and how to troubleshoot them! We know that there are so many articles about how to configure NTP servers but we could not find any which contains all the issues we faced in the same place!">
@@ -49,27 +29,18 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-  
-
-  
-
-
-
-
-
-  <meta property="og:type" content="article">
   <meta property="article:published_time" content="2017-12-14T10:42:00+02:00">
 
+
+
+
+
+  
+
+  
+
+
+<link rel="canonical" href="https://manios.org/2017/12/14/install-and-configure-and-troubleshoot-ntp-servers-in-debian-linux">
 
 
 
@@ -79,11 +50,11 @@
 
   <script type="application/ld+json">
     {
-      "@context" : "http://schema.org",
-      "@type" : "Person",
-      "name" : "Christos Manios",
-      "url" : "https://manios.org",
-      "sameAs" : null
+      "@context": "http://schema.org",
+      "@type": "Person",
+      "name": "Christos Manios",
+      "url": "https://manios.org",
+      "sameAs": null
     }
   </script>
 
@@ -93,10 +64,10 @@
 
 
 
-<!-- end SEO -->
+<!-- end _includes/seo.html -->
 
 
-<link href="https://manios.org/feed.xml" type="application/atom+xml" rel="alternate" title="cmanios Feed">
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="cmanios Feed">
 
 <!-- http://t.co/dKP3o1e -->
 <meta name="HandheldFriendly" content="True">
@@ -108,7 +79,7 @@
 </script>
 
 <!-- For all browsers -->
-<link rel="stylesheet" href="https://manios.org/assets/css/main.css">
+<link rel="stylesheet" href="/assets/css/main.css">
 
 <!--[if lte IE 9]>
   <style>
@@ -128,9 +99,10 @@
 
     <!-- start custom head snippets -->
 
-<!-- insert favicons. use http://realfavicongenerator.net/ -->
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
 
 <!-- end custom head snippets -->
+
   </head>
 
   <body class="layout--single">
@@ -143,23 +115,32 @@
   <div class="masthead__inner-wrap">
     <div class="masthead__menu">
       <nav id="site-nav" class="greedy-nav">
-        <a class="site-title" href="https://manios.org/">cmanios</a>
+        <a class="site-title" href="/">cmanios</a>
         <ul class="visible-links">
           
             
-            <li class="masthead__menu-item"><a href="https://manios.org/year-archive/">Posts archive</a></li>
+            <li class="masthead__menu-item">
+              <a href="https://manios.org/year-archive/" >Posts archive</a>
+            </li>
           
             
-            <li class="masthead__menu-item"><a href="https://manios.org/categories/">Categories</a></li>
+            <li class="masthead__menu-item">
+              <a href="https://manios.org/categories/" >Categories</a>
+            </li>
           
             
-            <li class="masthead__menu-item"><a href="https://manios.org/tags/">Tags</a></li>
+            <li class="masthead__menu-item">
+              <a href="https://manios.org/tags/" >Tags</a>
+            </li>
           
             
-            <li class="masthead__menu-item"><a href="https://manios.org/about/">About</a></li>
+            <li class="masthead__menu-item">
+              <a href="https://manios.org/about/" >About</a>
+            </li>
           
         </ul>
-        <button type="button">
+        
+        <button class="greedy-nav__toggle hidden" type="button">
           <span class="visually-hidden">Toggle Menu</span>
           <div class="navicon"></div>
         </button>
@@ -178,16 +159,15 @@
   <div class="sidebar sticky">
   
 
+
 <div itemscope itemtype="http://schema.org/Person">
 
   
 
   <div class="author__content">
-    <h3 class="author__name" itemprop="name">Christos Manios</h3>
     
-      <p class="author__bio" itemprop="description">
-        Developer life is a NullPointerException
-      </p>
+      <h3 class="author__name" itemprop="name"></h3>
+    
     
   </div>
 
@@ -195,23 +175,11 @@
     <button class="btn btn--inverse">Follow</button>
     <ul class="author__urls social-icons">
       
-        <li itemprop="homeLocation" itemscope itemtype="http://schema.org/Place">
-          <i class="fa fa-fw fa-map-marker" aria-hidden="true"></i> <span itemprop="name">Thessaloniki, GR</span>
-        </li>
-      
 
       
 
       
 
-      
-
-      
-        <li>
-          <a href="https://twitter.com/maniosolr" itemprop="sameAs">
-            <i class="fa fa-fw fa-twitter-square" aria-hidden="true"></i> Twitter
-          </a>
-        </li>
       
 
       
@@ -229,11 +197,7 @@
       
 
       
-        <li>
-          <a href="https://github.com/manios" itemprop="sameAs">
-            <i class="fa fa-fw fa-github" aria-hidden="true"></i> GitHub
-          </a>
-        </li>
+
       
 
       
@@ -265,7 +229,7 @@
       <!--
   <li>
     <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs">
-      <i class="fa fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
     </a>
   </li>
 -->
@@ -286,10 +250,10 @@
     <div class="page__inner-wrap">
       
         <header>
-          <h1 class="page__title" itemprop="headline">Install, configure and troubleshoot NTP servers in Debian Linux
+          <h1 id="page-title" class="page__title" itemprop="headline">Install, configure and troubleshoot NTP servers in Debian Linux
 </h1>
           
-            <p class="page__meta"><i class="fa fa-clock-o" aria-hidden="true"></i> 
+            <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
 
 
 
@@ -302,9 +266,9 @@
 
       <section class="page__content" itemprop="text">
         
-          <aside class="sidebar__right">
+          <aside class="sidebar__right ">
             <nav class="toc">
-              <header><h4 class="nav__title"><i class="fa fa-file-text"></i> In this article</h4></header>
+              <header><h4 class="nav__title"><i class="fas fa-file-alt"></i> In this article</h4></header>
               <ul class="toc__menu">
   <li><a href="#our-story">Our story</a></li>
   <li><a href="#install-ntp-server-in-debian-linux">Install NTP Server in Debian Linux</a></li>
@@ -376,7 +340,7 @@
 
 <p>So, to install NTP server in Debian Linux, you just execute:</p>
 
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>apt-get install ntp
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>apt-get <span class="nb">install </span>ntp
 </code></pre></div></div>
 
 <p>in VM1, VM2, VM3 and VM4 . After it is installed, our efforts are focused on one single file: <code class="highlighter-rouge">/etc/ntp.conf</code>.</p>
@@ -631,7 +595,7 @@ offset 0.000000
 
 <p>If you use <code class="highlighter-rouge">ntpq</code> tool and the output is the following:</p>
 
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bobos@WEBSRV01:~<span class="nv">$ </span><span class="nb">sudo </span>date <span class="o">&amp;&amp;</span> ntpq <span class="nt">-p</span>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bobos@WEBSRV01:~<span class="nv">$ </span><span class="nb">sudo date</span> <span class="o">&amp;&amp;</span> ntpq <span class="nt">-p</span>
 Tue Nov 24 13:26:45 EEST 2017
      remote           refid      st t when poll reach   delay   offset  jitter
 <span class="o">==============================================================================</span>
@@ -642,7 +606,7 @@ Tue Nov 24 13:26:45 EEST 2017
 
 <p>then it means that you have no communication at all with your NTP servers.  Contact your network administrator. A valid and working output would be:</p>
 
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bobos@WEBSRV01:~<span class="nv">$ </span>date <span class="o">&amp;&amp;</span> ntpq <span class="nt">-p</span>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bobos@WEBSRV01:~<span class="nv">$ </span><span class="nb">date</span> <span class="o">&amp;&amp;</span> ntpq <span class="nt">-p</span>
 Tue Nov 24 11:00:34 EEST 2017
      remote           refid      st t when poll reach   delay   offset  jitter
 <span class="o">==============================================================================</span>
@@ -678,96 +642,96 @@ Tue Nov 24 11:00:34 EEST 2017
   
 
   <p class="page__taxonomy">
-    <strong><i class="fa fa-fw fa-tags" aria-hidden="true"></i> Tags: </strong>
+    <strong><i class="fas fa-fw fa-tags" aria-hidden="true"></i> Tags: </strong>
     <span itemprop="keywords">
     
       
       
-      <a href="https://manios.org/tags/#configure" class="page__taxonomy-item" rel="tag">configure</a><span class="sep">, </span>
+      <a href="/tags/#configure" class="page__taxonomy-item" rel="tag">configure</a><span class="sep">, </span>
     
       
       
-      <a href="https://manios.org/tags/#debian" class="page__taxonomy-item" rel="tag">debian</a><span class="sep">, </span>
+      <a href="/tags/#debian" class="page__taxonomy-item" rel="tag">debian</a><span class="sep">, </span>
     
       
       
-      <a href="https://manios.org/tags/#error" class="page__taxonomy-item" rel="tag">error</a><span class="sep">, </span>
+      <a href="/tags/#error" class="page__taxonomy-item" rel="tag">error</a><span class="sep">, </span>
     
       
       
-      <a href="https://manios.org/tags/#high" class="page__taxonomy-item" rel="tag">high</a><span class="sep">, </span>
+      <a href="/tags/#high" class="page__taxonomy-item" rel="tag">high</a><span class="sep">, </span>
     
       
       
-      <a href="https://manios.org/tags/#iburst" class="page__taxonomy-item" rel="tag">iburst</a><span class="sep">, </span>
+      <a href="/tags/#iburst" class="page__taxonomy-item" rel="tag">iburst</a><span class="sep">, </span>
     
       
       
-      <a href="https://manios.org/tags/#install" class="page__taxonomy-item" rel="tag">install</a><span class="sep">, </span>
+      <a href="/tags/#install" class="page__taxonomy-item" rel="tag">install</a><span class="sep">, </span>
     
       
       
-      <a href="https://manios.org/tags/#linux" class="page__taxonomy-item" rel="tag">linux</a><span class="sep">, </span>
+      <a href="/tags/#linux" class="page__taxonomy-item" rel="tag">linux</a><span class="sep">, </span>
     
       
       
-      <a href="https://manios.org/tags/#maxpoll" class="page__taxonomy-item" rel="tag">maxpoll</a><span class="sep">, </span>
+      <a href="/tags/#maxpoll" class="page__taxonomy-item" rel="tag">maxpoll</a><span class="sep">, </span>
     
       
       
-      <a href="https://manios.org/tags/#minpoll" class="page__taxonomy-item" rel="tag">minpoll</a><span class="sep">, </span>
+      <a href="/tags/#minpoll" class="page__taxonomy-item" rel="tag">minpoll</a><span class="sep">, </span>
     
       
       
-      <a href="https://manios.org/tags/#network" class="page__taxonomy-item" rel="tag">network</a><span class="sep">, </span>
+      <a href="/tags/#network" class="page__taxonomy-item" rel="tag">network</a><span class="sep">, </span>
     
       
       
-      <a href="https://manios.org/tags/#ntp" class="page__taxonomy-item" rel="tag">ntp</a><span class="sep">, </span>
+      <a href="/tags/#ntp" class="page__taxonomy-item" rel="tag">ntp</a><span class="sep">, </span>
     
       
       
-      <a href="https://manios.org/tags/#ntpdate" class="page__taxonomy-item" rel="tag">ntpdate</a><span class="sep">, </span>
+      <a href="/tags/#ntpdate" class="page__taxonomy-item" rel="tag">ntpdate</a><span class="sep">, </span>
     
       
       
-      <a href="https://manios.org/tags/#ntpq" class="page__taxonomy-item" rel="tag">ntpq</a><span class="sep">, </span>
+      <a href="/tags/#ntpq" class="page__taxonomy-item" rel="tag">ntpq</a><span class="sep">, </span>
     
       
       
-      <a href="https://manios.org/tags/#pool" class="page__taxonomy-item" rel="tag">pool</a><span class="sep">, </span>
+      <a href="/tags/#pool" class="page__taxonomy-item" rel="tag">pool</a><span class="sep">, </span>
     
       
       
-      <a href="https://manios.org/tags/#server" class="page__taxonomy-item" rel="tag">server</a><span class="sep">, </span>
+      <a href="/tags/#server" class="page__taxonomy-item" rel="tag">server</a><span class="sep">, </span>
     
       
       
-      <a href="https://manios.org/tags/#service" class="page__taxonomy-item" rel="tag">service</a><span class="sep">, </span>
+      <a href="/tags/#service" class="page__taxonomy-item" rel="tag">service</a><span class="sep">, </span>
     
       
       
-      <a href="https://manios.org/tags/#strata" class="page__taxonomy-item" rel="tag">strata</a><span class="sep">, </span>
+      <a href="/tags/#strata" class="page__taxonomy-item" rel="tag">strata</a><span class="sep">, </span>
     
       
       
-      <a href="https://manios.org/tags/#suitable" class="page__taxonomy-item" rel="tag">suitable</a><span class="sep">, </span>
+      <a href="/tags/#suitable" class="page__taxonomy-item" rel="tag">suitable</a><span class="sep">, </span>
     
       
       
-      <a href="https://manios.org/tags/#sync" class="page__taxonomy-item" rel="tag">sync</a><span class="sep">, </span>
+      <a href="/tags/#sync" class="page__taxonomy-item" rel="tag">sync</a><span class="sep">, </span>
     
       
       
-      <a href="https://manios.org/tags/#synchronisation" class="page__taxonomy-item" rel="tag">synchronisation</a><span class="sep">, </span>
+      <a href="/tags/#synchronisation" class="page__taxonomy-item" rel="tag">synchronisation</a><span class="sep">, </span>
     
       
       
-      <a href="https://manios.org/tags/#time" class="page__taxonomy-item" rel="tag">time</a><span class="sep">, </span>
+      <a href="/tags/#time" class="page__taxonomy-item" rel="tag">time</a><span class="sep">, </span>
     
       
       
-      <a href="https://manios.org/tags/#ubuntu" class="page__taxonomy-item" rel="tag">ubuntu</a>
+      <a href="/tags/#ubuntu" class="page__taxonomy-item" rel="tag">ubuntu</a>
     
     </span>
   </p>
@@ -783,23 +747,23 @@ Tue Nov 24 11:00:34 EEST 2017
   
 
   <p class="page__taxonomy">
-    <strong><i class="fa fa-fw fa-folder-open" aria-hidden="true"></i> Categories: </strong>
+    <strong><i class="fas fa-fw fa-folder-open" aria-hidden="true"></i> Categories: </strong>
     <span itemprop="keywords">
     
       
       
-      <a href="https://manios.org/categories/#debian" class="page__taxonomy-item" rel="tag">Debian</a><span class="sep">, </span>
+      <a href="/categories/#debian" class="page__taxonomy-item" rel="tag">Debian</a><span class="sep">, </span>
     
       
       
-      <a href="https://manios.org/categories/#linux" class="page__taxonomy-item" rel="tag">Linux</a>
+      <a href="/categories/#linux" class="page__taxonomy-item" rel="tag">Linux</a>
     
     </span>
   </p>
 
 
         
-          <p class="page__date"><strong><i class="fa fa-fw fa-calendar" aria-hidden="true"></i> Updated:</strong> <time datetime="2017-12-14T10:42:00+02:00">December 14, 2017</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="2017-12-14T10:42:00+02:00">December 14, 2017</time></p>
         
       </footer>
 
@@ -808,38 +772,30 @@ Tue Nov 24 11:00:34 EEST 2017
     <h4 class="page__share-title">Share on</h4>
   
 
-  <a href="https://twitter.com/intent/tweet?text=Install%2C+configure+and+troubleshoot+NTP+servers+in+Debian+Linux%20https%3A%2F%2Fmanios.org%2F2017%2F12%2F14%2Finstall-and-configure-and-troubleshoot-ntp-servers-in-debian-linux" class="btn btn--twitter" title="Share on Twitter"><i class="fa fa-fw fa-twitter" aria-hidden="true"></i><span> Twitter</span></a>
+  <a href="https://twitter.com/intent/tweet?text=Install%2C+configure+and+troubleshoot+NTP+servers+in+Debian+Linux%20https%3A%2F%2Fmanios.org%2F2017%2F12%2F14%2Finstall-and-configure-and-troubleshoot-ntp-servers-in-debian-linux" class="btn btn--twitter" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Twitter"><i class="fab fa-fw fa-twitter" aria-hidden="true"></i><span> Twitter</span></a>
 
-  <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fmanios.org%2F2017%2F12%2F14%2Finstall-and-configure-and-troubleshoot-ntp-servers-in-debian-linux" class="btn btn--facebook" title="Share on Facebook"><i class="fa fa-fw fa-facebook" aria-hidden="true"></i><span> Facebook</span></a>
+  <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fmanios.org%2F2017%2F12%2F14%2Finstall-and-configure-and-troubleshoot-ntp-servers-in-debian-linux" class="btn btn--facebook" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Facebook"><i class="fab fa-fw fa-facebook" aria-hidden="true"></i><span> Facebook</span></a>
 
-  <a href="https://plus.google.com/share?url=https%3A%2F%2Fmanios.org%2F2017%2F12%2F14%2Finstall-and-configure-and-troubleshoot-ntp-servers-in-debian-linux" class="btn btn--google-plus" title="Share on Google Plus"><i class="fa fa-fw fa-google-plus" aria-hidden="true"></i><span> Google+</span></a>
+  <a href="https://plus.google.com/share?url=https%3A%2F%2Fmanios.org%2F2017%2F12%2F14%2Finstall-and-configure-and-troubleshoot-ntp-servers-in-debian-linux" class="btn btn--google-plus" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Google Plus"><i class="fab fa-fw fa-google-plus" aria-hidden="true"></i><span> Google+</span></a>
 
-  <a href="https://www.linkedin.com/shareArticle?mini=true&url=https%3A%2F%2Fmanios.org%2F2017%2F12%2F14%2Finstall-and-configure-and-troubleshoot-ntp-servers-in-debian-linux" class="btn btn--linkedin" title="Share on LinkedIn"><i class="fa fa-fw fa-linkedin" aria-hidden="true"></i><span> LinkedIn</span></a>
+  <a href="https://www.linkedin.com/shareArticle?mini=true&url=https%3A%2F%2Fmanios.org%2F2017%2F12%2F14%2Finstall-and-configure-and-troubleshoot-ntp-servers-in-debian-linux" class="btn btn--linkedin" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on LinkedIn"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i><span> LinkedIn</span></a>
 </section>
 
 
       
   <nav class="pagination">
     
-      <a href="https://manios.org/2017/11/23/mongodb-replica-stale-during-recovery" class="pagination--pager" title="MongoDB replica error RS102 too stale to catch up during full recovery
+      <a href="/2017/11/23/mongodb-replica-stale-during-recovery" class="pagination--pager" title="MongoDB replica error RS102 too stale to catch up during full recovery
 ">Previous</a>
     
     
-      <a href="https://manios.org/2018/03/30/java-soap-jax-ws-client-basic-auth" class="pagination--pager" title="HTTP Basic Authentication in Java SOAP JAX-WS web service client
+      <a href="/2018/03/30/java-soap-jax-ws-client-basic-auth" class="pagination--pager" title="HTTP Basic Authentication in Java SOAP JAX-WS web service client
 ">Next</a>
     
   </nav>
 
     </div>
 
-    
-      <div class="page__comments">
-  
-  
-      <h4 class="page__comments-title">Leave a Comment</h4>
-      <section id="disqus_thread"></section>
-    
-</div>
     
   </article>
 
@@ -858,12 +814,12 @@ Tue Nov 24 11:00:34 EEST 2017
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/2018/08/18/logstash-geoip-json-logs-maxmint-geolite-docker" rel="permalink">Rsyslog - Parse Json and enrich IP with Geolocation using Maxmind GeoLite2 City and ISP
+        <a href="/2018/08/18/logstash-geoip-json-logs-maxmint-geolite-docker" rel="permalink">Rsyslog - Parse Json and enrich IP with Geolocation using Maxmind GeoLite2 City and ISP
 </a>
       
     </h2>
     
-      <p class="page__meta"><i class="fa fa-clock-o" aria-hidden="true"></i> 
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
 
 
 
@@ -884,12 +840,12 @@ Tue Nov 24 11:00:34 EEST 2017
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/2018/08/14/logstash-geoip-json-logs-maxmint-geolite-docker" rel="permalink">Logstash - Enrich IP with Geolocation using Maxmind GeoLite2 City and ISP
+        <a href="/2018/08/14/logstash-geoip-json-logs-maxmint-geolite-docker" rel="permalink">Logstash - Enrich IP with Geolocation using Maxmind GeoLite2 City and ISP
 </a>
       
     </h2>
     
-      <p class="page__meta"><i class="fa fa-clock-o" aria-hidden="true"></i> 
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
 
 
 
@@ -910,12 +866,12 @@ Tue Nov 24 11:00:34 EEST 2017
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/2018/07/23/create-a-beat-based-on-metricbeat-resolving-bugs" rel="permalink">Creating a Beat based on Metricbeat resolving Init and create metricset failures
+        <a href="/2018/07/23/create-a-beat-based-on-metricbeat-resolving-bugs" rel="permalink">Creating a Beat based on Metricbeat resolving Init and create metricset failures
 </a>
       
     </h2>
     
-      <p class="page__meta"><i class="fa fa-clock-o" aria-hidden="true"></i> 
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
 
 
 
@@ -936,12 +892,12 @@ Tue Nov 24 11:00:34 EEST 2017
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/2018/05/30/git-merge-conflicts-using-tortoise-git-merge-windows" rel="permalink">Git merge conflicts using Tortoise Git merge in Windows
+        <a href="/2018/05/30/git-merge-conflicts-using-tortoise-git-merge-windows" rel="permalink">Git merge conflicts using Tortoise Git merge in Windows
 </a>
       
     </h2>
     
-      <p class="page__meta"><i class="fa fa-clock-o" aria-hidden="true"></i> 
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
 
 
 
@@ -956,8 +912,8 @@ Tue Nov 24 11:00:34 EEST 2017
       </div>
     </div>
   
+  
 </div>
-
 
 	<!-- TODO add Google AdSense -->
     <!--<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
@@ -985,11 +941,11 @@ Tue Nov 24 11:00:34 EEST 2017
     
     
     
-      <li><a href="https://github.com/manios"><i class="fa fa-fw fa-github" aria-hidden="true"></i> GitHub</a></li>
+      <li><a href="https://github.com/manios"><i class="fab fa-fw fa-github" aria-hidden="true"></i> GitHub</a></li>
     
     
     
-    <li><a href="https://manios.org/feed.xml"><i class="fa fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+    <li><a href="/feed.xml"><i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
   </ul>
 </div>
 
@@ -999,23 +955,9 @@ Tue Nov 24 11:00:34 EEST 2017
     </div>
 
     
-  <script src="https://manios.org/assets/js/main.min.js"></script>
+  <script src="/assets/js/main.min.js"></script>
+  <script src="https://use.fontawesome.com/releases/v5.2.0/js/all.js"></script>
 
-
-
-
-
-
-
-  <script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-  ga('create', 'UA-96500199-2', 'auto');
-  ga('send', 'pageview');
-</script>
 
 
 

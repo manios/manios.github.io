@@ -9,42 +9,16 @@
   <head>
     <meta charset="utf-8">
 
-<!-- begin SEO -->
-
-
-
-
-
-
-
-
-
-<title>Page Archive - cmanios</title>
-
-
-
-
+<!-- begin _includes/seo.html --><title>Page Archive - cmanios</title>
 <meta name="description" content="Developer life is a NullPointerException">
 
 
 
-
-<meta name="author" content="Christos Manios">
-
+<meta property="og:type" content="website">
 <meta property="og:locale" content="en_US">
 <meta property="og:site_name" content="cmanios">
 <meta property="og:title" content="Page Archive">
-
-
-  <link rel="canonical" href="https://manios.org/page-archive/">
-  <meta property="og:url" content="https://manios.org/page-archive/">
-
-
-
-
-
-
-
+<meta property="og:url" content="https://manios.org/page-archive/">
 
 
 
@@ -62,9 +36,7 @@
   
 
 
-
-
-
+<link rel="canonical" href="https://manios.org/page-archive/">
 
 
 
@@ -74,11 +46,11 @@
 
   <script type="application/ld+json">
     {
-      "@context" : "http://schema.org",
-      "@type" : "Person",
-      "name" : "Christos Manios",
-      "url" : "https://manios.org",
-      "sameAs" : null
+      "@context": "http://schema.org",
+      "@type": "Person",
+      "name": "Christos Manios",
+      "url": "https://manios.org",
+      "sameAs": null
     }
   </script>
 
@@ -88,10 +60,10 @@
 
 
 
-<!-- end SEO -->
+<!-- end _includes/seo.html -->
 
 
-<link href="https://manios.org/feed.xml" type="application/atom+xml" rel="alternate" title="cmanios Feed">
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="cmanios Feed">
 
 <!-- http://t.co/dKP3o1e -->
 <meta name="HandheldFriendly" content="True">
@@ -103,7 +75,7 @@
 </script>
 
 <!-- For all browsers -->
-<link rel="stylesheet" href="https://manios.org/assets/css/main.css">
+<link rel="stylesheet" href="/assets/css/main.css">
 
 <!--[if lte IE 9]>
   <style>
@@ -123,9 +95,10 @@
 
     <!-- start custom head snippets -->
 
-<!-- insert favicons. use http://realfavicongenerator.net/ -->
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
 
 <!-- end custom head snippets -->
+
   </head>
 
   <body class="layout--archive">
@@ -138,23 +111,32 @@
   <div class="masthead__inner-wrap">
     <div class="masthead__menu">
       <nav id="site-nav" class="greedy-nav">
-        <a class="site-title" href="https://manios.org/">cmanios</a>
+        <a class="site-title" href="/">cmanios</a>
         <ul class="visible-links">
           
             
-            <li class="masthead__menu-item"><a href="https://manios.org/year-archive/">Posts archive</a></li>
+            <li class="masthead__menu-item">
+              <a href="https://manios.org/year-archive/" >Posts archive</a>
+            </li>
           
             
-            <li class="masthead__menu-item"><a href="https://manios.org/categories/">Categories</a></li>
+            <li class="masthead__menu-item">
+              <a href="https://manios.org/categories/" >Categories</a>
+            </li>
           
             
-            <li class="masthead__menu-item"><a href="https://manios.org/tags/">Tags</a></li>
+            <li class="masthead__menu-item">
+              <a href="https://manios.org/tags/" >Tags</a>
+            </li>
           
             
-            <li class="masthead__menu-item"><a href="https://manios.org/about/">About</a></li>
+            <li class="masthead__menu-item">
+              <a href="https://manios.org/about/" >About</a>
+            </li>
           
         </ul>
-        <button type="button">
+        
+        <button class="greedy-nav__toggle hidden" type="button">
           <span class="visually-hidden">Toggle Menu</span>
           <div class="navicon"></div>
         </button>
@@ -173,7 +155,7 @@
 
   <div class="archive">
     
-      <h1 class="page__title">Page Archive</h1>
+      <h1 id="page-title" class="page__title">Page Archive</h1>
     
     
   
@@ -185,7 +167,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/categories/" rel="permalink">Posts by Category</a>
+        <a href="/categories/" rel="permalink">Posts by Category</a>
       
     </h2>
     
@@ -202,7 +184,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/collection-archive/" rel="permalink">Posts by Collection</a>
+        <a href="/collection-archive/" rel="permalink">Posts by Collection</a>
       
     </h2>
     
@@ -219,7 +201,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/" rel="permalink"></a>
+        <a href="/" rel="permalink"></a>
       
     </h2>
     
@@ -236,7 +218,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/about/" rel="permalink">About</a>
+        <a href="/about/" rel="permalink">About</a>
       
     </h2>
     
@@ -253,7 +235,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/page-archive/" rel="permalink">Page Archive</a>
+        <a href="/page-archive/" rel="permalink">Page Archive</a>
       
     </h2>
     
@@ -270,7 +252,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tags/" rel="permalink">Posts by Tags</a>
+        <a href="/tags/" rel="permalink">Posts by Tags</a>
       
     </h2>
     
@@ -287,7 +269,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/year-archive/" rel="permalink">Posts by Year</a>
+        <a href="/year-archive/" rel="permalink">Posts by Year</a>
       
     </h2>
     
@@ -304,7 +286,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/assets/css/main.css" rel="permalink"></a>
+        <a href="/assets/css/main.css" rel="permalink"></a>
       
     </h2>
     
@@ -321,7 +303,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/assets/js/lunr-en.js" rel="permalink"></a>
+        <a href="/assets/js/lunr/lunr-en.js" rel="permalink"></a>
       
     </h2>
     
@@ -338,7 +320,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/android/" rel="permalink">android</a>
+        <a href="/assets/js/lunr/lunr-gr.js" rel="permalink"></a>
       
     </h2>
     
@@ -355,7 +337,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/database/" rel="permalink">database</a>
+        <a href="/assets/js/lunr/lunr-store.js" rel="permalink"></a>
       
     </h2>
     
@@ -372,7 +354,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/library/" rel="permalink">library</a>
+        <a href="/tag/android/" rel="permalink">android</a>
       
     </h2>
     
@@ -389,7 +371,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/sqlite/" rel="permalink">sqlite</a>
+        <a href="/tag/database/" rel="permalink">database</a>
       
     </h2>
     
@@ -406,7 +388,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/arraylist/" rel="permalink">arraylist</a>
+        <a href="/tag/library/" rel="permalink">library</a>
       
     </h2>
     
@@ -423,7 +405,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/collection/" rel="permalink">collection</a>
+        <a href="/tag/sqlite/" rel="permalink">sqlite</a>
       
     </h2>
     
@@ -440,7 +422,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/java/" rel="permalink">java</a>
+        <a href="/tag/arraylist/" rel="permalink">arraylist</a>
       
     </h2>
     
@@ -457,7 +439,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/object/" rel="permalink">object</a>
+        <a href="/tag/collection/" rel="permalink">collection</a>
       
     </h2>
     
@@ -474,7 +456,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/sort/" rel="permalink">sort</a>
+        <a href="/tag/java/" rel="permalink">java</a>
       
     </h2>
     
@@ -491,7 +473,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/availabe/" rel="permalink">availabe</a>
+        <a href="/tag/object/" rel="permalink">object</a>
       
     </h2>
     
@@ -508,7 +490,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/sd/" rel="permalink">sd</a>
+        <a href="/tag/sort/" rel="permalink">sort</a>
       
     </h2>
     
@@ -525,7 +507,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/space/" rel="permalink">space</a>
+        <a href="/tag/availabe/" rel="permalink">availabe</a>
       
     </h2>
     
@@ -542,7 +524,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/copy/" rel="permalink">copy</a>
+        <a href="/tag/sd/" rel="permalink">sd</a>
       
     </h2>
     
@@ -559,7 +541,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/eclipse/" rel="permalink">eclipse</a>
+        <a href="/tag/space/" rel="permalink">space</a>
       
     </h2>
     
@@ -576,7 +558,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/highlighting/" rel="permalink">highlighting</a>
+        <a href="/tag/copy/" rel="permalink">copy</a>
       
     </h2>
     
@@ -593,7 +575,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/microsoft/" rel="permalink">microsoft</a>
+        <a href="/tag/eclipse/" rel="permalink">eclipse</a>
       
     </h2>
     
@@ -610,7 +592,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/paste/" rel="permalink">paste</a>
+        <a href="/tag/highlighting/" rel="permalink">highlighting</a>
       
     </h2>
     
@@ -627,7 +609,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/source/" rel="permalink">source</a>
+        <a href="/tag/microsoft/" rel="permalink">microsoft</a>
       
     </h2>
     
@@ -644,7 +626,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/syntax/" rel="permalink">syntax</a>
+        <a href="/tag/paste/" rel="permalink">paste</a>
       
     </h2>
     
@@ -661,7 +643,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/word/" rel="permalink">word</a>
+        <a href="/tag/source/" rel="permalink">source</a>
       
     </h2>
     
@@ -678,7 +660,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/address/" rel="permalink">address</a>
+        <a href="/tag/syntax/" rel="permalink">syntax</a>
       
     </h2>
     
@@ -695,7 +677,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/card/" rel="permalink">card</a>
+        <a href="/tag/word/" rel="permalink">word</a>
       
     </h2>
     
@@ -712,7 +694,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/connectivity/" rel="permalink">connectivity</a>
+        <a href="/tag/address/" rel="permalink">address</a>
       
     </h2>
     
@@ -729,7 +711,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/mac/" rel="permalink">mac</a>
+        <a href="/tag/card/" rel="permalink">card</a>
       
     </h2>
     
@@ -746,7 +728,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/network/" rel="permalink">network</a>
+        <a href="/tag/connectivity/" rel="permalink">connectivity</a>
       
     </h2>
     
@@ -763,7 +745,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/wifi/" rel="permalink">wifi</a>
+        <a href="/tag/mac/" rel="permalink">mac</a>
       
     </h2>
     
@@ -780,7 +762,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/install/" rel="permalink">install</a>
+        <a href="/tag/network/" rel="permalink">network</a>
       
     </h2>
     
@@ -797,7 +779,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/jboss/" rel="permalink">jboss</a>
+        <a href="/tag/wifi/" rel="permalink">wifi</a>
       
     </h2>
     
@@ -814,7 +796,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/server/" rel="permalink">server</a>
+        <a href="/tag/install/" rel="permalink">install</a>
       
     </h2>
     
@@ -831,7 +813,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/windows/" rel="permalink">windows</a>
+        <a href="/tag/jboss/" rel="permalink">jboss</a>
       
     </h2>
     
@@ -848,7 +830,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/adapter/" rel="permalink">adapter</a>
+        <a href="/tag/server/" rel="permalink">server</a>
       
     </h2>
     
@@ -865,7 +847,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/bluetooth/" rel="permalink">bluetooth</a>
+        <a href="/tag/windows/" rel="permalink">windows</a>
       
     </h2>
     
@@ -882,7 +864,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/asset/" rel="permalink">asset</a>
+        <a href="/tag/adapter/" rel="permalink">adapter</a>
       
     </h2>
     
@@ -899,7 +881,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/pre-populated/" rel="permalink">pre-populated</a>
+        <a href="/tag/bluetooth/" rel="permalink">bluetooth</a>
       
     </h2>
     
@@ -916,7 +898,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/log/" rel="permalink">log</a>
+        <a href="/tag/asset/" rel="permalink">asset</a>
       
     </h2>
     
@@ -933,7 +915,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/logcat/" rel="permalink">logcat</a>
+        <a href="/tag/pre-populated/" rel="permalink">pre-populated</a>
       
     </h2>
     
@@ -950,7 +932,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/output/" rel="permalink">output</a>
+        <a href="/tag/log/" rel="permalink">log</a>
       
     </h2>
     
@@ -967,7 +949,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/public/" rel="permalink">public</a>
+        <a href="/tag/logcat/" rel="permalink">logcat</a>
       
     </h2>
     
@@ -984,7 +966,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/singleton/" rel="permalink">singleton</a>
+        <a href="/tag/output/" rel="permalink">output</a>
       
     </h2>
     
@@ -1001,7 +983,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/all/" rel="permalink">all</a>
+        <a href="/tag/public/" rel="permalink">public</a>
       
     </h2>
     
@@ -1018,7 +1000,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/check-constraint/" rel="permalink">check constraint</a>
+        <a href="/tag/singleton/" rel="permalink">singleton</a>
       
     </h2>
     
@@ -1035,7 +1017,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/data/" rel="permalink">data</a>
+        <a href="/tag/all/" rel="permalink">all</a>
       
     </h2>
     
@@ -1052,7 +1034,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/delete/" rel="permalink">delete</a>
+        <a href="/tag/check-constraint/" rel="permalink">check constraint</a>
       
     </h2>
     
@@ -1069,7 +1051,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/sql/" rel="permalink">sql</a>
+        <a href="/tag/data/" rel="permalink">data</a>
       
     </h2>
     
@@ -1086,7 +1068,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/truncate/" rel="permalink">truncate</a>
+        <a href="/tag/delete/" rel="permalink">delete</a>
       
     </h2>
     
@@ -1103,7 +1085,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/column/" rel="permalink">column</a>
+        <a href="/tag/sql/" rel="permalink">sql</a>
       
     </h2>
     
@@ -1120,7 +1102,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/select/" rel="permalink">select</a>
+        <a href="/tag/truncate/" rel="permalink">truncate</a>
       
     </h2>
     
@@ -1137,7 +1119,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/table/" rel="permalink">table</a>
+        <a href="/tag/column/" rel="permalink">column</a>
       
     </h2>
     
@@ -1154,7 +1136,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/pb/" rel="permalink">pb</a>
+        <a href="/tag/select/" rel="permalink">select</a>
       
     </h2>
     
@@ -1171,7 +1153,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/pb10/" rel="permalink">pb10</a>
+        <a href="/tag/table/" rel="permalink">table</a>
       
     </h2>
     
@@ -1188,7 +1170,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/powerbuilder/" rel="permalink">powerbuilder</a>
+        <a href="/tag/pb/" rel="permalink">pb</a>
       
     </h2>
     
@@ -1205,7 +1187,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/system-language/" rel="permalink">system language</a>
+        <a href="/tag/pb10/" rel="permalink">pb10</a>
       
     </h2>
     
@@ -1222,7 +1204,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/win32/" rel="permalink">win32</a>
+        <a href="/tag/powerbuilder/" rel="permalink">powerbuilder</a>
       
     </h2>
     
@@ -1239,7 +1221,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/content-length/" rel="permalink">content-length</a>
+        <a href="/tag/system-language/" rel="permalink">system language</a>
       
     </h2>
     
@@ -1256,7 +1238,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/download/" rel="permalink">download</a>
+        <a href="/tag/win32/" rel="permalink">win32</a>
       
     </h2>
     
@@ -1273,7 +1255,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/http/" rel="permalink">http</a>
+        <a href="/tag/content-length/" rel="permalink">content-length</a>
       
     </h2>
     
@@ -1290,7 +1272,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/bash/" rel="permalink">bash</a>
+        <a href="/tag/download/" rel="permalink">download</a>
       
     </h2>
     
@@ -1307,7 +1289,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/command/" rel="permalink">command</a>
+        <a href="/tag/http/" rel="permalink">http</a>
       
     </h2>
     
@@ -1324,7 +1306,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/debian/" rel="permalink">debian</a>
+        <a href="/tag/bash/" rel="permalink">bash</a>
       
     </h2>
     
@@ -1341,7 +1323,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/linux/" rel="permalink">linux</a>
+        <a href="/tag/command/" rel="permalink">command</a>
       
     </h2>
     
@@ -1358,7 +1340,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/shell/" rel="permalink">shell</a>
+        <a href="/tag/debian/" rel="permalink">debian</a>
       
     </h2>
     
@@ -1375,7 +1357,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/easter/" rel="permalink">easter</a>
+        <a href="/tag/linux/" rel="permalink">linux</a>
       
     </h2>
     
@@ -1392,7 +1374,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/easter-date/" rel="permalink">easter date</a>
+        <a href="/tag/shell/" rel="permalink">shell</a>
       
     </h2>
     
@@ -1409,7 +1391,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/orthodox/" rel="permalink">orthodox</a>
+        <a href="/tag/easter/" rel="permalink">easter</a>
       
     </h2>
     
@@ -1426,7 +1408,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/expression/" rel="permalink">expression</a>
+        <a href="/tag/easter-date/" rel="permalink">easter date</a>
       
     </h2>
     
@@ -1443,7 +1425,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/perl/" rel="permalink">perl</a>
+        <a href="/tag/orthodox/" rel="permalink">orthodox</a>
       
     </h2>
     
@@ -1460,7 +1442,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/regular/" rel="permalink">regular</a>
+        <a href="/tag/expression/" rel="permalink">expression</a>
       
     </h2>
     
@@ -1477,7 +1459,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/unicode/" rel="permalink">unicode</a>
+        <a href="/tag/perl/" rel="permalink">perl</a>
       
     </h2>
     
@@ -1494,7 +1476,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/utf-8/" rel="permalink">utf-8</a>
+        <a href="/tag/regular/" rel="permalink">regular</a>
       
     </h2>
     
@@ -1511,7 +1493,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/utf8/" rel="permalink">utf8</a>
+        <a href="/tag/unicode/" rel="permalink">unicode</a>
       
     </h2>
     
@@ -1528,7 +1510,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/buffer/" rel="permalink">buffer</a>
+        <a href="/tag/utf-8/" rel="permalink">utf-8</a>
       
     </h2>
     
@@ -1545,7 +1527,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/datawindow/" rel="permalink">datawindow</a>
+        <a href="/tag/utf8/" rel="permalink">utf8</a>
       
     </h2>
     
@@ -1562,7 +1544,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/efficient/" rel="permalink">efficient</a>
+        <a href="/tag/buffer/" rel="permalink">buffer</a>
       
     </h2>
     
@@ -1579,7 +1561,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/filter/" rel="permalink">filter</a>
+        <a href="/tag/datawindow/" rel="permalink">datawindow</a>
       
     </h2>
     
@@ -1596,7 +1578,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/grid/" rel="permalink">grid</a>
+        <a href="/tag/efficient/" rel="permalink">efficient</a>
       
     </h2>
     
@@ -1613,7 +1595,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/primary/" rel="permalink">primary</a>
+        <a href="/tag/filter/" rel="permalink">filter</a>
       
     </h2>
     
@@ -1630,7 +1612,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/gmail/" rel="permalink">gmail</a>
+        <a href="/tag/grid/" rel="permalink">grid</a>
       
     </h2>
     
@@ -1647,7 +1629,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/smtp/" rel="permalink">smtp</a>
+        <a href="/tag/primary/" rel="permalink">primary</a>
       
     </h2>
     
@@ -1664,7 +1646,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/vbscript/" rel="permalink">vbscript</a>
+        <a href="/tag/gmail/" rel="permalink">gmail</a>
       
     </h2>
     
@@ -1681,7 +1663,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/wscript/" rel="permalink">wscript</a>
+        <a href="/tag/smtp/" rel="permalink">smtp</a>
       
     </h2>
     
@@ -1698,7 +1680,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/driver/" rel="permalink">driver</a>
+        <a href="/tag/vbscript/" rel="permalink">vbscript</a>
       
     </h2>
     
@@ -1715,7 +1697,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/odbc/" rel="permalink">odbc</a>
+        <a href="/tag/wscript/" rel="permalink">wscript</a>
       
     </h2>
     
@@ -1732,7 +1714,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/empty/" rel="permalink">empty</a>
+        <a href="/tag/driver/" rel="permalink">driver</a>
       
     </h2>
     
@@ -1749,7 +1731,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/manipulation/" rel="permalink">manipulation</a>
+        <a href="/tag/odbc/" rel="permalink">odbc</a>
       
     </h2>
     
@@ -1766,7 +1748,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/method/" rel="permalink">method</a>
+        <a href="/tag/empty/" rel="permalink">empty</a>
       
     </h2>
     
@@ -1783,7 +1765,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/string/" rel="permalink">string</a>
+        <a href="/tag/manipulation/" rel="permalink">manipulation</a>
       
     </h2>
     
@@ -1800,7 +1782,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/mail/" rel="permalink">mail</a>
+        <a href="/tag/method/" rel="permalink">method</a>
       
     </h2>
     
@@ -1817,7 +1799,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/ssl/" rel="permalink">ssl</a>
+        <a href="/tag/string/" rel="permalink">string</a>
       
     </h2>
     
@@ -1834,7 +1816,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/tls/" rel="permalink">tls</a>
+        <a href="/tag/mail/" rel="permalink">mail</a>
       
     </h2>
     
@@ -1851,7 +1833,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/apache/" rel="permalink">apache</a>
+        <a href="/tag/ssl/" rel="permalink">ssl</a>
       
     </h2>
     
@@ -1868,7 +1850,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/conf/" rel="permalink">conf</a>
+        <a href="/tag/tls/" rel="permalink">tls</a>
       
     </h2>
     
@@ -1885,7 +1867,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/date/" rel="permalink">date</a>
+        <a href="/tag/apache/" rel="permalink">apache</a>
       
     </h2>
     
@@ -1902,7 +1884,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/httpd/" rel="permalink">httpd</a>
+        <a href="/tag/conf/" rel="permalink">conf</a>
       
     </h2>
     
@@ -1919,7 +1901,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/ini/" rel="permalink">ini</a>
+        <a href="/tag/date/" rel="permalink">date</a>
       
     </h2>
     
@@ -1936,7 +1918,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/module/" rel="permalink">module</a>
+        <a href="/tag/httpd/" rel="permalink">httpd</a>
       
     </h2>
     
@@ -1953,7 +1935,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/my/" rel="permalink">my</a>
+        <a href="/tag/ini/" rel="permalink">ini</a>
       
     </h2>
     
@@ -1970,7 +1952,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/mysql/" rel="permalink">mysql</a>
+        <a href="/tag/module/" rel="permalink">module</a>
       
     </h2>
     
@@ -1987,7 +1969,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/php/" rel="permalink">php</a>
+        <a href="/tag/my/" rel="permalink">my</a>
       
     </h2>
     
@@ -2004,7 +1986,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/timezone/" rel="permalink">timezone</a>
+        <a href="/tag/mysql/" rel="permalink">mysql</a>
       
     </h2>
     
@@ -2021,7 +2003,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/dd/" rel="permalink">dd</a>
+        <a href="/tag/php/" rel="permalink">php</a>
       
     </h2>
     
@@ -2038,7 +2020,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/df/" rel="permalink">df</a>
+        <a href="/tag/timezone/" rel="permalink">timezone</a>
       
     </h2>
     
@@ -2055,7 +2037,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/format/" rel="permalink">format</a>
+        <a href="/tag/dd/" rel="permalink">dd</a>
       
     </h2>
     
@@ -2072,7 +2054,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/lubuntu/" rel="permalink">lubuntu</a>
+        <a href="/tag/df/" rel="permalink">df</a>
       
     </h2>
     
@@ -2089,7 +2071,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/pi/" rel="permalink">pi</a>
+        <a href="/tag/format/" rel="permalink">format</a>
       
     </h2>
     
@@ -2106,7 +2088,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/raspberry/" rel="permalink">raspberry</a>
+        <a href="/tag/lubuntu/" rel="permalink">lubuntu</a>
       
     </h2>
     
@@ -2123,7 +2105,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/raspbian/" rel="permalink">raspbian</a>
+        <a href="/tag/pi/" rel="permalink">pi</a>
       
     </h2>
     
@@ -2140,7 +2122,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/ubuntu/" rel="permalink">ubuntu</a>
+        <a href="/tag/raspberry/" rel="permalink">raspberry</a>
       
     </h2>
     
@@ -2157,7 +2139,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/umount/" rel="permalink">umount</a>
+        <a href="/tag/raspbian/" rel="permalink">raspbian</a>
       
     </h2>
     
@@ -2174,7 +2156,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/wheezy/" rel="permalink">wheezy</a>
+        <a href="/tag/ubuntu/" rel="permalink">ubuntu</a>
       
     </h2>
     
@@ -2191,7 +2173,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/constraint/" rel="permalink">constraint</a>
+        <a href="/tag/umount/" rel="permalink">umount</a>
       
     </h2>
     
@@ -2208,7 +2190,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/dump/" rel="permalink">dump</a>
+        <a href="/tag/wheezy/" rel="permalink">wheezy</a>
       
     </h2>
     
@@ -2225,7 +2207,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/file/" rel="permalink">file</a>
+        <a href="/tag/constraint/" rel="permalink">constraint</a>
       
     </h2>
     
@@ -2242,7 +2224,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/foreign/" rel="permalink">foreign</a>
+        <a href="/tag/dump/" rel="permalink">dump</a>
       
     </h2>
     
@@ -2259,7 +2241,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/import/" rel="permalink">import</a>
+        <a href="/tag/file/" rel="permalink">file</a>
       
     </h2>
     
@@ -2276,7 +2258,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/key/" rel="permalink">key</a>
+        <a href="/tag/foreign/" rel="permalink">foreign</a>
       
     </h2>
     
@@ -2293,7 +2275,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/line/" rel="permalink">line</a>
+        <a href="/tag/import/" rel="permalink">import</a>
       
     </h2>
     
@@ -2310,7 +2292,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/connection/" rel="permalink">connection</a>
+        <a href="/tag/key/" rel="permalink">key</a>
       
     </h2>
     
@@ -2327,7 +2309,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/error/" rel="permalink">error</a>
+        <a href="/tag/line/" rel="permalink">line</a>
       
     </h2>
     
@@ -2344,7 +2326,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/haproxy/" rel="permalink">haproxy</a>
+        <a href="/tag/connection/" rel="permalink">connection</a>
       
     </h2>
     
@@ -2361,7 +2343,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/colour/" rel="permalink">colour</a>
+        <a href="/tag/error/" rel="permalink">error</a>
       
     </h2>
     
@@ -2378,7 +2360,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/highlight/" rel="permalink">highlight</a>
+        <a href="/tag/haproxy/" rel="permalink">haproxy</a>
       
     </h2>
     
@@ -2395,7 +2377,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/scheme/" rel="permalink">scheme</a>
+        <a href="/tag/colour/" rel="permalink">colour</a>
       
     </h2>
     
@@ -2412,7 +2394,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/vi/" rel="permalink">vi</a>
+        <a href="/tag/highlight/" rel="permalink">highlight</a>
       
     </h2>
     
@@ -2429,7 +2411,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/vim/" rel="permalink">vim</a>
+        <a href="/tag/scheme/" rel="permalink">scheme</a>
       
     </h2>
     
@@ -2446,7 +2428,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/header/" rel="permalink">header</a>
+        <a href="/tag/vi/" rel="permalink">vi</a>
       
     </h2>
     
@@ -2463,7 +2445,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/kernel/" rel="permalink">kernel</a>
+        <a href="/tag/vim/" rel="permalink">vim</a>
       
     </h2>
     
@@ -2480,7 +2462,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/link/" rel="permalink">link</a>
+        <a href="/tag/header/" rel="permalink">header</a>
       
     </h2>
     
@@ -2497,7 +2479,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/symbolic/" rel="permalink">symbolic</a>
+        <a href="/tag/kernel/" rel="permalink">kernel</a>
       
     </h2>
     
@@ -2514,7 +2496,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/tools/" rel="permalink">tools</a>
+        <a href="/tag/link/" rel="permalink">link</a>
       
     </h2>
     
@@ -2531,7 +2513,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/vmware/" rel="permalink">vmware</a>
+        <a href="/tag/symbolic/" rel="permalink">symbolic</a>
       
     </h2>
     
@@ -2548,7 +2530,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/active/" rel="permalink">active</a>
+        <a href="/tag/tools/" rel="permalink">tools</a>
       
     </h2>
     
@@ -2565,7 +2547,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/cifs/" rel="permalink">cifs</a>
+        <a href="/tag/vmware/" rel="permalink">vmware</a>
       
     </h2>
     
@@ -2582,7 +2564,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/directory/" rel="permalink">directory</a>
+        <a href="/tag/active/" rel="permalink">active</a>
       
     </h2>
     
@@ -2599,7 +2581,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/domain/" rel="permalink">domain</a>
+        <a href="/tag/cifs/" rel="permalink">cifs</a>
       
     </h2>
     
@@ -2616,7 +2598,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/mount/" rel="permalink">mount</a>
+        <a href="/tag/directory/" rel="permalink">directory</a>
       
     </h2>
     
@@ -2633,7 +2615,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/samba/" rel="permalink">samba</a>
+        <a href="/tag/domain/" rel="permalink">domain</a>
       
     </h2>
     
@@ -2650,7 +2632,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/share/" rel="permalink">share</a>
+        <a href="/tag/mount/" rel="permalink">mount</a>
       
     </h2>
     
@@ -2667,7 +2649,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/authentication/" rel="permalink">authentication</a>
+        <a href="/tag/samba/" rel="permalink">samba</a>
       
     </h2>
     
@@ -2684,7 +2666,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/basic/" rel="permalink">basic</a>
+        <a href="/tag/share/" rel="permalink">share</a>
       
     </h2>
     
@@ -2701,7 +2683,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/disk/" rel="permalink">disk</a>
+        <a href="/tag/authentication/" rel="permalink">authentication</a>
       
     </h2>
     
@@ -2718,7 +2700,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/python/" rel="permalink">python</a>
+        <a href="/tag/basic/" rel="permalink">basic</a>
       
     </h2>
     
@@ -2735,7 +2717,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/statistic/" rel="permalink">statistic</a>
+        <a href="/tag/disk/" rel="permalink">disk</a>
       
     </h2>
     
@@ -2752,7 +2734,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/adb/" rel="permalink">adb</a>
+        <a href="/tag/python/" rel="permalink">python</a>
       
     </h2>
     
@@ -2769,7 +2751,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/cyanogenmod/" rel="permalink">cyanogenmod</a>
+        <a href="/tag/statistic/" rel="permalink">statistic</a>
       
     </h2>
     
@@ -2786,7 +2768,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/location/" rel="permalink">location</a>
+        <a href="/tag/adb/" rel="permalink">adb</a>
       
     </h2>
     
@@ -2803,7 +2785,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/root/" rel="permalink">root</a>
+        <a href="/tag/cyanogenmod/" rel="permalink">cyanogenmod</a>
       
     </h2>
     
@@ -2820,7 +2802,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/sms/" rel="permalink">sms</a>
+        <a href="/tag/location/" rel="permalink">location</a>
       
     </h2>
     
@@ -2837,7 +2819,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/telephony/" rel="permalink">telephony</a>
+        <a href="/tag/root/" rel="permalink">root</a>
       
     </h2>
     
@@ -2854,7 +2836,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/thread/" rel="permalink">thread</a>
+        <a href="/tag/sms/" rel="permalink">sms</a>
       
     </h2>
     
@@ -2871,7 +2853,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/convert/" rel="permalink">convert</a>
+        <a href="/tag/telephony/" rel="permalink">telephony</a>
       
     </h2>
     
@@ -2888,7 +2870,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/escape/" rel="permalink">escape</a>
+        <a href="/tag/thread/" rel="permalink">thread</a>
       
     </h2>
     
@@ -2905,7 +2887,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/create/" rel="permalink">create</a>
+        <a href="/tag/convert/" rel="permalink">convert</a>
       
     </h2>
     
@@ -2922,7 +2904,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/daemon/" rel="permalink">daemon</a>
+        <a href="/tag/escape/" rel="permalink">escape</a>
       
     </h2>
     
@@ -2939,7 +2921,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/nssm/" rel="permalink">nssm</a>
+        <a href="/tag/create/" rel="permalink">create</a>
       
     </h2>
     
@@ -2956,7 +2938,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/service/" rel="permalink">service</a>
+        <a href="/tag/daemon/" rel="permalink">daemon</a>
       
     </h2>
     
@@ -2973,7 +2955,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/solr/" rel="permalink">solr</a>
+        <a href="/tag/nssm/" rel="permalink">nssm</a>
       
     </h2>
     
@@ -2990,7 +2972,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/archive/" rel="permalink">archive</a>
+        <a href="/tag/service/" rel="permalink">service</a>
       
     </h2>
     
@@ -3007,7 +2989,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/control/" rel="permalink">control</a>
+        <a href="/tag/solr/" rel="permalink">solr</a>
       
     </h2>
     
@@ -3024,7 +3006,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/deleted/" rel="permalink">deleted</a>
+        <a href="/tag/archive/" rel="permalink">archive</a>
       
     </h2>
     
@@ -3041,7 +3023,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/export/" rel="permalink">export</a>
+        <a href="/tag/control/" rel="permalink">control</a>
       
     </h2>
     
@@ -3058,7 +3040,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/git/" rel="permalink">git</a>
+        <a href="/tag/deleted/" rel="permalink">deleted</a>
       
     </h2>
     
@@ -3075,7 +3057,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/modified/" rel="permalink">modified</a>
+        <a href="/tag/export/" rel="permalink">export</a>
       
     </h2>
     
@@ -3092,7 +3074,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/moved/" rel="permalink">moved</a>
+        <a href="/tag/git/" rel="permalink">git</a>
       
     </h2>
     
@@ -3109,7 +3091,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/new/" rel="permalink">new</a>
+        <a href="/tag/modified/" rel="permalink">modified</a>
       
     </h2>
     
@@ -3126,7 +3108,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/repository/" rel="permalink">repository</a>
+        <a href="/tag/moved/" rel="permalink">moved</a>
       
     </h2>
     
@@ -3143,7 +3125,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/tar/" rel="permalink">tar</a>
+        <a href="/tag/new/" rel="permalink">new</a>
       
     </h2>
     
@@ -3160,7 +3142,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/untracked/" rel="permalink">untracked</a>
+        <a href="/tag/repository/" rel="permalink">repository</a>
       
     </h2>
     
@@ -3177,7 +3159,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/blog/" rel="permalink">blog</a>
+        <a href="/tag/tar/" rel="permalink">tar</a>
       
     </h2>
     
@@ -3194,7 +3176,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/https/" rel="permalink">https</a>
+        <a href="/tag/untracked/" rel="permalink">untracked</a>
       
     </h2>
     
@@ -3211,7 +3193,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/nginx/" rel="permalink">nginx</a>
+        <a href="/tag/blog/" rel="permalink">blog</a>
       
     </h2>
     
@@ -3228,7 +3210,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/port/" rel="permalink">port</a>
+        <a href="/tag/https/" rel="permalink">https</a>
       
     </h2>
     
@@ -3245,7 +3227,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/proxy/" rel="permalink">proxy</a>
+        <a href="/tag/nginx/" rel="permalink">nginx</a>
       
     </h2>
     
@@ -3262,7 +3244,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/reverse/" rel="permalink">reverse</a>
+        <a href="/tag/port/" rel="permalink">port</a>
       
     </h2>
     
@@ -3279,7 +3261,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/wordpress/" rel="permalink">wordpress</a>
+        <a href="/tag/proxy/" rel="permalink">proxy</a>
       
     </h2>
     
@@ -3296,7 +3278,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/audio/" rel="permalink">audio</a>
+        <a href="/tag/reverse/" rel="permalink">reverse</a>
       
     </h2>
     
@@ -3313,7 +3295,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/extract/" rel="permalink">extract</a>
+        <a href="/tag/wordpress/" rel="permalink">wordpress</a>
       
     </h2>
     
@@ -3330,7 +3312,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/ffmpeg/" rel="permalink">ffmpeg</a>
+        <a href="/tag/audio/" rel="permalink">audio</a>
       
     </h2>
     
@@ -3347,7 +3329,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/mp3/" rel="permalink">mp3</a>
+        <a href="/tag/extract/" rel="permalink">extract</a>
       
     </h2>
     
@@ -3364,7 +3346,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/mp4/" rel="permalink">mp4</a>
+        <a href="/tag/ffmpeg/" rel="permalink">ffmpeg</a>
       
     </h2>
     
@@ -3381,7 +3363,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/video/" rel="permalink">video</a>
+        <a href="/tag/mp3/" rel="permalink">mp3</a>
       
     </h2>
     
@@ -3398,7 +3380,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/check/" rel="permalink">check</a>
+        <a href="/tag/mp4/" rel="permalink">mp4</a>
       
     </h2>
     
@@ -3415,7 +3397,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/core/" rel="permalink">core</a>
+        <a href="/tag/video/" rel="permalink">video</a>
       
     </h2>
     
@@ -3432,7 +3414,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/corrupt/" rel="permalink">corrupt</a>
+        <a href="/tag/check/" rel="permalink">check</a>
       
     </h2>
     
@@ -3449,7 +3431,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/fix/" rel="permalink">fix</a>
+        <a href="/tag/core/" rel="permalink">core</a>
       
     </h2>
     
@@ -3466,7 +3448,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/index/" rel="permalink">index</a>
+        <a href="/tag/corrupt/" rel="permalink">corrupt</a>
       
     </h2>
     
@@ -3483,7 +3465,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/lucene/" rel="permalink">lucene</a>
+        <a href="/tag/fix/" rel="permalink">fix</a>
       
     </h2>
     
@@ -3500,7 +3482,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/repair/" rel="permalink">repair</a>
+        <a href="/tag/index/" rel="permalink">index</a>
       
     </h2>
     
@@ -3517,7 +3499,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/segment/" rel="permalink">segment</a>
+        <a href="/tag/lucene/" rel="permalink">lucene</a>
       
     </h2>
     
@@ -3534,7 +3516,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/curl/" rel="permalink">curl</a>
+        <a href="/tag/repair/" rel="permalink">repair</a>
       
     </h2>
     
@@ -3551,7 +3533,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/json/" rel="permalink">json</a>
+        <a href="/tag/segment/" rel="permalink">segment</a>
       
     </h2>
     
@@ -3568,7 +3550,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/junit/" rel="permalink">junit</a>
+        <a href="/tag/curl/" rel="permalink">curl</a>
       
     </h2>
     
@@ -3585,7 +3567,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/newline/" rel="permalink">newline</a>
+        <a href="/tag/json/" rel="permalink">json</a>
       
     </h2>
     
@@ -3602,7 +3584,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/parse/" rel="permalink">parse</a>
+        <a href="/tag/junit/" rel="permalink">junit</a>
       
     </h2>
     
@@ -3619,7 +3601,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/container/" rel="permalink">container</a>
+        <a href="/tag/newline/" rel="permalink">newline</a>
       
     </h2>
     
@@ -3636,7 +3618,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/docker/" rel="permalink">docker</a>
+        <a href="/tag/parse/" rel="permalink">parse</a>
       
     </h2>
     
@@ -3653,7 +3635,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/gitlab/" rel="permalink">gitlab</a>
+        <a href="/tag/container/" rel="permalink">container</a>
       
     </h2>
     
@@ -3670,7 +3652,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/image/" rel="permalink">image</a>
+        <a href="/tag/docker/" rel="permalink">docker</a>
       
     </h2>
     
@@ -3687,7 +3669,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/migrate/" rel="permalink">migrate</a>
+        <a href="/tag/gitlab/" rel="permalink">gitlab</a>
       
     </h2>
     
@@ -3704,7 +3686,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/centos/" rel="permalink">centos</a>
+        <a href="/tag/image/" rel="permalink">image</a>
       
     </h2>
     
@@ -3721,7 +3703,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/certificate/" rel="permalink">certificate</a>
+        <a href="/tag/migrate/" rel="permalink">migrate</a>
       
     </h2>
     
@@ -3738,7 +3720,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/encrypt/" rel="permalink">encrypt</a>
+        <a href="/tag/centos/" rel="permalink">centos</a>
       
     </h2>
     
@@ -3755,7 +3737,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/free/" rel="permalink">free</a>
+        <a href="/tag/certificate/" rel="permalink">certificate</a>
       
     </h2>
     
@@ -3772,7 +3754,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/jelastic/" rel="permalink">jelastic</a>
+        <a href="/tag/encrypt/" rel="permalink">encrypt</a>
       
     </h2>
     
@@ -3789,7 +3771,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/let-s-encrypt/" rel="permalink">let's encrypt</a>
+        <a href="/tag/free/" rel="permalink">free</a>
       
     </h2>
     
@@ -3806,7 +3788,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/lets/" rel="permalink">lets</a>
+        <a href="/tag/jelastic/" rel="permalink">jelastic</a>
       
     </h2>
     
@@ -3823,7 +3805,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/ssh/" rel="permalink">ssh</a>
+        <a href="/tag/let-s-encrypt/" rel="permalink">let's encrypt</a>
       
     </h2>
     
@@ -3840,7 +3822,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/sudo/" rel="permalink">sudo</a>
+        <a href="/tag/lets/" rel="permalink">lets</a>
       
     </h2>
     
@@ -3857,7 +3839,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/spring/" rel="permalink">spring</a>
+        <a href="/tag/ssh/" rel="permalink">ssh</a>
       
     </h2>
     
@@ -3874,7 +3856,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/maven/" rel="permalink">maven</a>
+        <a href="/tag/sudo/" rel="permalink">sudo</a>
       
     </h2>
     
@@ -3891,7 +3873,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/m2e/" rel="permalink">m2e</a>
+        <a href="/tag/spring/" rel="permalink">spring</a>
       
     </h2>
     
@@ -3908,7 +3890,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/m2e-apt/" rel="permalink">m2e-apt</a>
+        <a href="/tag/maven/" rel="permalink">maven</a>
       
     </h2>
     
@@ -3925,7 +3907,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/plugin/" rel="permalink">plugin</a>
+        <a href="/tag/m2e/" rel="permalink">m2e</a>
       
     </h2>
     
@@ -3942,7 +3924,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/compile/" rel="permalink">compile</a>
+        <a href="/tag/m2e-apt/" rel="permalink">m2e-apt</a>
       
     </h2>
     
@@ -3959,7 +3941,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/annotation/" rel="permalink">annotation</a>
+        <a href="/tag/plugin/" rel="permalink">plugin</a>
       
     </h2>
     
@@ -3976,7 +3958,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/mapper/" rel="permalink">mapper</a>
+        <a href="/tag/compile/" rel="permalink">compile</a>
       
     </h2>
     
@@ -3993,7 +3975,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/sublimetext/" rel="permalink">sublimetext</a>
+        <a href="/tag/annotation/" rel="permalink">annotation</a>
       
     </h2>
     
@@ -4010,7 +3992,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/sublime/" rel="permalink">sublime</a>
+        <a href="/tag/mapper/" rel="permalink">mapper</a>
       
     </h2>
     
@@ -4027,7 +4009,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/text/" rel="permalink">text</a>
+        <a href="/tag/sublimetext/" rel="permalink">sublimetext</a>
       
     </h2>
     
@@ -4044,7 +4026,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/editor/" rel="permalink">editor</a>
+        <a href="/tag/sublime/" rel="permalink">sublime</a>
       
     </h2>
     
@@ -4061,7 +4043,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/accented/" rel="permalink">accented</a>
+        <a href="/tag/text/" rel="permalink">text</a>
       
     </h2>
     
@@ -4078,7 +4060,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/accent/" rel="permalink">accent</a>
+        <a href="/tag/editor/" rel="permalink">editor</a>
       
     </h2>
     
@@ -4095,7 +4077,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/char/" rel="permalink">char</a>
+        <a href="/tag/accented/" rel="permalink">accented</a>
       
     </h2>
     
@@ -4112,7 +4094,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/character/" rel="permalink">character</a>
+        <a href="/tag/accent/" rel="permalink">accent</a>
       
     </h2>
     
@@ -4129,7 +4111,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/greek/" rel="permalink">greek</a>
+        <a href="/tag/char/" rel="permalink">char</a>
       
     </h2>
     
@@ -4146,7 +4128,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/solrcloud/" rel="permalink">solrcloud</a>
+        <a href="/tag/character/" rel="permalink">character</a>
       
     </h2>
     
@@ -4163,7 +4145,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/load/" rel="permalink">load</a>
+        <a href="/tag/greek/" rel="permalink">greek</a>
       
     </h2>
     
@@ -4180,7 +4162,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/balancing/" rel="permalink">balancing</a>
+        <a href="/tag/solrcloud/" rel="permalink">solrcloud</a>
       
     </h2>
     
@@ -4197,7 +4179,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/mongo/" rel="permalink">mongo</a>
+        <a href="/tag/load/" rel="permalink">load</a>
       
     </h2>
     
@@ -4214,7 +4196,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/mongodb/" rel="permalink">mongodb</a>
+        <a href="/tag/balancing/" rel="permalink">balancing</a>
       
     </h2>
     
@@ -4231,7 +4213,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/replication/" rel="permalink">replication</a>
+        <a href="/tag/mongo/" rel="permalink">mongo</a>
       
     </h2>
     
@@ -4248,7 +4230,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/recovery/" rel="permalink">recovery</a>
+        <a href="/tag/mongodb/" rel="permalink">mongodb</a>
       
     </h2>
     
@@ -4265,7 +4247,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/secondary/" rel="permalink">secondary</a>
+        <a href="/tag/replication/" rel="permalink">replication</a>
       
     </h2>
     
@@ -4282,7 +4264,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/replica/" rel="permalink">replica</a>
+        <a href="/tag/recovery/" rel="permalink">recovery</a>
       
     </h2>
     
@@ -4299,7 +4281,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/sync/" rel="permalink">sync</a>
+        <a href="/tag/secondary/" rel="permalink">secondary</a>
       
     </h2>
     
@@ -4316,7 +4298,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/synchronisation/" rel="permalink">synchronisation</a>
+        <a href="/tag/replica/" rel="permalink">replica</a>
       
     </h2>
     
@@ -4333,7 +4315,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/ntp/" rel="permalink">ntp</a>
+        <a href="/tag/sync/" rel="permalink">sync</a>
       
     </h2>
     
@@ -4350,7 +4332,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/time/" rel="permalink">time</a>
+        <a href="/tag/synchronisation/" rel="permalink">synchronisation</a>
       
     </h2>
     
@@ -4367,7 +4349,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/configure/" rel="permalink">configure</a>
+        <a href="/tag/ntp/" rel="permalink">ntp</a>
       
     </h2>
     
@@ -4384,7 +4366,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/ntpdate/" rel="permalink">ntpdate</a>
+        <a href="/tag/time/" rel="permalink">time</a>
       
     </h2>
     
@@ -4401,7 +4383,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/ntpq/" rel="permalink">ntpq</a>
+        <a href="/tag/configure/" rel="permalink">configure</a>
       
     </h2>
     
@@ -4418,7 +4400,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/strata/" rel="permalink">strata</a>
+        <a href="/tag/ntpdate/" rel="permalink">ntpdate</a>
       
     </h2>
     
@@ -4435,7 +4417,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/high/" rel="permalink">high</a>
+        <a href="/tag/ntpq/" rel="permalink">ntpq</a>
       
     </h2>
     
@@ -4452,7 +4434,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/suitable/" rel="permalink">suitable</a>
+        <a href="/tag/strata/" rel="permalink">strata</a>
       
     </h2>
     
@@ -4469,7 +4451,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/minpoll/" rel="permalink">minpoll</a>
+        <a href="/tag/high/" rel="permalink">high</a>
       
     </h2>
     
@@ -4486,7 +4468,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/maxpoll/" rel="permalink">maxpoll</a>
+        <a href="/tag/suitable/" rel="permalink">suitable</a>
       
     </h2>
     
@@ -4503,7 +4485,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/pool/" rel="permalink">pool</a>
+        <a href="/tag/minpoll/" rel="permalink">minpoll</a>
       
     </h2>
     
@@ -4520,7 +4502,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/iburst/" rel="permalink">iburst</a>
+        <a href="/tag/maxpoll/" rel="permalink">maxpoll</a>
       
     </h2>
     
@@ -4537,7 +4519,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/soap/" rel="permalink">soap</a>
+        <a href="/tag/pool/" rel="permalink">pool</a>
       
     </h2>
     
@@ -4554,7 +4536,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/auth/" rel="permalink">auth</a>
+        <a href="/tag/iburst/" rel="permalink">iburst</a>
       
     </h2>
     
@@ -4571,7 +4553,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/client/" rel="permalink">client</a>
+        <a href="/tag/soap/" rel="permalink">soap</a>
       
     </h2>
     
@@ -4588,7 +4570,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/jax/" rel="permalink">jax</a>
+        <a href="/tag/auth/" rel="permalink">auth</a>
       
     </h2>
     
@@ -4605,7 +4587,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/ws/" rel="permalink">ws</a>
+        <a href="/tag/client/" rel="permalink">client</a>
       
     </h2>
     
@@ -4622,7 +4604,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/jax-ws/" rel="permalink">jax-ws</a>
+        <a href="/tag/jax/" rel="permalink">jax</a>
       
     </h2>
     
@@ -4639,7 +4621,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/web/" rel="permalink">web</a>
+        <a href="/tag/ws/" rel="permalink">ws</a>
       
     </h2>
     
@@ -4656,7 +4638,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/netbeans/" rel="permalink">netbeans</a>
+        <a href="/tag/jax-ws/" rel="permalink">jax-ws</a>
       
     </h2>
     
@@ -4673,7 +4655,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/wsdl/" rel="permalink">wsdl</a>
+        <a href="/tag/web/" rel="permalink">web</a>
       
     </h2>
     
@@ -4690,7 +4672,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/request/" rel="permalink">request</a>
+        <a href="/tag/netbeans/" rel="permalink">netbeans</a>
       
     </h2>
     
@@ -4707,7 +4689,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/message/" rel="permalink">message</a>
+        <a href="/tag/wsdl/" rel="permalink">wsdl</a>
       
     </h2>
     
@@ -4724,7 +4706,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/debug/" rel="permalink">debug</a>
+        <a href="/tag/request/" rel="permalink">request</a>
       
     </h2>
     
@@ -4741,7 +4723,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/print/" rel="permalink">print</a>
+        <a href="/tag/message/" rel="permalink">message</a>
       
     </h2>
     
@@ -4758,7 +4740,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/console/" rel="permalink">console</a>
+        <a href="/tag/debug/" rel="permalink">debug</a>
       
     </h2>
     
@@ -4775,7 +4757,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/merge/" rel="permalink">merge</a>
+        <a href="/tag/print/" rel="permalink">print</a>
       
     </h2>
     
@@ -4792,7 +4774,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/mergetool/" rel="permalink">mergetool</a>
+        <a href="/tag/console/" rel="permalink">console</a>
       
     </h2>
     
@@ -4809,7 +4791,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/tortoise/" rel="permalink">tortoise</a>
+        <a href="/tag/merge/" rel="permalink">merge</a>
       
     </h2>
     
@@ -4826,7 +4808,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/conflict/" rel="permalink">conflict</a>
+        <a href="/tag/mergetool/" rel="permalink">mergetool</a>
       
     </h2>
     
@@ -4843,7 +4825,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/elastic/" rel="permalink">elastic</a>
+        <a href="/tag/tortoise/" rel="permalink">tortoise</a>
       
     </h2>
     
@@ -4860,7 +4842,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/metricbeat/" rel="permalink">metricbeat</a>
+        <a href="/tag/conflict/" rel="permalink">conflict</a>
       
     </h2>
     
@@ -4877,7 +4859,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/beats/" rel="permalink">beats</a>
+        <a href="/tag/elastic/" rel="permalink">elastic</a>
       
     </h2>
     
@@ -4894,7 +4876,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/elasticsearch/" rel="permalink">elasticsearch</a>
+        <a href="/tag/metricbeat/" rel="permalink">metricbeat</a>
       
     </h2>
     
@@ -4911,7 +4893,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/generator/" rel="permalink">generator</a>
+        <a href="/tag/beats/" rel="permalink">beats</a>
       
     </h2>
     
@@ -4928,7 +4910,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/go/" rel="permalink">go</a>
+        <a href="/tag/elasticsearch/" rel="permalink">elasticsearch</a>
       
     </h2>
     
@@ -4945,7 +4927,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/golang/" rel="permalink">golang</a>
+        <a href="/tag/generator/" rel="permalink">generator</a>
       
     </h2>
     
@@ -4962,7 +4944,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/elk/" rel="permalink">elk</a>
+        <a href="/tag/go/" rel="permalink">go</a>
       
     </h2>
     
@@ -4979,7 +4961,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/search/" rel="permalink">search</a>
+        <a href="/tag/golang/" rel="permalink">golang</a>
       
     </h2>
     
@@ -4996,7 +4978,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/kibana/" rel="permalink">kibana</a>
+        <a href="/tag/elk/" rel="permalink">elk</a>
       
     </h2>
     
@@ -5013,7 +4995,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/monitor/" rel="permalink">monitor</a>
+        <a href="/tag/search/" rel="permalink">search</a>
       
     </h2>
     
@@ -5030,7 +5012,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/logstash/" rel="permalink">logstash</a>
+        <a href="/tag/kibana/" rel="permalink">kibana</a>
       
     </h2>
     
@@ -5047,7 +5029,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/geolocation/" rel="permalink">geolocation</a>
+        <a href="/tag/monitor/" rel="permalink">monitor</a>
       
     </h2>
     
@@ -5064,7 +5046,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/ip/" rel="permalink">ip</a>
+        <a href="/tag/logstash/" rel="permalink">logstash</a>
       
     </h2>
     
@@ -5081,7 +5063,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/geoip/" rel="permalink">geoip</a>
+        <a href="/tag/geolocation/" rel="permalink">geolocation</a>
       
     </h2>
     
@@ -5098,7 +5080,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/maxmind/" rel="permalink">maxmind</a>
+        <a href="/tag/ip/" rel="permalink">ip</a>
       
     </h2>
     
@@ -5115,7 +5097,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/geo/" rel="permalink">geo</a>
+        <a href="/tag/geoip/" rel="permalink">geoip</a>
       
     </h2>
     
@@ -5132,7 +5114,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/geolite/" rel="permalink">geolite</a>
+        <a href="/tag/maxmind/" rel="permalink">maxmind</a>
       
     </h2>
     
@@ -5149,7 +5131,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/geolite2/" rel="permalink">geolite2</a>
+        <a href="/tag/geo/" rel="permalink">geo</a>
       
     </h2>
     
@@ -5166,7 +5148,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/rsyslog/" rel="permalink">rsyslog</a>
+        <a href="/tag/geolite/" rel="permalink">geolite</a>
       
     </h2>
     
@@ -5183,7 +5165,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/mmdblookup/" rel="permalink">mmdblookup</a>
+        <a href="/tag/geolite2/" rel="permalink">geolite2</a>
       
     </h2>
     
@@ -5200,7 +5182,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/tag/omelasticsearch/" rel="permalink">omelasticsearch</a>
+        <a href="/tag/rsyslog/" rel="permalink">rsyslog</a>
       
     </h2>
     
@@ -5217,7 +5199,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/category/databases/" rel="permalink">Databases</a>
+        <a href="/tag/mmdblookup/" rel="permalink">mmdblookup</a>
       
     </h2>
     
@@ -5234,7 +5216,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/category/linux/" rel="permalink">Linux</a>
+        <a href="/tag/omelasticsearch/" rel="permalink">omelasticsearch</a>
       
     </h2>
     
@@ -5251,7 +5233,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/category/android/" rel="permalink">Android</a>
+        <a href="/category/databases/" rel="permalink">Databases</a>
       
     </h2>
     
@@ -5268,7 +5250,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/category/java/" rel="permalink">Java</a>
+        <a href="/category/linux/" rel="permalink">Linux</a>
       
     </h2>
     
@@ -5285,7 +5267,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/category/application-server/" rel="permalink">Application Server</a>
+        <a href="/category/android/" rel="permalink">Android</a>
       
     </h2>
     
@@ -5302,7 +5284,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/category/jboss/" rel="permalink">JBoss</a>
+        <a href="/category/java/" rel="permalink">Java</a>
       
     </h2>
     
@@ -5319,7 +5301,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/category/sql-server/" rel="permalink">Sql Server</a>
+        <a href="/category/application-server/" rel="permalink">Application Server</a>
       
     </h2>
     
@@ -5336,7 +5318,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/category/powerbuilder/" rel="permalink">PowerBuilder</a>
+        <a href="/category/jboss/" rel="permalink">JBoss</a>
       
     </h2>
     
@@ -5353,7 +5335,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/category/networking/" rel="permalink">Networking</a>
+        <a href="/category/sql-server/" rel="permalink">Sql Server</a>
       
     </h2>
     
@@ -5370,7 +5352,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/category/smtp/" rel="permalink">smtp</a>
+        <a href="/category/powerbuilder/" rel="permalink">PowerBuilder</a>
       
     </h2>
     
@@ -5387,7 +5369,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/category/apache/" rel="permalink">Apache</a>
+        <a href="/category/networking/" rel="permalink">Networking</a>
       
     </h2>
     
@@ -5404,7 +5386,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/category/http/" rel="permalink">HTTP</a>
+        <a href="/category/smtp/" rel="permalink">smtp</a>
       
     </h2>
     
@@ -5421,7 +5403,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/category/mysql/" rel="permalink">mysql</a>
+        <a href="/category/apache/" rel="permalink">Apache</a>
       
     </h2>
     
@@ -5438,7 +5420,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/category/php/" rel="permalink">PHP</a>
+        <a href="/category/http/" rel="permalink">HTTP</a>
       
     </h2>
     
@@ -5455,7 +5437,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/category/raspberry-pi/" rel="permalink">Raspberry Pi</a>
+        <a href="/category/mysql/" rel="permalink">mysql</a>
       
     </h2>
     
@@ -5472,7 +5454,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/category/raspbian/" rel="permalink">Raspbian</a>
+        <a href="/category/php/" rel="permalink">PHP</a>
       
     </h2>
     
@@ -5489,7 +5471,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/category/ubuntu/" rel="permalink">Ubuntu</a>
+        <a href="/category/raspberry-pi/" rel="permalink">Raspberry Pi</a>
       
     </h2>
     
@@ -5506,7 +5488,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/category/haproxy/" rel="permalink">HaProxy</a>
+        <a href="/category/raspbian/" rel="permalink">Raspbian</a>
       
     </h2>
     
@@ -5523,7 +5505,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/category/mint/" rel="permalink">Mint</a>
+        <a href="/category/ubuntu/" rel="permalink">Ubuntu</a>
       
     </h2>
     
@@ -5540,7 +5522,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/category/virtualisation/" rel="permalink">Virtualisation</a>
+        <a href="/category/haproxy/" rel="permalink">HaProxy</a>
       
     </h2>
     
@@ -5557,7 +5539,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/category/vmware/" rel="permalink">vmware</a>
+        <a href="/category/mint/" rel="permalink">Mint</a>
       
     </h2>
     
@@ -5574,7 +5556,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/category/python/" rel="permalink">Python</a>
+        <a href="/category/virtualisation/" rel="permalink">Virtualisation</a>
       
     </h2>
     
@@ -5591,7 +5573,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/category/sqlite/" rel="permalink">SQLite</a>
+        <a href="/category/vmware/" rel="permalink">vmware</a>
       
     </h2>
     
@@ -5608,7 +5590,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/category/solr/" rel="permalink">Solr</a>
+        <a href="/category/python/" rel="permalink">Python</a>
       
     </h2>
     
@@ -5625,7 +5607,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/category/windows/" rel="permalink">Windows</a>
+        <a href="/category/sqlite/" rel="permalink">SQLite</a>
       
     </h2>
     
@@ -5642,7 +5624,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/category/git/" rel="permalink">Git</a>
+        <a href="/category/solr/" rel="permalink">Solr</a>
       
     </h2>
     
@@ -5659,7 +5641,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/category/source-control/" rel="permalink">Source control</a>
+        <a href="/category/windows/" rel="permalink">Windows</a>
       
     </h2>
     
@@ -5676,7 +5658,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/category/nginx/" rel="permalink">Nginx</a>
+        <a href="/category/git/" rel="permalink">Git</a>
       
     </h2>
     
@@ -5693,7 +5675,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/category/server/" rel="permalink">Server</a>
+        <a href="/category/source-control/" rel="permalink">Source control</a>
       
     </h2>
     
@@ -5710,7 +5692,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/category/lucene/" rel="permalink">Lucene</a>
+        <a href="/category/nginx/" rel="permalink">Nginx</a>
       
     </h2>
     
@@ -5727,7 +5709,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/category/docker/" rel="permalink">Docker</a>
+        <a href="/category/server/" rel="permalink">Server</a>
       
     </h2>
     
@@ -5744,7 +5726,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/category/gitlab/" rel="permalink">Gitlab</a>
+        <a href="/category/lucene/" rel="permalink">Lucene</a>
       
     </h2>
     
@@ -5761,7 +5743,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/category/eclipse/" rel="permalink">Eclipse</a>
+        <a href="/category/docker/" rel="permalink">Docker</a>
       
     </h2>
     
@@ -5778,7 +5760,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/category/spring/" rel="permalink">Spring</a>
+        <a href="/category/gitlab/" rel="permalink">Gitlab</a>
       
     </h2>
     
@@ -5795,7 +5777,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/category/text-editor/" rel="permalink">Text editor</a>
+        <a href="/category/eclipse/" rel="permalink">Eclipse</a>
       
     </h2>
     
@@ -5812,7 +5794,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/category/haproxy/" rel="permalink">HAProxy</a>
+        <a href="/category/spring/" rel="permalink">Spring</a>
       
     </h2>
     
@@ -5829,7 +5811,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/category/debian/" rel="permalink">Debian</a>
+        <a href="/category/text-editor/" rel="permalink">Text editor</a>
       
     </h2>
     
@@ -5846,7 +5828,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/category/go/" rel="permalink">Go</a>
+        <a href="/category/haproxy/" rel="permalink">HAProxy</a>
       
     </h2>
     
@@ -5863,7 +5845,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/category/golang/" rel="permalink">Golang</a>
+        <a href="/category/debian/" rel="permalink">Debian</a>
       
     </h2>
     
@@ -5880,7 +5862,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/category/elasticsearch/" rel="permalink">Elasticsearch</a>
+        <a href="/category/go/" rel="permalink">Go</a>
       
     </h2>
     
@@ -5897,7 +5879,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/category/logstash/" rel="permalink">Logstash</a>
+        <a href="/category/golang/" rel="permalink">Golang</a>
       
     </h2>
     
@@ -5914,7 +5896,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/category/rsyslog/" rel="permalink">Rsyslog</a>
+        <a href="/category/elasticsearch/" rel="permalink">Elasticsearch</a>
       
     </h2>
     
@@ -5931,7 +5913,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/page2/" rel="permalink"></a>
+        <a href="/category/logstash/" rel="permalink">Logstash</a>
       
     </h2>
     
@@ -5948,7 +5930,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/page3/" rel="permalink"></a>
+        <a href="/category/rsyslog/" rel="permalink">Rsyslog</a>
       
     </h2>
     
@@ -5965,7 +5947,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/page4/" rel="permalink"></a>
+        <a href="/page2/" rel="permalink"></a>
       
     </h2>
     
@@ -5982,7 +5964,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/page5/" rel="permalink"></a>
+        <a href="/page3/" rel="permalink"></a>
       
     </h2>
     
@@ -5999,7 +5981,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/page6/" rel="permalink"></a>
+        <a href="/page4/" rel="permalink"></a>
       
     </h2>
     
@@ -6016,7 +5998,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/page7/" rel="permalink"></a>
+        <a href="/page5/" rel="permalink"></a>
       
     </h2>
     
@@ -6033,7 +6015,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/page8/" rel="permalink"></a>
+        <a href="/page6/" rel="permalink"></a>
       
     </h2>
     
@@ -6050,7 +6032,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/page9/" rel="permalink"></a>
+        <a href="/page7/" rel="permalink"></a>
       
     </h2>
     
@@ -6067,7 +6049,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/page10/" rel="permalink"></a>
+        <a href="/page8/" rel="permalink"></a>
       
     </h2>
     
@@ -6084,7 +6066,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/page11/" rel="permalink"></a>
+        <a href="/page9/" rel="permalink"></a>
       
     </h2>
     
@@ -6101,7 +6083,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/feed.xml" rel="permalink"></a>
+        <a href="/page10/" rel="permalink"></a>
       
     </h2>
     
@@ -6118,7 +6100,7 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/sitemap.xml" rel="permalink"></a>
+        <a href="/page11/" rel="permalink"></a>
       
     </h2>
     
@@ -6135,7 +6117,41 @@
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/robots.txt" rel="permalink"></a>
+        <a href="/feed.xml" rel="permalink"></a>
+      
+    </h2>
+    
+    
+  </article>
+</div>
+
+  
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="http://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/sitemap.xml" rel="permalink"></a>
+      
+    </h2>
+    
+    
+  </article>
+</div>
+
+  
+
+
+
+<div class="list__item">
+  <article class="archive__item" itemscope itemtype="http://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
+        <a href="/robots.txt" rel="permalink"></a>
       
     </h2>
     
@@ -6172,11 +6188,11 @@
     
     
     
-      <li><a href="https://github.com/manios"><i class="fa fa-fw fa-github" aria-hidden="true"></i> GitHub</a></li>
+      <li><a href="https://github.com/manios"><i class="fab fa-fw fa-github" aria-hidden="true"></i> GitHub</a></li>
     
     
     
-    <li><a href="https://manios.org/feed.xml"><i class="fa fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+    <li><a href="/feed.xml"><i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
   </ul>
 </div>
 
@@ -6186,23 +6202,9 @@
     </div>
 
     
-  <script src="https://manios.org/assets/js/main.min.js"></script>
+  <script src="/assets/js/main.min.js"></script>
+  <script src="https://use.fontawesome.com/releases/v5.2.0/js/all.js"></script>
 
-
-
-
-
-
-
-  <script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-  ga('create', 'UA-96500199-2', 'auto');
-  ga('send', 'pageview');
-</script>
 
 
 

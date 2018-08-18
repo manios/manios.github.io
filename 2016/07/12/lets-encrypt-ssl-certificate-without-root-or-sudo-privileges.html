@@ -9,59 +9,19 @@
   <head>
     <meta charset="utf-8">
 
-<!-- begin SEO -->
-
-
-
-
-
-
-
-
-
-<title>Let’s Encrypt SSL certificate without root or sudo privileges - cmanios</title>
-
-
-
-
+<!-- begin _includes/seo.html --><title>Let’s Encrypt SSL certificate without root or sudo privileges - cmanios</title>
 <meta name="description" content="Five days ago we had to renew a number of SSL certificates using free Let’s Encrypt SSL authority to a few Apache servers which were installed in Jelastic PaaS environment. The Apache servers were installed in an environment where:">
 
 
 
-
-<meta name="author" content="cmanios">
-
+<meta property="og:type" content="article">
 <meta property="og:locale" content="en_US">
 <meta property="og:site_name" content="cmanios">
 <meta property="og:title" content="Let’s Encrypt SSL certificate without root or sudo privileges">
-
-
-  <link rel="canonical" href="https://manios.org/2016/07/12/lets-encrypt-ssl-certificate-without-root-or-sudo-privileges">
-  <meta property="og:url" content="https://manios.org/2016/07/12/lets-encrypt-ssl-certificate-without-root-or-sudo-privileges">
-
+<meta property="og:url" content="https://manios.org/2016/07/12/lets-encrypt-ssl-certificate-without-root-or-sudo-privileges">
 
 
   <meta property="og:description" content="Five days ago we had to renew a number of SSL certificates using free Let’s Encrypt SSL authority to a few Apache servers which were installed in Jelastic PaaS environment. The Apache servers were installed in an environment where:">
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-  
 
 
 
@@ -69,9 +29,20 @@
 
 
 
-  <meta property="og:type" content="article">
+
+
   <meta property="article:published_time" content="2016-07-12T22:32:53+03:00">
 
+
+
+
+
+  
+
+  
+
+
+<link rel="canonical" href="https://manios.org/2016/07/12/lets-encrypt-ssl-certificate-without-root-or-sudo-privileges">
 
 
 
@@ -81,11 +52,11 @@
 
   <script type="application/ld+json">
     {
-      "@context" : "http://schema.org",
-      "@type" : "Person",
-      "name" : "Christos Manios",
-      "url" : "https://manios.org",
-      "sameAs" : null
+      "@context": "http://schema.org",
+      "@type": "Person",
+      "name": "Christos Manios",
+      "url": "https://manios.org",
+      "sameAs": null
     }
   </script>
 
@@ -95,10 +66,10 @@
 
 
 
-<!-- end SEO -->
+<!-- end _includes/seo.html -->
 
 
-<link href="https://manios.org/feed.xml" type="application/atom+xml" rel="alternate" title="cmanios Feed">
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="cmanios Feed">
 
 <!-- http://t.co/dKP3o1e -->
 <meta name="HandheldFriendly" content="True">
@@ -110,7 +81,7 @@
 </script>
 
 <!-- For all browsers -->
-<link rel="stylesheet" href="https://manios.org/assets/css/main.css">
+<link rel="stylesheet" href="/assets/css/main.css">
 
 <!--[if lte IE 9]>
   <style>
@@ -130,9 +101,10 @@
 
     <!-- start custom head snippets -->
 
-<!-- insert favicons. use http://realfavicongenerator.net/ -->
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
 
 <!-- end custom head snippets -->
+
   </head>
 
   <body class="layout--single">
@@ -145,23 +117,32 @@
   <div class="masthead__inner-wrap">
     <div class="masthead__menu">
       <nav id="site-nav" class="greedy-nav">
-        <a class="site-title" href="https://manios.org/">cmanios</a>
+        <a class="site-title" href="/">cmanios</a>
         <ul class="visible-links">
           
             
-            <li class="masthead__menu-item"><a href="https://manios.org/year-archive/">Posts archive</a></li>
+            <li class="masthead__menu-item">
+              <a href="https://manios.org/year-archive/" >Posts archive</a>
+            </li>
           
             
-            <li class="masthead__menu-item"><a href="https://manios.org/categories/">Categories</a></li>
+            <li class="masthead__menu-item">
+              <a href="https://manios.org/categories/" >Categories</a>
+            </li>
           
             
-            <li class="masthead__menu-item"><a href="https://manios.org/tags/">Tags</a></li>
+            <li class="masthead__menu-item">
+              <a href="https://manios.org/tags/" >Tags</a>
+            </li>
           
             
-            <li class="masthead__menu-item"><a href="https://manios.org/about/">About</a></li>
+            <li class="masthead__menu-item">
+              <a href="https://manios.org/about/" >About</a>
+            </li>
           
         </ul>
-        <button type="button">
+        
+        <button class="greedy-nav__toggle hidden" type="button">
           <span class="visually-hidden">Toggle Menu</span>
           <div class="navicon"></div>
         </button>
@@ -185,11 +166,11 @@
 
 
 <div class="page__hero--overlay"
-  style=" background-image: url('https://manios.org/images/hubble_space.png');"
+  style=" background-image: url('/images/hubble_space.png');"
 >
   
     <div class="wrapper">
-      <h1 class="page__title" itemprop="headline">
+      <h1 id="page-title" class="page__title" itemprop="headline">
         
           Let’s Encrypt SSL certificate without root or sudo privileges
 
@@ -200,6 +181,14 @@
 
 </p>
       
+      
+        <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  6 minute read
+</p>
       
       
     </div>
@@ -216,16 +205,15 @@
   <div class="sidebar sticky">
   
 
+
 <div itemscope itemtype="http://schema.org/Person">
 
   
 
   <div class="author__content">
-    <h3 class="author__name" itemprop="name">Christos Manios</h3>
     
-      <p class="author__bio" itemprop="description">
-        Developer life is a NullPointerException
-      </p>
+      <h3 class="author__name" itemprop="name"></h3>
+    
     
   </div>
 
@@ -233,23 +221,11 @@
     <button class="btn btn--inverse">Follow</button>
     <ul class="author__urls social-icons">
       
-        <li itemprop="homeLocation" itemscope itemtype="http://schema.org/Place">
-          <i class="fa fa-fw fa-map-marker" aria-hidden="true"></i> <span itemprop="name">Thessaloniki, GR</span>
-        </li>
-      
 
       
 
       
 
-      
-
-      
-        <li>
-          <a href="https://twitter.com/maniosolr" itemprop="sameAs">
-            <i class="fa fa-fw fa-twitter-square" aria-hidden="true"></i> Twitter
-          </a>
-        </li>
       
 
       
@@ -267,11 +243,7 @@
       
 
       
-        <li>
-          <a href="https://github.com/manios" itemprop="sameAs">
-            <i class="fa fa-fw fa-github" aria-hidden="true"></i> GitHub
-          </a>
-        </li>
+
       
 
       
@@ -303,7 +275,7 @@
       <!--
   <li>
     <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs">
-      <i class="fa fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
     </a>
   </li>
 -->
@@ -403,7 +375,7 @@ remote: Total 873 <span class="o">(</span>delta 0<span class="o">)</span>, reuse
 Receiving objects: 100% <span class="o">(</span>873/873<span class="o">)</span>, 223.44 KiB | 0 bytes/s, <span class="k">done</span><span class="nb">.</span>
 Resolving deltas: 100% <span class="o">(</span>530/530<span class="o">)</span>, <span class="k">done</span><span class="nb">.</span>
 Checking connectivity... <span class="k">done</span><span class="nb">.</span>
-apache@apache2 ~ <span class="nv">$ </span>chown <span class="nt">-R</span> apache:apache letsencrypt.sh
+apache@apache2 ~ <span class="nv">$ </span><span class="nb">chown</span> <span class="nt">-R</span> apache:apache letsencrypt.sh
 apache@apache2 ~ <span class="nv">$ </span><span class="nb">cd </span>letsencrypt.sh
 apache@apache2 ~ <span class="nv">$ </span><span class="nb">pwd</span>
 /var/www/etsencrypt.sh
@@ -415,10 +387,10 @@ apache@apache2 ~ <span class="nv">$ </span><span class="nb">pwd</span>
 
 <ol>
   <li>Prepare <code class="highlighter-rouge">base</code> and <code class="highlighter-rouge">conf</code> directories:
-    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>apache@apache2 ~/letsencrypt.sh <span class="nv">$ </span>mkdir conf 
-apache@apache2 ~/letsencrypt.sh <span class="nv">$ </span>mkdir base
-apache@apache2 ~/letsencrypt.sh <span class="nv">$ </span>cp config.sh.example conf/config.sh
-apache@apache2 ~/letsencrypt.sh <span class="nv">$ </span>cp domains.txt.exampleconfig.sh.example conf/domains.txt
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>apache@apache2 ~/letsencrypt.sh <span class="nv">$ </span><span class="nb">mkdir </span>conf 
+apache@apache2 ~/letsencrypt.sh <span class="nv">$ </span><span class="nb">mkdir </span>base
+apache@apache2 ~/letsencrypt.sh <span class="nv">$ </span><span class="nb">cp </span>config.sh.example conf/config.sh
+apache@apache2 ~/letsencrypt.sh <span class="nv">$ </span><span class="nb">cp </span>domains.txt.exampleconfig.sh.example conf/domains.txt
 </code></pre></div>    </div>
   </li>
   <li>Edit configuration in <code class="highlighter-rouge">/var/www/letsencrypt.sh/conf/config.sh</code>:
@@ -539,64 +511,64 @@ lrwxrwxrwx 1 apache apache   22 Jul  7 06:50 privkey.pem -&gt; privkey-145733338
   
 
   <p class="page__taxonomy">
-    <strong><i class="fa fa-fw fa-tags" aria-hidden="true"></i> Tags: </strong>
+    <strong><i class="fas fa-fw fa-tags" aria-hidden="true"></i> Tags: </strong>
     <span itemprop="keywords">
     
       
       
-      <a href="https://manios.org/tags/#bash" class="page__taxonomy-item" rel="tag">bash</a><span class="sep">, </span>
+      <a href="/tags/#bash" class="page__taxonomy-item" rel="tag">bash</a><span class="sep">, </span>
     
       
       
-      <a href="https://manios.org/tags/#centos" class="page__taxonomy-item" rel="tag">centos</a><span class="sep">, </span>
+      <a href="/tags/#centos" class="page__taxonomy-item" rel="tag">centos</a><span class="sep">, </span>
     
       
       
-      <a href="https://manios.org/tags/#certificate" class="page__taxonomy-item" rel="tag">certificate</a><span class="sep">, </span>
+      <a href="/tags/#certificate" class="page__taxonomy-item" rel="tag">certificate</a><span class="sep">, </span>
     
       
       
-      <a href="https://manios.org/tags/#encrypt" class="page__taxonomy-item" rel="tag">encrypt</a><span class="sep">, </span>
+      <a href="/tags/#encrypt" class="page__taxonomy-item" rel="tag">encrypt</a><span class="sep">, </span>
     
       
       
-      <a href="https://manios.org/tags/#free" class="page__taxonomy-item" rel="tag">free</a><span class="sep">, </span>
+      <a href="/tags/#free" class="page__taxonomy-item" rel="tag">free</a><span class="sep">, </span>
     
       
       
-      <a href="https://manios.org/tags/#install" class="page__taxonomy-item" rel="tag">install</a><span class="sep">, </span>
+      <a href="/tags/#install" class="page__taxonomy-item" rel="tag">install</a><span class="sep">, </span>
     
       
       
-      <a href="https://manios.org/tags/#jelastic" class="page__taxonomy-item" rel="tag">jelastic</a><span class="sep">, </span>
+      <a href="/tags/#jelastic" class="page__taxonomy-item" rel="tag">jelastic</a><span class="sep">, </span>
     
       
       
-      <a href="https://manios.org/tags/#let-s-encrypt" class="page__taxonomy-item" rel="tag">let's encrypt</a><span class="sep">, </span>
+      <a href="/tags/#let-s-encrypt" class="page__taxonomy-item" rel="tag">let's encrypt</a><span class="sep">, </span>
     
       
       
-      <a href="https://manios.org/tags/#lets" class="page__taxonomy-item" rel="tag">lets</a><span class="sep">, </span>
+      <a href="/tags/#lets" class="page__taxonomy-item" rel="tag">lets</a><span class="sep">, </span>
     
       
       
-      <a href="https://manios.org/tags/#linux" class="page__taxonomy-item" rel="tag">linux</a><span class="sep">, </span>
+      <a href="/tags/#linux" class="page__taxonomy-item" rel="tag">linux</a><span class="sep">, </span>
     
       
       
-      <a href="https://manios.org/tags/#root" class="page__taxonomy-item" rel="tag">root</a><span class="sep">, </span>
+      <a href="/tags/#root" class="page__taxonomy-item" rel="tag">root</a><span class="sep">, </span>
     
       
       
-      <a href="https://manios.org/tags/#ssh" class="page__taxonomy-item" rel="tag">ssh</a><span class="sep">, </span>
+      <a href="/tags/#ssh" class="page__taxonomy-item" rel="tag">ssh</a><span class="sep">, </span>
     
       
       
-      <a href="https://manios.org/tags/#ssl" class="page__taxonomy-item" rel="tag">ssl</a><span class="sep">, </span>
+      <a href="/tags/#ssl" class="page__taxonomy-item" rel="tag">ssl</a><span class="sep">, </span>
     
       
       
-      <a href="https://manios.org/tags/#sudo" class="page__taxonomy-item" rel="tag">sudo</a>
+      <a href="/tags/#sudo" class="page__taxonomy-item" rel="tag">sudo</a>
     
     </span>
   </p>
@@ -612,27 +584,27 @@ lrwxrwxrwx 1 apache apache   22 Jul  7 06:50 privkey.pem -&gt; privkey-145733338
   
 
   <p class="page__taxonomy">
-    <strong><i class="fa fa-fw fa-folder-open" aria-hidden="true"></i> Categories: </strong>
+    <strong><i class="fas fa-fw fa-folder-open" aria-hidden="true"></i> Categories: </strong>
     <span itemprop="keywords">
     
       
       
-      <a href="https://manios.org/categories/#apache" class="page__taxonomy-item" rel="tag">Apache</a><span class="sep">, </span>
+      <a href="/categories/#apache" class="page__taxonomy-item" rel="tag">Apache</a><span class="sep">, </span>
     
       
       
-      <a href="https://manios.org/categories/#http" class="page__taxonomy-item" rel="tag">HTTP</a><span class="sep">, </span>
+      <a href="/categories/#http" class="page__taxonomy-item" rel="tag">HTTP</a><span class="sep">, </span>
     
       
       
-      <a href="https://manios.org/categories/#linux" class="page__taxonomy-item" rel="tag">Linux</a>
+      <a href="/categories/#linux" class="page__taxonomy-item" rel="tag">Linux</a>
     
     </span>
   </p>
 
 
         
-          <p class="page__date"><strong><i class="fa fa-fw fa-calendar" aria-hidden="true"></i> Updated:</strong> <time datetime="2016-07-12T22:32:53+03:00">July 12, 2016</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="2016-07-12T22:32:53+03:00">July 12, 2016</time></p>
         
       </footer>
 
@@ -641,38 +613,30 @@ lrwxrwxrwx 1 apache apache   22 Jul  7 06:50 privkey.pem -&gt; privkey-145733338
     <h4 class="page__share-title">Share on</h4>
   
 
-  <a href="https://twitter.com/intent/tweet?text=Let%27s+Encrypt+SSL+certificate+without+root+or+sudo+privileges%20https%3A%2F%2Fmanios.org%2F2016%2F07%2F12%2Flets-encrypt-ssl-certificate-without-root-or-sudo-privileges" class="btn btn--twitter" title="Share on Twitter"><i class="fa fa-fw fa-twitter" aria-hidden="true"></i><span> Twitter</span></a>
+  <a href="https://twitter.com/intent/tweet?text=Let%27s+Encrypt+SSL+certificate+without+root+or+sudo+privileges%20https%3A%2F%2Fmanios.org%2F2016%2F07%2F12%2Flets-encrypt-ssl-certificate-without-root-or-sudo-privileges" class="btn btn--twitter" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Twitter"><i class="fab fa-fw fa-twitter" aria-hidden="true"></i><span> Twitter</span></a>
 
-  <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fmanios.org%2F2016%2F07%2F12%2Flets-encrypt-ssl-certificate-without-root-or-sudo-privileges" class="btn btn--facebook" title="Share on Facebook"><i class="fa fa-fw fa-facebook" aria-hidden="true"></i><span> Facebook</span></a>
+  <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fmanios.org%2F2016%2F07%2F12%2Flets-encrypt-ssl-certificate-without-root-or-sudo-privileges" class="btn btn--facebook" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Facebook"><i class="fab fa-fw fa-facebook" aria-hidden="true"></i><span> Facebook</span></a>
 
-  <a href="https://plus.google.com/share?url=https%3A%2F%2Fmanios.org%2F2016%2F07%2F12%2Flets-encrypt-ssl-certificate-without-root-or-sudo-privileges" class="btn btn--google-plus" title="Share on Google Plus"><i class="fa fa-fw fa-google-plus" aria-hidden="true"></i><span> Google+</span></a>
+  <a href="https://plus.google.com/share?url=https%3A%2F%2Fmanios.org%2F2016%2F07%2F12%2Flets-encrypt-ssl-certificate-without-root-or-sudo-privileges" class="btn btn--google-plus" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Google Plus"><i class="fab fa-fw fa-google-plus" aria-hidden="true"></i><span> Google+</span></a>
 
-  <a href="https://www.linkedin.com/shareArticle?mini=true&url=https%3A%2F%2Fmanios.org%2F2016%2F07%2F12%2Flets-encrypt-ssl-certificate-without-root-or-sudo-privileges" class="btn btn--linkedin" title="Share on LinkedIn"><i class="fa fa-fw fa-linkedin" aria-hidden="true"></i><span> LinkedIn</span></a>
+  <a href="https://www.linkedin.com/shareArticle?mini=true&url=https%3A%2F%2Fmanios.org%2F2016%2F07%2F12%2Flets-encrypt-ssl-certificate-without-root-or-sudo-privileges" class="btn btn--linkedin" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on LinkedIn"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i><span> LinkedIn</span></a>
 </section>
 
 
       
   <nav class="pagination">
     
-      <a href="https://manios.org/2015/12/04/migrate-a-gitlab-docker-container-from-version-8-0-4-to-8-2-0" class="pagination--pager" title="Migrate a Gitlab Docker container from version 8.0.4 to 8.2.0
+      <a href="/2015/12/04/migrate-a-gitlab-docker-container-from-version-8-0-4-to-8-2-0" class="pagination--pager" title="Migrate a Gitlab Docker container from version 8.0.4 to 8.2.0
 ">Previous</a>
     
     
-      <a href="https://manios.org/2017/08/09/configure-eclipse-in-order-to-build-mapstruct-in-java-projects" class="pagination--pager" title="Configure Eclipse in order to build MapStruct in Java projects
+      <a href="/2017/08/09/configure-eclipse-in-order-to-build-mapstruct-in-java-projects" class="pagination--pager" title="Configure Eclipse in order to build MapStruct in Java projects
 ">Next</a>
     
   </nav>
 
     </div>
 
-    
-      <div class="page__comments">
-  
-  
-      <h4 class="page__comments-title">Leave a Comment</h4>
-      <section id="disqus_thread"></section>
-    
-</div>
     
   </article>
 
@@ -691,12 +655,12 @@ lrwxrwxrwx 1 apache apache   22 Jul  7 06:50 privkey.pem -&gt; privkey-145733338
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/2018/08/18/logstash-geoip-json-logs-maxmint-geolite-docker" rel="permalink">Rsyslog - Parse Json and enrich IP with Geolocation using Maxmind GeoLite2 City and ISP
+        <a href="/2018/08/18/logstash-geoip-json-logs-maxmint-geolite-docker" rel="permalink">Rsyslog - Parse Json and enrich IP with Geolocation using Maxmind GeoLite2 City and ISP
 </a>
       
     </h2>
     
-      <p class="page__meta"><i class="fa fa-clock-o" aria-hidden="true"></i> 
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
 
 
 
@@ -717,12 +681,12 @@ lrwxrwxrwx 1 apache apache   22 Jul  7 06:50 privkey.pem -&gt; privkey-145733338
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/2018/08/14/logstash-geoip-json-logs-maxmint-geolite-docker" rel="permalink">Logstash - Enrich IP with Geolocation using Maxmind GeoLite2 City and ISP
+        <a href="/2018/08/14/logstash-geoip-json-logs-maxmint-geolite-docker" rel="permalink">Logstash - Enrich IP with Geolocation using Maxmind GeoLite2 City and ISP
 </a>
       
     </h2>
     
-      <p class="page__meta"><i class="fa fa-clock-o" aria-hidden="true"></i> 
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
 
 
 
@@ -743,12 +707,12 @@ lrwxrwxrwx 1 apache apache   22 Jul  7 06:50 privkey.pem -&gt; privkey-145733338
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/2018/07/23/create-a-beat-based-on-metricbeat-resolving-bugs" rel="permalink">Creating a Beat based on Metricbeat resolving Init and create metricset failures
+        <a href="/2018/07/23/create-a-beat-based-on-metricbeat-resolving-bugs" rel="permalink">Creating a Beat based on Metricbeat resolving Init and create metricset failures
 </a>
       
     </h2>
     
-      <p class="page__meta"><i class="fa fa-clock-o" aria-hidden="true"></i> 
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
 
 
 
@@ -769,12 +733,12 @@ lrwxrwxrwx 1 apache apache   22 Jul  7 06:50 privkey.pem -&gt; privkey-145733338
     
     <h2 class="archive__item-title" itemprop="headline">
       
-        <a href="https://manios.org/2018/05/30/git-merge-conflicts-using-tortoise-git-merge-windows" rel="permalink">Git merge conflicts using Tortoise Git merge in Windows
+        <a href="/2018/05/30/git-merge-conflicts-using-tortoise-git-merge-windows" rel="permalink">Git merge conflicts using Tortoise Git merge in Windows
 </a>
       
     </h2>
     
-      <p class="page__meta"><i class="fa fa-clock-o" aria-hidden="true"></i> 
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
 
 
 
@@ -789,8 +753,8 @@ lrwxrwxrwx 1 apache apache   22 Jul  7 06:50 privkey.pem -&gt; privkey-145733338
       </div>
     </div>
   
+  
 </div>
-
 
 	<!-- TODO add Google AdSense -->
     <!--<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
@@ -818,11 +782,11 @@ lrwxrwxrwx 1 apache apache   22 Jul  7 06:50 privkey.pem -&gt; privkey-145733338
     
     
     
-      <li><a href="https://github.com/manios"><i class="fa fa-fw fa-github" aria-hidden="true"></i> GitHub</a></li>
+      <li><a href="https://github.com/manios"><i class="fab fa-fw fa-github" aria-hidden="true"></i> GitHub</a></li>
     
     
     
-    <li><a href="https://manios.org/feed.xml"><i class="fa fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+    <li><a href="/feed.xml"><i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
   </ul>
 </div>
 
@@ -832,23 +796,9 @@ lrwxrwxrwx 1 apache apache   22 Jul  7 06:50 privkey.pem -&gt; privkey-145733338
     </div>
 
     
-  <script src="https://manios.org/assets/js/main.min.js"></script>
+  <script src="/assets/js/main.min.js"></script>
+  <script src="https://use.fontawesome.com/releases/v5.2.0/js/all.js"></script>
 
-
-
-
-
-
-
-  <script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-  ga('create', 'UA-96500199-2', 'auto');
-  ga('send', 'pageview');
-</script>
 
 
 
