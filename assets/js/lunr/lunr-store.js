@@ -273,4 +273,9 @@ var store = [{
         "excerpt":"Today we wanted to parse some json logs which we had in a file using Rsyslog and enrich them with Geolocation information regarding the city and the ISP an IP belongs. We initially tried with Logstash (see relevant previous blog post) but it was too slow. Thus we decided to...","categories": ["Rsyslog","Elasticsearch"],
         "tags": ["rsyslog","mmdblookup","omelasticsearch","geolocation","ip","geoip","maxmind","geo","geoip","geolite","geolite2","database","json","parse","message","log"],
         "url": "https://manios.org/2018/08/18/logstash-geoip-json-logs-maxmint-geolite-docker",
+        "teaser":null},{
+        "title": "Resolve \"Could not find __debug_frame section in binary\" when trying to Debug Metricbeat with Delve and Go 1.10.4",
+        "excerpt":"Today we were trying to debug Metricbeat (on commit #cff3e40c) using Visual Studio Code v1.27.2 and Delve debugger but it failed with the error: Could not find __debug_frame section in binaryOur environment was: $ go versiongo version go1.10.4 linux/amd64$ dlv versionDelve DebuggerVersion: 1.1.0Build: $Id: 1990ba12450cab9425a2ae62e6ab988725023d5cOur Visual Studio Code debug configuration...","categories": ["Go","Golang","Elastic","Beats"],
+        "tags": ["elastic","metricbeat","beats","elasticsearch","debug","frame","go","golang","elk","error","delve","kibana","index","monitor"],
+        "url": "https://manios.org/2018/10/05/metricbeat-debug-frame-section-error",
         "teaser":null}]
