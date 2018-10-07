@@ -1,4 +1,58 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.0">Jekyll</generator><link href="https://manios.org/feed.xml" rel="self" type="application/atom+xml" /><link href="https://manios.org/" rel="alternate" type="text/html" /><updated>2018-10-05T22:57:14+03:00</updated><id>https://manios.org/</id><title type="html">cmanios</title><subtitle>Developer life is a NullPointerException</subtitle><author><name>Christos Manios</name></author><entry><title type="html">Resolve “Could not find __debug_frame section in binary” when trying to Debug Metricbeat with Delve and Go 1.10.4</title><link href="https://manios.org/2018/10/05/metricbeat-debug-frame-section-error" rel="alternate" type="text/html" title="Resolve &quot;Could not find __debug_frame section in binary&quot; when trying to Debug Metricbeat with Delve and Go 1.10.4" /><published>2018-10-05T22:35:00+03:00</published><updated>2018-10-05T22:35:00+03:00</updated><id>https://manios.org/2018/10/05/metricbeat-debug-frame-section-error</id><content type="html" xml:base="https://manios.org/2018/10/05/metricbeat-debug-frame-section-error">&lt;p&gt;Today we were trying to debug &lt;a href=&quot;https://www.elastic.co/products/beats/metricbeat&quot;&gt;Metricbeat&lt;/a&gt; (on commit &lt;a href=&quot;https://github.com/elastic/beats/commit/cff3e40cfedb9521d7249caaa569668de203dc59&quot;&gt;#cff3e40c&lt;/a&gt;) using &lt;a href=&quot;http://code.visualstudio.com/&quot;&gt;Visual Studio Code&lt;/a&gt; v1.27.2 and &lt;a href=&quot;https://github.com/derekparker/delve&quot;&gt;Delve&lt;/a&gt; debugger but it failed with the error:&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.0">Jekyll</generator><link href="https://manios.org/feed.xml" rel="self" type="application/atom+xml" /><link href="https://manios.org/" rel="alternate" type="text/html" /><updated>2018-10-07T22:20:42+03:00</updated><id>https://manios.org/</id><title type="html">cmanios</title><subtitle>Developer life is a NullPointerException</subtitle><author><name>Christos Manios</name></author><entry><title type="html">Solved: HP 630 notebook overheating problem</title><link href="https://manios.org/2018/10/07/hp-630-notebook-overheating-problem" rel="alternate" type="text/html" title="Solved: HP 630 notebook overheating problem" /><published>2018-10-07T21:54:00+03:00</published><updated>2018-10-07T21:54:00+03:00</updated><id>https://manios.org/2018/10/07/hp-630-notebook-overheating-problem</id><content type="html" xml:base="https://manios.org/2018/10/07/hp-630-notebook-overheating-problem">&lt;h2 id=&quot;first-incident&quot;&gt;First Incident&lt;/h2&gt;
+
+&lt;p&gt;A year ago (April 2017) while we were using a &lt;a href=&quot;https://support.hp.com/in-en/drivers/selfservice/hp-630-notebook-pc/5086782&quot;&gt;HP 630&lt;/a&gt; notebook in a training, it started overheating and eventually made an emergency shutdown. The fan was spinning at maximum speed and the problem was not solved by restarting it. Temperatures could rise high up to 75 degrees Celcious when browsing pages, not to mention when running VMs for our training! At the same time a friend of ours, who owns the same notebook, informed us that due to the overheating, its WiFi module got burnt.&lt;/p&gt;
+
+&lt;figure&gt;
+    &lt;a href=&quot;/images/2018-10-07-hp-630-overheat-problem-clean/temperature2018-08-3013-36-25.png&quot;&gt;&lt;img src=&quot;/images/2018-10-07-hp-630-overheat-problem-clean/temperature2018-08-3013-36-25.png&quot; alt=&quot;HP 630 Overheating problem. Screenshot of CPU temperatures in Linux Mint 18.1 while browsing&quot; /&gt;&lt;/a&gt;
+    &lt;figcaption&gt;HP 630 Overheating problem. Screenshot of CPU temperatures in Linux Mint 18.1 while browsing.&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;h2 id=&quot;the-problem&quot;&gt;The problem&lt;/h2&gt;
+
+&lt;p&gt;After &lt;a href=&quot;https://www.google.com/search?q=hp+630+overheat&amp;amp;ie=utf-8&amp;amp;oe=utf-8&amp;amp;client=firefox-b&quot;&gt;searching in the internet&lt;/a&gt;, we found out that the issue can be caused by dust inside the CPU fan which blocks the air ventilation grilles. Thus, CPU is suffocating.&lt;/p&gt;
+
+&lt;p&gt;The solution proposed was to disassemble the notebook and clean the CPU fan. Be advised that the notebook worked for 4 years, overheating, but neglected because it had not reached the issue of abrupt shutdown.&lt;/p&gt;
+
+&lt;h2 id=&quot;remedy&quot;&gt;Remedy&lt;/h2&gt;
+
+&lt;p&gt;We wanted to clean the notebook ourselves, so we followed the official HP 630 &lt;a href=&quot;http://h22235.www2.hp.com/hpinfo/globalcitizenship/environment/productdata/Countries/_MultiCountry/disassembly_notebo_2011418191247.pdf&quot;&gt;Product End-of-Life Disassembly Instructions&lt;/a&gt; (&lt;a href=&quot;/images/2018-10-07-hp-630-overheat-problem-clean/disassembly_notebo_2011418191247.pdf&quot;&gt;alternative link&lt;/a&gt;) combined with visual assistance from a Youtube &lt;a href=&quot;https://www.youtube.com/watch?v=GE_hqrxzX4E&quot;&gt;video&lt;/a&gt; and we removed the CPU fan in order to clean it. After dissasembling the CPU fan we found out that all ventilation grilles were blocked by a “sponge” of dust formed in front of them. Under no circumstances air could could cool down the CPU!&lt;/p&gt;
+
+&lt;figure&gt;
+    &lt;a href=&quot;/images/2018-10-07-hp-630-overheat-problem-clean/IMG_20170403_233924.png&quot;&gt;&lt;img src=&quot;/images/2018-10-07-hp-630-overheat-problem-clean/IMG_20170403_233924.png&quot; alt=&quot;HP 630 dust forms a sponge which blocks all ventilation grilles of CPU Fan.&quot; /&gt;&lt;/a&gt;
+    &lt;figcaption&gt;HP 630 dust forms a sponge which blocks all ventilation grilles of CPU Fan.&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;figure&gt;
+    &lt;a href=&quot;/images/2018-10-07-hp-630-overheat-problem-clean/IMG_20170403_234022.png&quot;&gt;&lt;img src=&quot;/images/2018-10-07-hp-630-overheat-problem-clean/IMG_20170403_234022.png&quot; alt=&quot;Focus on the thickness of the dust sponge which blocks all ventilation grilles of CPU Fan.&quot; /&gt;&lt;/a&gt;
+    &lt;figcaption&gt;Focus on the thickness of the dust sponge which blocks all ventilation grilles of CPU Fan.&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;After cleaning the CPU fan from the dust, the temperatures went back to normal as seen in the screenshot:&lt;/p&gt;
+
+&lt;figure&gt;
+    &lt;a href=&quot;/images/2018-10-07-hp-630-overheat-problem-clean/temperature2018-10-0617-25-28.png&quot;&gt;&lt;img src=&quot;/images/2018-10-07-hp-630-overheat-problem-clean/temperature2018-10-0617-25-28.png&quot; alt=&quot;HP 630 Overheating problem. Screenshot of CPU temperatures in Linux Mint 18.1 while browsing&quot; /&gt;&lt;/a&gt;
+    &lt;figcaption&gt;HP 630 temperatures back to normal after cleaning CPU fan. Screenshot in Linux Mint 18.1 while browsing.&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;h2 id=&quot;annual-service&quot;&gt;Annual Service&lt;/h2&gt;
+
+&lt;p&gt;Yesterday we cleaned it again after 17 months as the notebook was overheating. We discovered that the dust had formed again a sponge&lt;/p&gt;
+
+&lt;figure&gt;
+    &lt;a href=&quot;/images/2018-10-07-hp-630-overheat-problem-clean/IMG_20181006_160202.png&quot;&gt;&lt;img src=&quot;/images/2018-10-07-hp-630-overheat-problem-clean/IMG_20181006_160202.png&quot; alt=&quot;HP 630 dust sponge a year after the first cleaning. It still blocks all ventilation grilles of CPU Fan.&quot; /&gt;&lt;/a&gt;
+    &lt;figcaption&gt;HP 630 dust sponge a year after the first cleaning. It still blocks all ventilation grilles of CPU Fan.&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;, lesser in thickness than the previous time.&lt;/p&gt;
+
+&lt;figure&gt;
+    &lt;a href=&quot;/images/2018-10-07-hp-630-overheat-problem-clean/IMG_20181006_160229.png&quot;&gt;&lt;img src=&quot;/images/2018-10-07-hp-630-overheat-problem-clean/IMG_20181006_160229.png&quot; alt=&quot;HP 630 dust sponge thickness a year after the first cleaning.&quot; /&gt;&lt;/a&gt;
+    &lt;figcaption&gt;HP 630 dust sponge thickness a year after the first cleaning.&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;Consequently we will monitor the temperature of our notebook and when it starts dangerously increasing, we will have to clean it again! We hope it does happen once in a year as the disassembly, cleaning and reassembly costs us two hours of work!&lt;/p&gt;
+
+&lt;p&gt;Cheers!&lt;/p&gt;</content><author><name>cmanios</name></author><category term="hp" /><category term="630" /><category term="hp630" /><category term="hp-630" /><category term="overheat" /><category term="overheating" /><category term="problem" /><category term="shutdown" /><category term="clean" /><category term="fan" /><summary type="html">First Incident</summary></entry><entry><title type="html">Resolve “Could not find __debug_frame section in binary” when trying to Debug Metricbeat with Delve and Go 1.10.4</title><link href="https://manios.org/2018/10/05/metricbeat-debug-frame-section-error" rel="alternate" type="text/html" title="Resolve &quot;Could not find __debug_frame section in binary&quot; when trying to Debug Metricbeat with Delve and Go 1.10.4" /><published>2018-10-05T22:35:00+03:00</published><updated>2018-10-05T22:35:00+03:00</updated><id>https://manios.org/2018/10/05/metricbeat-debug-frame-section-error</id><content type="html" xml:base="https://manios.org/2018/10/05/metricbeat-debug-frame-section-error">&lt;p&gt;Today we were trying to debug &lt;a href=&quot;https://www.elastic.co/products/beats/metricbeat&quot;&gt;Metricbeat&lt;/a&gt; (on commit &lt;a href=&quot;https://github.com/elastic/beats/commit/cff3e40cfedb9521d7249caaa569668de203dc59&quot;&gt;#cff3e40c&lt;/a&gt;) using &lt;a href=&quot;http://code.visualstudio.com/&quot;&gt;Visual Studio Code&lt;/a&gt; v1.27.2 and &lt;a href=&quot;https://github.com/derekparker/delve&quot;&gt;Delve&lt;/a&gt; debugger but it failed with the error:&lt;/p&gt;
 
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Could not find __debug_frame section in binary
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
@@ -1155,76 +1209,4 @@ Tue Nov 24 11:00:34 EEST 2017
 
 &lt;p&gt;We rejected resizing the oplog because the database grows every day +9GB so the oplog had to become at least 81GB in order to contain the changes of the aforementioned last 9 days.&lt;/p&gt;
 
-&lt;p&gt;That’s it! I hope it helped you!&lt;/p&gt;</content><author><name>cmanios</name></author><category term="mongo" /><category term="mongodb" /><category term="database" /><category term="replication" /><category term="recovery" /><category term="secondary" /><category term="replica" /><category term="sync" /><category term="synchronisation" /><category term="linux" /><summary type="html">We run MongoDB 2.6.0 on a production system configured with a replica set of 3 members: Primary Secondary Arbiter</summary></entry><entry><title type="html">Use HAProxy and Docker to load balance requests to Solr and SolrCloud</title><link href="https://manios.org/2017/11/15/use-haproxy-and-docker-for-solr-load-balancing" rel="alternate" type="text/html" title="Use HAProxy and Docker to load balance requests to Solr and SolrCloud" /><published>2017-11-15T12:14:00+02:00</published><updated>2017-11-15T12:14:00+02:00</updated><id>https://manios.org/2017/11/15/use-haproxy-and-docker-for-solr-load-balancing</id><content type="html" xml:base="https://manios.org/2017/11/15/use-haproxy-and-docker-for-solr-load-balancing">&lt;p&gt;We use Solr 4.6 with SolrCloud configuration in a production system. You may say: “It is hight time you upgraded to the latest version, isn’t it?”. And you will be absolute right! But currently this is not the case because full reindexing costs! Our SolrCloud consists of one shard and five replicas as seen in the screenshot bellow:&lt;/p&gt;
-
-&lt;figure&gt;
-    &lt;a href=&quot;/images/2017-11-15-haproxy-docker-and-solr/2017-11-15-solrcloud.png&quot;&gt;&lt;img src=&quot;/images/2017-11-15-haproxy-docker-and-solr/2017-11-15-solrcloud.png&quot; alt=&quot;SolrCloud with one shard and five replicas&quot; /&gt;&lt;/a&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;The problem we were facing was that SolrJ library does balance the requests using round robin algorithm when using class &lt;a href=&quot;https://lucene.apache.org/solr/4_6_0/solr-solrj/org/apache/solr/client/solrj/impl/LBHttpSolrServer.html&quot;&gt;LBHttpSolrServer&lt;/a&gt;. Furthermore, when a request to a node fails for any reason (timeout, http 403, http 404, etc), it &lt;a href=&quot;http://grepcode.com/file/repo1.maven.org/maven2/org.apache.solr/solr-solrj/4.6.0/org/apache/solr/client/solrj/impl/LBHttpSolrServer.java?av=f#265&quot;&gt;puts the node to a zombie list&lt;/a&gt; for 60 seconds. This can become a burden when the SolrCloud has heavy loads and you will start to see in your application logs:&lt;/p&gt;
-
-&lt;div class=&quot;language-text highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Exception in thread &quot;main&quot; org.apache.solr.client.solrj.SolrServerException: No live SolrServers available to handle this request
-	at org.apache.solr.client.solrj.impl.LBHttpSolrServer.request(LBHttpSolrServer.java:289)
-	at org.apache.solr.client.solrj.impl.CloudSolrServer.request(CloudSolrServer.java:310)
-	at org.apache.solr.client.solrj.request.AbstractUpdateRequest.process(AbstractUpdateRequest.java:117)
-	at org.apache.solr.client.solrj.SolrServer.add(SolrServer.java:116)
-	at org.apache.solr.client.solrj.SolrServer.add(SolrServer.java:102)
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;So we decided to put a HAProxy instance to load balance the query requests to the SolrCloud using &lt;code class=&quot;highlighter-rouge&quot;&gt;leastconn&lt;/code&gt; (least connections) algorithm. After a lot of search and using a combination of &lt;a href=&quot;http://cbonte.github.io/haproxy-dconv/1.7/configuration.html&quot;&gt;official documentation&lt;/a&gt; and articles (&lt;a href=&quot;http://davehall.com.au/blog/dave/2010/03/13/solr-replication-load-balancing-haproxy-and-drupal&quot;&gt;link1&lt;/a&gt;, &lt;a href=&quot;https://gist.github.com/feniix/1974460&quot;&gt;link2&lt;/a&gt;) and the official HAProxy &lt;a href=&quot;https://hub.docker.com/_/haproxy/&quot;&gt;Docker image&lt;/a&gt; we created a container using the following configuration:&lt;/p&gt;
-
-&lt;div class=&quot;language-nginx highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;global&lt;/span&gt;
-    &lt;span class=&quot;s&quot;&gt;log&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;127&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;.0.0.1&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;local0&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;notice&lt;/span&gt;
-    &lt;span class=&quot;s&quot;&gt;maxconn&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2000&lt;/span&gt;
-    &lt;span class=&quot;c1&quot;&gt;#user haproxy
-&lt;/span&gt;    &lt;span class=&quot;c1&quot;&gt;#group haproxy
-&lt;/span&gt;
-&lt;span class=&quot;s&quot;&gt;defaults&lt;/span&gt;
-    &lt;span class=&quot;s&quot;&gt;log&lt;/span&gt;     &lt;span class=&quot;s&quot;&gt;global&lt;/span&gt;
-    &lt;span class=&quot;s&quot;&gt;mode&lt;/span&gt;    &lt;span class=&quot;s&quot;&gt;http&lt;/span&gt;
-    &lt;span class=&quot;s&quot;&gt;option&lt;/span&gt;  &lt;span class=&quot;s&quot;&gt;httplog&lt;/span&gt;
-    &lt;span class=&quot;s&quot;&gt;option&lt;/span&gt;  &lt;span class=&quot;s&quot;&gt;dontlognull&lt;/span&gt;
-    &lt;span class=&quot;s&quot;&gt;retries&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;
-    &lt;span class=&quot;s&quot;&gt;timeout&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;connect&lt;/span&gt;  &lt;span class=&quot;mi&quot;&gt;5000&lt;/span&gt;
-    &lt;span class=&quot;s&quot;&gt;timeout&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;client&lt;/span&gt;  &lt;span class=&quot;mi&quot;&gt;10000&lt;/span&gt;
-    &lt;span class=&quot;s&quot;&gt;timeout&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;server&lt;/span&gt;  &lt;span class=&quot;mi&quot;&gt;10000&lt;/span&gt;
-
-&lt;span class=&quot;s&quot;&gt;listen&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;solrcloud&lt;/span&gt;
-    &lt;span class=&quot;s&quot;&gt;bind&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;0.0.0.0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;8983&lt;/span&gt;
-    &lt;span class=&quot;s&quot;&gt;mode&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;http&lt;/span&gt;
-    &lt;span class=&quot;s&quot;&gt;stats&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;enable&lt;/span&gt;
-    &lt;span class=&quot;s&quot;&gt;stats&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;uri&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;/haproxy?stats&lt;/span&gt;
-    &lt;span class=&quot;s&quot;&gt;stats&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;realm&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Strictly&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;\&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Private&lt;/span&gt;
-    &lt;span class=&quot;s&quot;&gt;stats&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;auth&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;haproxyuser:haproxypassword&lt;/span&gt;
-    &lt;span class=&quot;s&quot;&gt;balance&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;leastconn&lt;/span&gt;
-    &lt;span class=&quot;s&quot;&gt;option&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;httpclose&lt;/span&gt;
-    &lt;span class=&quot;s&quot;&gt;option&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;forwardfor&lt;/span&gt;
-    &lt;span class=&quot;s&quot;&gt;option&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;httpchk&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;GET&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;/solr/paradise-papers/admin/ping?wt=json&lt;/span&gt;
-    &lt;span class=&quot;s&quot;&gt;server&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;search1&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;192.168.1.1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;8983&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;check&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;port&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;8983&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;inter&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;20s&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;fastinter&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;2s&lt;/span&gt;
-    &lt;span class=&quot;s&quot;&gt;server&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;search2&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;192.168.1.2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;8983&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;check&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;port&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;8983&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;inter&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;20s&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;fastinter&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;2s&lt;/span&gt;
-    &lt;span class=&quot;s&quot;&gt;server&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;search3&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;192.168.1.3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;8983&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;check&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;port&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;8983&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;inter&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;20s&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;fastinter&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;2s&lt;/span&gt;
-    &lt;span class=&quot;s&quot;&gt;server&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;search4&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;192.168.1.4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;8983&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;check&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;port&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;8983&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;inter&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;20s&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;fastinter&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;2s&lt;/span&gt;
-    &lt;span class=&quot;s&quot;&gt;server&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;search5&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;192.168.1.5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;8983&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;check&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;port&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;8983&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;inter&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;20s&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;fastinter&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;2s&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;h3 id=&quot;notes-on-configuration&quot;&gt;Notes on configuration:&lt;/h3&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Our HAProxy runs in &lt;code class=&quot;highlighter-rouge&quot;&gt;192.168.1.10&lt;/code&gt; and all the queries are handled by port &lt;code class=&quot;highlighter-rouge&quot;&gt;8983&lt;/code&gt;.&lt;/li&gt;
-  &lt;li&gt;We can see statistics about the distribution of requests using HAProxy statistics page which is accessible in &lt;a href=&quot;http://192.168.1.10:8983/haproxy?stats&quot;&gt;http://192.168.1.10:8983/haproxy?stats&lt;/a&gt;. See:
-    &lt;div class=&quot;language-nginx highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;  &lt;span class=&quot;k&quot;&gt;stats&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;uri&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;/haproxy?stats&lt;/span&gt;
-  &lt;span class=&quot;s&quot;&gt;stats&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;realm&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Strictly&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;\&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Private&lt;/span&gt;
-  &lt;span class=&quot;s&quot;&gt;stats&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;auth&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;haproxyuser:haproxypassword&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
-  &lt;/li&gt;
-  &lt;li&gt;We check if every Solr node is alive by pinging it (see: &lt;code class=&quot;highlighter-rouge&quot;&gt;option httpchk GET /solr/paradise-papers/admin/ping?wt=json&lt;/code&gt;)&lt;/li&gt;
-  &lt;li&gt;Check interval is 20 seconds (see: &lt;code class=&quot;highlighter-rouge&quot;&gt;inter 20s&lt;/code&gt;)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;Now our search queries are handled better and we have already noticed an increase in query performance, faster response times and no downtime! This is a sample output from HAProxy statistics page:&lt;/p&gt;
-
-&lt;figure&gt;
-    &lt;a href=&quot;/images/2017-11-15-haproxy-docker-and-solr/2017-11-15-haproxy-stats.png&quot;&gt;&lt;img src=&quot;/images/2017-11-15-haproxy-docker-and-solr/2017-11-15-haproxy-stats.png&quot; alt=&quot;HAProxy as a load balancer to Solr and SolrCloud with one shard and five replicas using leastconn algorithm&quot; /&gt;&lt;/a&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;We hope you find this article helpful!&lt;/p&gt;</content><author><name>cmanios</name></author><category term="haproxy" /><category term="solr" /><category term="solrcloud" /><category term="docker" /><category term="linux" /><category term="install" /><category term="load" /><category term="balancing" /><summary type="html">We use Solr 4.6 with SolrCloud configuration in a production system. You may say: “It is hight time you upgraded to the latest version, isn’t it?”. And you will be absolute right! But currently this is not the case because full reindexing costs! Our SolrCloud consists of one shard and five replicas as seen in the screenshot bellow:</summary></entry></feed>
+&lt;p&gt;That’s it! I hope it helped you!&lt;/p&gt;</content><author><name>cmanios</name></author><category term="mongo" /><category term="mongodb" /><category term="database" /><category term="replication" /><category term="recovery" /><category term="secondary" /><category term="replica" /><category term="sync" /><category term="synchronisation" /><category term="linux" /><summary type="html">We run MongoDB 2.6.0 on a production system configured with a replica set of 3 members: Primary Secondary Arbiter</summary></entry></feed>

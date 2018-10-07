@@ -278,4 +278,9 @@ var store = [{
         "excerpt":"Today we were trying to debug Metricbeat (on commit #cff3e40c) using Visual Studio Code v1.27.2 and Delve debugger but it failed with the error: Could not find __debug_frame section in binaryOur environment was: $ go versiongo version go1.10.4 linux/amd64$ dlv versionDelve DebuggerVersion: 1.1.0Build: $Id: 1990ba12450cab9425a2ae62e6ab988725023d5cOur Visual Studio Code debug configuration...","categories": ["Go","Golang","Elastic","Beats"],
         "tags": ["elastic","metricbeat","beats","elasticsearch","debug","frame","go","golang","elk","error","delve","kibana","index","monitor"],
         "url": "https://manios.org/2018/10/05/metricbeat-debug-frame-section-error",
+        "teaser":null},{
+        "title": "Solved: HP 630 notebook overheating problem",
+        "excerpt":"First Incident A year ago (April 2017) while we were using a HP 630 notebook in a training, it started overheating and eventually made an emergency shutdown. The fan was spinning at maximum speed and the problem was not solved by restarting it. Temperatures could rise high up to 75...","categories": ["HP","Notebook"],
+        "tags": ["hp","630","hp630","hp-630","overheat","overheating","problem","shutdown","clean","fan"],
+        "url": "https://manios.org/2018/10/07/hp-630-notebook-overheating-problem",
         "teaser":null}]
