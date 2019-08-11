@@ -283,4 +283,9 @@ var store = [{
         "excerpt":"First Incident A year ago (April 2017) while we were using a HP 630 notebook in a training, it started overheating and eventually made an emergency shutdown. The fan was spinning at maximum speed and the problem was not solved by restarting it. Temperatures could rise high up to 75...","categories": ["HP","Notebook"],
         "tags": ["hp","630","hp630","hp-630","overheat","overheating","problem","shutdown","clean","fan"],
         "url": "https://manios.org/2018/10/07/hp-630-notebook-overheating-problem",
+        "teaser":null},{
+        "title": "MongoDB query to aggregate documents by a specific property",
+        "excerpt":"Yesterday a colleague had a problem on finding a query. His documents looked like the following: { id : 1, category : \"aaa\", answers : [ { gender : \"male\"} ] }{ id : 2, category : \"bbb\" , answers : [ { gender : \"female\"} ] },{ id :...","categories": ["MongoDB","Database","NoSQL"],
+        "tags": ["mongodb","nosql","database","query","aggregation","framework"],
+        "url": "https://manios.org/2019/08/11/mongodb-aggregate-documents-by-property",
         "teaser":null}]

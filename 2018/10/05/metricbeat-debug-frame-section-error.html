@@ -10,7 +10,7 @@
     <meta charset="utf-8">
 
 <!-- begin _includes/seo.html --><title>Resolve “Could not find __debug_frame section in binary” when trying to Debug Metricbeat with Delve and Go 1.10.4 - cmanios</title>
-<meta name="description" content="Today we were trying to debug Metricbeat (on commit #cff3e40c) using Visual Studio Code v1.27.2 and Delve debugger but it failed with the error:">
+<meta name="description" content="Today we were trying to debug Metricbeat (on commit #cff3e40c) using Visual Studio Code v1.27.2 and Delve debugger but it failed with the error:Could not find __debug_frame section in binaryOur environment was:$ go versiongo version go1.10.4 linux/amd64$ dlv versionDelve DebuggerVersion: 1.1.0Build: $Id: 1990ba12450cab9425a2ae62e6ab988725023d5cOur Visual Studio Code debug configuration was the following:{    &quot;version&quot;: &quot;0.2.0&quot;,    &quot;configurations&quot;: [        {            &quot;name&quot;: &quot;Launch&quot;,            &quot;type&quot;: &quot;go&quot;,            &quot;request&quot;: &quot;launch&quot;,            &quot;remotePath&quot;: &quot;&quot;,            &quot;port&quot;: 2345,            &quot;host&quot;: &quot;127.0.0.1&quot;,            &quot;program&quot;: &quot;${fileDirname}&quot;,            &quot;env&quot;: {},            &quot;args&quot;: [&quot;-e&quot;,&quot;-d&quot;,&quot;&#39;*&#39;&quot;,&quot;-c&quot;, &quot;metricbeat.yml&quot;],            &quot;showLog&quot;: true        }    ]}After 1 hour of searching in the internet we found that starting from go 1.10.x the .debug_frame is missing entirely, so Delve could not be used.SolutionIn order to make debugging with Delve work again we downgraded to go 1.9.7.You can find more information regarding the problem in the following links:  Elastic Discuss question #146817  olang/go #23733  derekparker/delve #860  orbs-network/orbs-network-go #245Have a nice night!P.S. TAKIS R.I.P. ! We will never forget! We had eaten the best gyros in Triandria, Thessaloniki!">
 
 
 
@@ -21,7 +21,7 @@
 <meta property="og:url" content="https://manios.org/2018/10/05/metricbeat-debug-frame-section-error">
 
 
-  <meta property="og:description" content="Today we were trying to debug Metricbeat (on commit #cff3e40c) using Visual Studio Code v1.27.2 and Delve debugger but it failed with the error:">
+  <meta property="og:description" content="Today we were trying to debug Metricbeat (on commit #cff3e40c) using Visual Studio Code v1.27.2 and Delve debugger but it failed with the error:Could not find __debug_frame section in binaryOur environment was:$ go versiongo version go1.10.4 linux/amd64$ dlv versionDelve DebuggerVersion: 1.1.0Build: $Id: 1990ba12450cab9425a2ae62e6ab988725023d5cOur Visual Studio Code debug configuration was the following:{    &quot;version&quot;: &quot;0.2.0&quot;,    &quot;configurations&quot;: [        {            &quot;name&quot;: &quot;Launch&quot;,            &quot;type&quot;: &quot;go&quot;,            &quot;request&quot;: &quot;launch&quot;,            &quot;remotePath&quot;: &quot;&quot;,            &quot;port&quot;: 2345,            &quot;host&quot;: &quot;127.0.0.1&quot;,            &quot;program&quot;: &quot;${fileDirname}&quot;,            &quot;env&quot;: {},            &quot;args&quot;: [&quot;-e&quot;,&quot;-d&quot;,&quot;&#39;*&#39;&quot;,&quot;-c&quot;, &quot;metricbeat.yml&quot;],            &quot;showLog&quot;: true        }    ]}After 1 hour of searching in the internet we found that starting from go 1.10.x the .debug_frame is missing entirely, so Delve could not be used.SolutionIn order to make debugging with Delve work again we downgraded to go 1.9.7.You can find more information regarding the problem in the following links:  Elastic Discuss question #146817  olang/go #23733  derekparker/delve #860  orbs-network/orbs-network-go #245Have a nice night!P.S. TAKIS R.I.P. ! We will never forget! We had eaten the best gyros in Triandria, Thessaloniki!">
 
 
 
@@ -248,7 +248,7 @@
 
   <article class="page" itemscope itemtype="http://schema.org/CreativeWork">
     <meta itemprop="headline" content="Resolve “Could not find __debug_frame section in binary” when trying to Debug Metricbeat with Delve and Go 1.10.4">
-    <meta itemprop="description" content="Today we were trying to debug Metricbeat (on commit #cff3e40c) using Visual Studio Code v1.27.2 and Delve debugger but it failed with the error:">
+    <meta itemprop="description" content="Today we were trying to debug Metricbeat (on commit #cff3e40c) using Visual Studio Code v1.27.2 and Delve debugger but it failed with the error:Could not find __debug_frame section in binaryOur environment was:$ go versiongo version go1.10.4 linux/amd64$ dlv versionDelve DebuggerVersion: 1.1.0Build: $Id: 1990ba12450cab9425a2ae62e6ab988725023d5cOur Visual Studio Code debug configuration was the following:{    &quot;version&quot;: &quot;0.2.0&quot;,    &quot;configurations&quot;: [        {            &quot;name&quot;: &quot;Launch&quot;,            &quot;type&quot;: &quot;go&quot;,            &quot;request&quot;: &quot;launch&quot;,            &quot;remotePath&quot;: &quot;&quot;,            &quot;port&quot;: 2345,            &quot;host&quot;: &quot;127.0.0.1&quot;,            &quot;program&quot;: &quot;${fileDirname}&quot;,            &quot;env&quot;: {},            &quot;args&quot;: [&quot;-e&quot;,&quot;-d&quot;,&quot;&#39;*&#39;&quot;,&quot;-c&quot;, &quot;metricbeat.yml&quot;],            &quot;showLog&quot;: true        }    ]}After 1 hour of searching in the internet we found that starting from go 1.10.x the .debug_frame is missing entirely, so Delve could not be used.SolutionIn order to make debugging with Delve work again we downgraded to go 1.9.7.You can find more information regarding the problem in the following links:  Elastic Discuss question #146817  olang/go #23733  derekparker/delve #860  orbs-network/orbs-network-go #245Have a nice night!P.S. TAKIS R.I.P. ! We will never forget! We had eaten the best gyros in Triandria, Thessaloniki!">
     <meta itemprop="datePublished" content="October 05, 2018">
     
 
@@ -496,6 +496,34 @@ Build: <span class="nv">$Id</span>: 1990ba12450cab9425a2ae62e6ab988725023d5c
     
     <h2 class="archive__item-title" itemprop="headline">
       
+        <a href="/2019/08/11/mongodb-aggregate-documents-by-property" rel="permalink">MongoDB query to aggregate documents by a specific property
+</a>
+      
+    </h2>
+    
+      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
+
+
+
+
+  1 minute read
+</p>
+    
+    <p class="archive__item-excerpt" itemprop="description">Yesterday a colleague had a problem on finding a query. His documents looked like the following:
+
+{ id : 1, category : "aaa", answers : [ { gender : "male"} ...</p>
+  </article>
+</div>
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="http://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title" itemprop="headline">
+      
         <a href="/2018/10/07/hp-630-notebook-overheating-problem" rel="permalink">Solved: HP 630 notebook overheating problem
 </a>
       
@@ -567,32 +595,6 @@ Build: <span class="nv">$Id</span>: 1990ba12450cab9425a2ae62e6ab988725023d5c
   </article>
 </div>
         
-          
-
-
-
-<div class="grid__item">
-  <article class="archive__item" itemscope itemtype="http://schema.org/CreativeWork">
-    
-    <h2 class="archive__item-title" itemprop="headline">
-      
-        <a href="/2018/07/23/create-a-beat-based-on-metricbeat-resolving-bugs" rel="permalink">Creating a Beat based on Metricbeat resolving Init and create metricset failures
-</a>
-      
-    </h2>
-    
-      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
-
-
-
-
-  4 minute read
-</p>
-    
-    <p class="archive__item-excerpt" itemprop="description">I suspect that you are reading this post after having trouble creating a new Elastic Beat based on Metricbeat. Bud do not worry! We have you covered and solv...</p>
-  </article>
-</div>
-        
       </div>
     </div>
   
@@ -637,7 +639,7 @@ Build: <span class="nv">$Id</span>: 1990ba12450cab9425a2ae62e6ab988725023d5c
   </ul>
 </div>
 
-<div class="page__footer-copyright">&copy; 2018 Christos Manios. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+<div class="page__footer-copyright">&copy; 2019 Christos Manios. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
 
       </footer>
     </div>
