@@ -288,4 +288,9 @@ var store = [{
         "excerpt":"Yesterday a colleague had a problem on finding a query. His documents looked like the following: { id : 1, category : \"aaa\", answers : [ { gender : \"male\"} ] }{ id : 2, category : \"bbb\" , answers : [ { gender : \"female\"} ] },{ id :...","categories": ["MongoDB","Database","NoSQL"],
         "tags": ["mongodb","nosql","database","query","aggregation","framework"],
         "url": "https://manios.org/2019/08/11/mongodb-aggregate-documents-by-property",
+        "teaser":null},{
+        "title": "Force Maven to execute offline with local repository dependencies in a machine without Internet connection",
+        "excerpt":"Debugging an application which runs on a remote Virtual Machine can prove to be very hard, especially if your client has “exceptional” conditions due to security, company or any other psycological measures/policies. For example, your VM can be a Windows machine (yes, Windows servers are an exception themselves and impose...","categories": ["MongoDB","Database","NoSQL"],
+        "tags": ["maven","offline","goal","dependencies","without","internet","connection","parent","pom","non","resolvable"],
+        "url": "https://manios.org/2019/08/21/force-maven-offline-execute-goal-dependencies",
         "teaser":null}]

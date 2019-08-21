@@ -1,4 +1,231 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.0">Jekyll</generator><link href="https://manios.org/feed.xml" rel="self" type="application/atom+xml" /><link href="https://manios.org/" rel="alternate" type="text/html" /><updated>2019-08-11T12:31:44+03:00</updated><id>https://manios.org/</id><title type="html">cmanios</title><subtitle>Developer life is a NullPointerException</subtitle><author><name>Christos Manios</name></author><entry><title type="html">MongoDB query to aggregate documents by a specific property</title><link href="https://manios.org/2019/08/11/mongodb-aggregate-documents-by-property" rel="alternate" type="text/html" title="MongoDB query to aggregate documents by a specific property" /><published>2019-08-11T10:41:00+03:00</published><updated>2019-08-11T10:41:00+03:00</updated><id>https://manios.org/2019/08/11/mongodb-aggregate-documents-by-property</id><content type="html" xml:base="https://manios.org/2019/08/11/mongodb-aggregate-documents-by-property">&lt;p&gt;Yesterday a colleague had a problem on finding a query. His documents looked like the following:&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.0">Jekyll</generator><link href="https://manios.org/feed.xml" rel="self" type="application/atom+xml" /><link href="https://manios.org/" rel="alternate" type="text/html" /><updated>2019-08-21T21:26:19+03:00</updated><id>https://manios.org/</id><title type="html">cmanios</title><subtitle>Developer life is a NullPointerException</subtitle><author><name>Christos Manios</name></author><entry><title type="html">Force Maven to execute offline with local repository dependencies in a machine without Internet connection</title><link href="https://manios.org/2019/08/21/force-maven-offline-execute-goal-dependencies" rel="alternate" type="text/html" title="Force Maven to execute offline with local repository dependencies in a machine without Internet connection" /><published>2019-08-21T20:57:53+03:00</published><updated>2019-08-21T20:57:53+03:00</updated><id>https://manios.org/2019/08/21/force-maven-offline-execute-goal-dependencies</id><content type="html" xml:base="https://manios.org/2019/08/21/force-maven-offline-execute-goal-dependencies">&lt;p&gt;Debugging an application which runs on a remote Virtual Machine can prove to be very hard, especially if your client has “exceptional” conditions due to security, company or any other psycological measures/policies. For example, your VM can be a Windows machine (yes, Windows servers are an exception themselves and impose many issues and difficulties), it may have no internet connection or accept no traffic other than http and RDP. Typically we as developers are called to confront such installations and make them work. As a paralellism, we are asked to fix a vehicle engine through the exhaust pipe without having access to the hood!&lt;/p&gt;
+
+&lt;p&gt;If you are not bored to death yet, you may proceed!&lt;/p&gt;
+
+&lt;h2 id=&quot;the-problem&quot;&gt;The problem&lt;/h2&gt;
+
+&lt;p&gt;A few days ago we had to remotely debug a Java Enterprise application inside a VM. The interesting fact was that everything had to be offline. Thus IDE installation, Maven installation and compile a Java project using Maven with no internet connection. Everything had to go fully offline. Really. Trully. Nothing special! (for a non technical person) At first we thought that it would suffice if we just copy the local maven repository from a development machine to the VM. Unfortunately that was not the case and it was not as simple as it looked like.&lt;/p&gt;
+
+&lt;p&gt;After investing 3 hours in searching and numerous trial and error attempts we managed to compile the application using Maven. The steps described are performed in 2 phases:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Preparation steps performed in a development machine with internet connection.&lt;/li&gt;
+  &lt;li&gt;Steps performed inside the VM with no internet connection (trully offline).&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&quot;inside-your-development-machine&quot;&gt;Inside your development machine&lt;/h2&gt;
+
+&lt;h3 id=&quot;step-1-create-a-new-local-repository&quot;&gt;Step 1: Create a new local repository&lt;/h3&gt;
+
+&lt;p&gt;This new local repository will be used only for the dependencies required by your application to be compiled in offline mode. It is unnecessary to copy your everyday repository with all other redundant dependencies which maybe numerous and great in size.&lt;/p&gt;
+
+&lt;p&gt;In order to create a new local repository, navigate to your Maven &lt;code class=&quot;highlighter-rouge&quot;&gt;settings.xml&lt;/code&gt; file. By default you can find it in:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;C:\Users\&amp;lt;your-username&amp;gt;\.m2\settings.xml&lt;/code&gt;: in Windows machines&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;/home/&amp;lt;your-username&amp;gt;/.m2/settings.xml&lt;/code&gt;: in Linux or *nix machines&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Edit the line:&lt;/p&gt;
+
+&lt;div class=&quot;language-xml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;&amp;lt;!-- Point to a new empty directory --&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;localRepository&amp;gt;&lt;/span&gt;C:/apps/m2repo&lt;span class=&quot;nt&quot;&gt;&amp;lt;/localRepository&amp;gt;&lt;/span&gt;--&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;step-2-run-maven-to-download-dependencies-for-offline-usage&quot;&gt;Step 2: Run Maven to download dependencies for offline usage&lt;/h3&gt;
+
+&lt;p&gt;In order to to download dependencies for offline usage, inside our project we execute the following:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;mvn dependency:go-offline
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Helpful link: &lt;a href=&quot;https://stackoverflow.com/questions/8851424/is-there-a-maven-command-line-option-for-offline-mode&quot;&gt;StackOverflow #8851424&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h3 id=&quot;step-3-run-your-usual-maven-goals&quot;&gt;Step 3: Run your usual Maven goals&lt;/h3&gt;
+
+&lt;p&gt;You also have to run your usual Maven goals which you eventually you are going to execute again in the offline VM, like &lt;code class=&quot;highlighter-rouge&quot;&gt;clean&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;test&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;package&lt;/code&gt;. The reason for that is that Maven did not download the .jars needed for these goals when you run &lt;code class=&quot;highlighter-rouge&quot;&gt;mvn dependency:go-offline&lt;/code&gt;. In our case we run:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;mvn clean &lt;span class=&quot;nb&quot;&gt;test
+&lt;/span&gt;mvn clean &lt;span class=&quot;nb&quot;&gt;install
+&lt;/span&gt;mvn clean package
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;You will notice that Maven downloads some extra .jars needed to execute its goals:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;mvn clean &lt;span class=&quot;nb&quot;&gt;install&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO] Scanning &lt;span class=&quot;k&quot;&gt;for &lt;/span&gt;projects...
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO]
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO] &lt;span class=&quot;nt&quot;&gt;------------------------------------------------------------------------&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO] Building jetsprinkler 2.5.0-SNAPSHOT
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO] &lt;span class=&quot;nt&quot;&gt;------------------------------------------------------------------------&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO]
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO] &lt;span class=&quot;nt&quot;&gt;---&lt;/span&gt; maven-clean-plugin:2.5:clean &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;default-clean&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; @ jetsprinkler &lt;span class=&quot;nt&quot;&gt;---&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO]
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO] &lt;span class=&quot;nt&quot;&gt;---&lt;/span&gt; maven-resources-plugin:2.6:resources &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;default-resources&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; @ jetsprinkler &lt;span class=&quot;nt&quot;&gt;---&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO] Using &lt;span class=&quot;s1&quot;&gt;'UTF-8'&lt;/span&gt; encoding to copy filtered resources.
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO] Copying 11 resources
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO]
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO] &lt;span class=&quot;nt&quot;&gt;---&lt;/span&gt; maven-compiler-plugin:2.3.2:compile &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;default-compile&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; @ jetsprinkler &lt;span class=&quot;nt&quot;&gt;---&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO] Compiling 64 &lt;span class=&quot;nb&quot;&gt;source &lt;/span&gt;files to C:&lt;span class=&quot;se&quot;&gt;\j&lt;/span&gt;avaprojects&lt;span class=&quot;se&quot;&gt;\j&lt;/span&gt;etsprinkler&lt;span class=&quot;se&quot;&gt;\t&lt;/span&gt;arget&lt;span class=&quot;se&quot;&gt;\c&lt;/span&gt;lasses
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO]
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO] &lt;span class=&quot;nt&quot;&gt;---&lt;/span&gt; maven-resources-plugin:2.6:testResources &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;default-testResources&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; @ jetsprinkler &lt;span class=&quot;nt&quot;&gt;---&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO] Using &lt;span class=&quot;s1&quot;&gt;'UTF-8'&lt;/span&gt; encoding to copy filtered resources.
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO] Copying 8 resources
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO]
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO] &lt;span class=&quot;nt&quot;&gt;---&lt;/span&gt; maven-compiler-plugin:2.3.2:testCompile &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;default-testCompile&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; @ jetsprinkler &lt;span class=&quot;nt&quot;&gt;---&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO] Compiling 15 &lt;span class=&quot;nb&quot;&gt;source &lt;/span&gt;files to C:&lt;span class=&quot;se&quot;&gt;\j&lt;/span&gt;avaprojects&lt;span class=&quot;se&quot;&gt;\j&lt;/span&gt;etsprinkler&lt;span class=&quot;se&quot;&gt;\t&lt;/span&gt;arget&lt;span class=&quot;se&quot;&gt;\t&lt;/span&gt;est-classes
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO]
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO] &lt;span class=&quot;nt&quot;&gt;---&lt;/span&gt; maven-surefire-plugin:2.12.4:test &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;default-test&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; @ jetsprinkler &lt;span class=&quot;nt&quot;&gt;---&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO] Surefire report directory: C:&lt;span class=&quot;se&quot;&gt;\j&lt;/span&gt;avaprojects&lt;span class=&quot;se&quot;&gt;\j&lt;/span&gt;etsprinkler&lt;span class=&quot;se&quot;&gt;\t&lt;/span&gt;arget&lt;span class=&quot;se&quot;&gt;\s&lt;/span&gt;urefire-reports
+Downloading from public: https://nexus.manios.org/nexus/repository/public/org/apache/maven/surefire/surefire-junit4/2.12.4/surefire-junit4-2.12.4.pom
+Downloaded from public: https://nexus.manios.org/nexus/repository/public/org/apache/maven/surefire/surefire-junit4/2.12.4/surefire-junit4-2.12.4.pom &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;2.4 kB at 4.2 kB/s&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+Downloading from public: https://nexus.manios.org/nexus/repository/public/org/apache/maven/surefire/surefire-providers/2.12.4/surefire-providers-2.12.4.pom
+Downloaded from public: https://nexus.manios.org/nexus/repository/public/org/apache/maven/surefire/surefire-providers/2.12.4/surefire-providers-2.12.4.pom &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;2.3 kB at 18 kB/s&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+Downloading from public: https://nexus.manios.org/nexus/repository/public/org/apache/maven/surefire/surefire-junit4/2.12.4/surefire-junit4-2.12.4.jar
+Downloaded from public: https://nexus.manios.org/nexus/repository/public/org/apache/maven/surefire/surefire-junit4/2.12.4/surefire-junit4-2.12.4.jar &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;37 kB at 187 kB/s&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;nt&quot;&gt;-------------------------------------------------------&lt;/span&gt;
+ T E S T S
+&lt;span class=&quot;nt&quot;&gt;-------------------------------------------------------&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;step-4-copy-your-local-repository-to-the-remote-vm&quot;&gt;Step 4: Copy your local repository to the remote VM&lt;/h3&gt;
+
+&lt;p&gt;We have to copy the contents of our new local repository (in our case &lt;code class=&quot;highlighter-rouge&quot;&gt;C:/apps/m2repo&lt;/code&gt;) to the remote VM with no internet connection. Place the contents of the repository in the respective repository directory.&lt;/p&gt;
+
+&lt;h2 id=&quot;inside-the-offline-machine-with-no-internet-connection&quot;&gt;Inside the offline machine (with no internet connection)&lt;/h2&gt;
+
+&lt;p&gt;The following steps will be run inside the target machine with no internet connection. Verify that you have cloned your source code somewhere.&lt;/p&gt;
+
+&lt;h3 id=&quot;step-5-remove-dependency-files-that-cause-trouble-in-offline-mode&quot;&gt;Step 5: Remove dependency files that cause trouble in offline mode&lt;/h3&gt;
+
+&lt;p&gt;When Maven resolves and downloads a dependency from the internet, it stores 2-3 extra files other than the .jars that contain the library, javadoc or the sources. For example for &lt;a href=&quot;https://mvnrepository.com/artifact/org.springframework/spring-core&quot;&gt;spring-core&lt;/a&gt;, the files inside the local repository are:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;ls&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-l&lt;/span&gt; ~/.m2/repository/org/springframework/spring-core/4.1.7.RELEASE/
+total 1004
+&lt;span class=&quot;nt&quot;&gt;-rw-r--r--&lt;/span&gt; 1 bobos bobos     212 Jun 17 13:16 _remote.repositories
+&lt;span class=&quot;nt&quot;&gt;-rw-r--r--&lt;/span&gt; 1 bobos bobos 1008584 Jun 17 13:16 spring-core-4.1.7.RELEASE.jar
+&lt;span class=&quot;nt&quot;&gt;-rw-r--r--&lt;/span&gt; 1 bobos bobos      40 Jun 17 13:16 spring-core-4.1.7.RELEASE.jar.sha1
+&lt;span class=&quot;nt&quot;&gt;-rw-r--r--&lt;/span&gt; 1 bobos bobos    2490 Jun 17 13:16 spring-core-4.1.7.RELEASE.pom
+&lt;span class=&quot;nt&quot;&gt;-rw-r--r--&lt;/span&gt; 1 bobos bobos      40 Jun 17 13:16 spring-core-4.1.7.RELEASE.pom.sha1
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;An here is the peculiar fact:&lt;/p&gt;
+
+&lt;p&gt;Although we configure Maven to work offline, when it detects files with the extension &lt;code class=&quot;highlighter-rouge&quot;&gt;*.repositories&lt;/code&gt; or &lt;code class=&quot;highlighter-rouge&quot;&gt;*.sha1&lt;/code&gt;, it tries to connect to the internet! Consequently the Maven goal we run tries to download the dependency from the internet and it eventually fails after timeout (StackOverflow &lt;a href=&quot;https://stackoverflow.com/questions/33548395/how-do-i-force-maven-to-use-my-local-repository-rather-than-going-out-to-remote&quot;&gt;#33548395&lt;/a&gt;). To resolve this issue we have to recursively delete all files with the aforementioned suffixes. Hence, execute:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# cd to repository directory&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;cd&lt;/span&gt; ~/.m2/repository
+
+&lt;span class=&quot;c&quot;&gt;# Then delete recursively all files&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;# with the extension `*.repositories` or `*.sha1`&lt;/span&gt;
+find &lt;span class=&quot;nt&quot;&gt;-iname&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;*.repositories&quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-exec&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;rm&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{}&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+find &lt;span class=&quot;nt&quot;&gt;-iname&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;*.sha1&quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-exec&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;rm&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{}&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;This issue might also be resolved by tweaking the &lt;a href=&quot;https://maven.apache.org/ref/3.3.3/maven-settings/settings.html#class_snapshots&quot;&gt;updatePolicy&lt;/a&gt; in Maven as mentioned in StackOverflow &lt;a href=&quot;https://stackoverflow.com/questions/33548395/how-do-i-force-maven-to-use-my-local-repository-rather-than-going-out-to-remote&quot;&gt;#33548395&lt;/a&gt; but unfortunately we did not have the time to test it.&lt;/p&gt;
+
+&lt;h3 id=&quot;step-6-optional-fix-parent-pom-references&quot;&gt;Step 6 (optional): Fix parent pom references&lt;/h3&gt;
+
+&lt;p&gt;In our case, the project had a parent pom:&lt;/p&gt;
+
+&lt;div class=&quot;language-xml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;parent&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;com.airplaneman&lt;span class=&quot;nt&quot;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;super-pom&lt;span class=&quot;nt&quot;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;version&amp;gt;&lt;/span&gt;1.1.4&lt;span class=&quot;nt&quot;&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/parent&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;which could not be downloaded from an external Maven repository. We had the files offline, however this configuration could not work. To make it work we had to add the &lt;code class=&quot;highlighter-rouge&quot;&gt;&amp;lt;relativePath&amp;gt;&lt;/code&gt; to the pom file. This is trully a relative path to the project.&lt;/p&gt;
+
+&lt;p&gt;Hence our project was placed in:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;C:/projects/jetsprinkler&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;and the parent pom was located in&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;C:/Users/cmanios/.m2/repository/com/airplanman/super-pom/1.1.4/super-pom-1.1.4.pom&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;To reference the parent pom in a relative way, we resulted in the following configuration:&lt;/p&gt;
+
+&lt;div class=&quot;language-xml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;parent&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;com.airplaneman&lt;span class=&quot;nt&quot;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;super-pom&lt;span class=&quot;nt&quot;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;version&amp;gt;&lt;/span&gt;1.1.4&lt;span class=&quot;nt&quot;&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;relativePath&amp;gt;&lt;/span&gt;../../Users/cmanios/.m2/repository/com/airplanman/super-pom/1.1.4/super-pom-1.1.4.pom&lt;span class=&quot;nt&quot;&gt;&amp;lt;/relativePath&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/parent&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;For more info regarding parent pom refer to:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;DZone: &lt;a href=&quot;https://dzone.com/articles/mavens-non-resolvable-parent&quot;&gt;Maven Non Resolvable parent pom&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;StackOverflow &lt;a href=&quot;https://stackoverflow.com/questions/7612309/maven-non-resolvable-parent-pom&quot;&gt;#7612309 Non Resolvable parent pom&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://www.google.com/search?client=firefox-b-d&amp;amp;q=offline+non+resolvable+parent+pom&quot;&gt;Google search: Offline Non Resolvable parent pom&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;step-7-configure-maven-to-work-offline&quot;&gt;Step 7: Configure Maven to work offline&lt;/h3&gt;
+
+&lt;p&gt;Edit your Maven &lt;code class=&quot;highlighter-rouge&quot;&gt;settings.xml&lt;/code&gt; file in the following lines:&lt;/p&gt;
+
+&lt;div class=&quot;language-xml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;&amp;lt;!-- (Optional) Set the path to your local repository --&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;localRepository&amp;gt;&lt;/span&gt;/path/to/local/repo&lt;span class=&quot;nt&quot;&gt;&amp;lt;/localRepository&amp;gt;&lt;/span&gt;
+
+&lt;span class=&quot;c&quot;&gt;&amp;lt;!-- Run Maven in Offline mode --&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;offline&amp;gt;&lt;/span&gt;true&lt;span class=&quot;nt&quot;&gt;&amp;lt;/offline&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;step-8-execute-your-goals-with--o-and--nsu-flag&quot;&gt;Step 8: Execute your goals with -o and -nsu flag&lt;/h3&gt;
+
+&lt;p&gt;It is useful that you run your goals with &lt;code class=&quot;highlighter-rouge&quot;&gt;-o&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;-nsu&lt;/code&gt; flags. According to &lt;a href=&quot;https://maven.apache.org/ref/3.1.0/maven-embedder/cli.html&quot;&gt;documentation&lt;/a&gt;:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;-o&lt;/code&gt;: Work offline&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt; -nsu,--no-snapshot-updates&lt;/code&gt;: Suppress SNAPSHOT updates&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Thus your goal will look like this:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;mvn &lt;span class=&quot;nt&quot;&gt;-nsu&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-o&lt;/span&gt; clean &lt;span class=&quot;nb&quot;&gt;install&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;troubleshooting&quot;&gt;Troubleshooting&lt;/h2&gt;
+
+&lt;h3 id=&quot;cannot-access-central-httpsrepomavenapacheorgmaven2-in-offline-mode-and-the-artifact-orgapachemavenplugins&quot;&gt;Cannot access central (https://repo.maven.apache.org/maven2) in offline mode and the artifact org.apache.maven.plugins…&lt;/h3&gt;
+
+&lt;p&gt;You may step on this error:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;[WARNING] The POM for org.apache.maven.plugins:maven-resources-plugin:jar:2.6 is missing, no dependency information available
+[INFO] ---------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------
+[ERROR] Plugin org.apache.maven.plugins:maven-resources-plugin:2.6 or one of its dependencies could not be resolved: Cannot access central (https://repo.maven.apache.org/maven2) in offline mode and the artifact org.apache.maven.plugins:maven-resources-plugin:jar:2.6 has not been downloaded from it before. -&amp;gt; [Help 1]
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;if you omit &lt;strong&gt;Step 3&lt;/strong&gt;. Maven tries to download it’s plugins to run the goals but they do not exist.&lt;/p&gt;
+
+&lt;h3 id=&quot;non-resolvable-parent-pom--and-parentrelativepath-points-at-no-local-pom&quot;&gt;Non-resolvable parent POM […] and ‘parent.relativePath’ points at no local POM&lt;/h3&gt;
+
+&lt;p&gt;If you see an error similar to the following:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-log&quot;&gt;[INFO] Scanning for projects...
+[DEBUG] Verifying availability of C:\Users\admin_manios\.m2\repository\com\airplanman\super-pom\1.1.4\super-pom-1.1.4.pom from [central (https://repo.maven.apache.org/maven2, default, releases)]
+[ERROR] [ERROR] Some problems were encountered while processing the POMs:
+[FATAL] Non-resolvable parent POM for airplanman.airsprinkler:jetengine:2.5.0-SNAPSHOT: Cannot access central (https://repo.maven.apache.org/maven2) in offline mode and the artifact com.airplaneman:super-pom:pom:1.1.4 has not been downloaded from it before. and 'parent.relativePath' points at no local POM @ line 10, column 10
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;then it means that either you did not copy the parent pom in your local repository for offline usage, or you did not set correctly the &lt;code class=&quot;highlighter-rouge&quot;&gt;relativePath&lt;/code&gt;. Please refer to &lt;strong&gt;Step 6&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;h3 id=&quot;maven-attempts-to-download-artifacts-although-we-have-configure-it-for-offline-mode&quot;&gt;Maven attempts to download artifacts although we have configure it for offline mode&lt;/h3&gt;
+
+&lt;p&gt;Either you have not downloaded all your dependencies as described in &lt;strong&gt;Step 2&lt;/strong&gt; or you have not deleted the files described in &lt;strong&gt;Step 5.&lt;/strong&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h2&gt;
+
+&lt;p&gt;I hope this article helps you and you will not waste so much time to do the same. Have a nice day and a wonderful and fruitful life!&lt;/p&gt;</content><author><name>cmanios</name></author><category term="maven" /><category term="offline" /><category term="goal" /><category term="dependencies" /><category term="without" /><category term="internet" /><category term="connection" /><category term="parent" /><category term="pom" /><category term="non" /><category term="resolvable" /><summary type="html">Debugging an application which runs on a remote Virtual Machine can prove to be very hard, especially if your client has “exceptional” conditions due to security, company or any other psycological measures/policies. For example, your VM can be a Windows machine (yes, Windows servers are an exception themselves and impose many issues and difficulties), it may have no internet connection or accept no traffic other than http and RDP. Typically we as developers are called to confront such installations and make them work. As a paralellism, we are asked to fix a vehicle engine through the exhaust pipe without having access to the hood!</summary></entry><entry><title type="html">MongoDB query to aggregate documents by a specific property</title><link href="https://manios.org/2019/08/11/mongodb-aggregate-documents-by-property" rel="alternate" type="text/html" title="MongoDB query to aggregate documents by a specific property" /><published>2019-08-11T10:41:00+03:00</published><updated>2019-08-11T10:41:00+03:00</updated><id>https://manios.org/2019/08/11/mongodb-aggregate-documents-by-property</id><content type="html" xml:base="https://manios.org/2019/08/11/mongodb-aggregate-documents-by-property">&lt;p&gt;Yesterday a colleague had a problem on finding a query. His documents looked like the following:&lt;/p&gt;
 
 &lt;div class=&quot;language-json highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;err&quot;&gt;id&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;err&quot;&gt;category&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;aaa&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;err&quot;&gt;answers&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;err&quot;&gt;gender&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;male&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
 &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;err&quot;&gt;id&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;err&quot;&gt;category&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;bbb&quot;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;err&quot;&gt;answers&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;err&quot;&gt;gender&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;female&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
@@ -824,343 +1051,4 @@ User-Agent: JAX-WS RI 2.2.9-b130926.1035 svn-revision#5f6196f2b90e9460065a4c2f4e
 &lt;p&gt;You can observe that the request contains the &lt;code class=&quot;highlighter-rouge&quot;&gt;Authorization&lt;/code&gt; header as expected:&lt;/p&gt;
 
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Authorization: Basic dXNlcm5hbWU6cGFzc3dvcmQ=
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name>cmanios</name></author><category term="java" /><category term="soap" /><category term="basic" /><category term="auth" /><category term="authentication" /><category term="client" /><category term="jax" /><category term="ws" /><category term="jax-ws" /><category term="web" /><category term="service" /><category term="http" /><category term="netbeans" /><category term="wsdl" /><summary type="html">Today I had to create a Java client for a SOAP web service. So I opened Netbeans IDE and used the great tool which generates JAX-WS client code using the respective service .wsdl file. However, the service needed to be called using Basic Http Authentication.</summary></entry><entry><title type="html">Install, configure and troubleshoot NTP servers in Debian Linux</title><link href="https://manios.org/2017/12/14/install-and-configure-and-troubleshoot-ntp-servers-in-debian-linux" rel="alternate" type="text/html" title="Install, configure and troubleshoot NTP servers in Debian Linux" /><published>2017-12-14T10:42:00+02:00</published><updated>2017-12-14T10:42:00+02:00</updated><id>https://manios.org/2017/12/14/install-and-configure-and-troubleshoot-ntp-servers-in-debian-linux</id><content type="html" xml:base="https://manios.org/2017/12/14/install-and-configure-and-troubleshoot-ntp-servers-in-debian-linux">&lt;p&gt;If you are reading this article, perhaps you have searched a lot about NTP server installation in Linux, issues and problems encountered and how to troubleshoot them! We know that there are so many articles about how to configure NTP servers but we could not find any which contains all the issues we faced in the same place!&lt;/p&gt;
-
-&lt;h2 id=&quot;our-story&quot;&gt;Our story&lt;/h2&gt;
-
-&lt;p&gt;A client of ours has a sever infrastructure where from the 40+ VMs in the tenant environment, only 3 are allowed to communicate with external NTP servers. Thus we had to install NTP servers in 3 Linux virtual machines in order to synchronise their clocks with the external pools and in the meantime act as internal environment  primary NTP servers. The following diagram (kudos to &lt;a href=&quot;http://asciiflow.com/&quot;&gt;AsciiFlow&lt;/a&gt;) summarizes the installation:&lt;/p&gt;
-
-&lt;div class=&quot;language-text highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;                  +---------------------+
-                  |     External NTP    |
-                  |1.europe.pool.ntp.org|
-                  +----------+----------+
-                             ^
-                             |
-                             |
-        +---------------------------------------+
-        |                    |                  |
-        |                    |                  |
-+-------+--------+  +--------+-------+  +-------+--------+
-|      VM1       |  |      VM2       |  |      VM3       |
-|  192.168.10.1  |  |  192.168.10.2  |  |  192.168.10.3  |
-|    NTP srv1    |  |    NTP srv2    |  |    NTP srv3    |
-+-------+--------+  +--------+-------+  +-----+----------+
-        ^                    ^                ^
-        |                    |                |
-        +-------------------------------------+
-                             |
-                     +-------+--------+
-                     |      VM4 (any) |
-                     |  192.168.10.4  |
-                     |   NTP client   |
-                     +----------------+
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Notes on diagram:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;External NTP&lt;/code&gt; is one of the many &lt;a href=&quot;http://www.pool.ntp.org&quot;&gt;NTP pools&lt;/a&gt; in the internet.&lt;/li&gt;
-  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;VM1&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;VM2&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;VM3&lt;/code&gt; are the Linux virtual machines which are allowed to connect to the internet using port 123 and synchronise their clocks with the external pool.&lt;/li&gt;
-  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;VM4&lt;/code&gt; is any virtual machine (Linux or Windows) in the infrastructure which cannot communicate with external NTP servers, thus it will use VM1, VM2 and VM3 to update its clock.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;&lt;strong&gt;IMPORTANT NOTES&lt;/strong&gt;:&lt;/p&gt;
-  &lt;ol&gt;
-    &lt;li&gt;If you are a developer or a devops person and you have to communicate with network admins for any network issues you might encounter, please be meticulous and describe the problems in detail.&lt;/li&gt;
-    &lt;li&gt;During this operation (yes, debugging was like war!), the majority of our problems were network related so we had to debug every step and inform network administrators in order to configure firewalls.&lt;/li&gt;
-    &lt;li&gt;If your infrastructure is completely blocked by a firewall and you cannot access UDP port 123 (ntp) in any way, then you might consider using &lt;a href=&quot;https://linux.die.net/man/8/htpdate&quot;&gt;htpdate&lt;/a&gt; in VM1, VM2, VM3.&lt;/li&gt;
-  &lt;/ol&gt;
-&lt;/blockquote&gt;
-
-&lt;h2 id=&quot;install-ntp-server-in-debian-linux&quot;&gt;Install NTP Server in Debian Linux&lt;/h2&gt;
-
-&lt;p&gt;So, to install NTP server in Debian Linux, you just execute:&lt;/p&gt;
-
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;apt-get &lt;span class=&quot;nb&quot;&gt;install &lt;/span&gt;ntp
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;in VM1, VM2, VM3 and VM4 . After it is installed, our efforts are focused on one single file: &lt;code class=&quot;highlighter-rouge&quot;&gt;/etc/ntp.conf&lt;/code&gt;.&lt;/p&gt;
-
-&lt;h2 id=&quot;configure-ntp-server&quot;&gt;Configure NTP Server&lt;/h2&gt;
-
-&lt;p&gt;As we mentioned, we open &lt;code class=&quot;highlighter-rouge&quot;&gt;/etc/ntp.conf&lt;/code&gt; and edit the pools in VM1, VM2, VM3 according to our needs:&lt;/p&gt;
-
-&lt;div class=&quot;language-conf highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# /etc/ntp.conf, configuration for ntpd; see ntp.conf(5) for help
-&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;driftfile&lt;/span&gt; /&lt;span class=&quot;n&quot;&gt;var&lt;/span&gt;/&lt;span class=&quot;n&quot;&gt;lib&lt;/span&gt;/&lt;span class=&quot;n&quot;&gt;ntp&lt;/span&gt;/&lt;span class=&quot;n&quot;&gt;ntp&lt;/span&gt;.&lt;span class=&quot;n&quot;&gt;drift&lt;/span&gt;
-
-&lt;span class=&quot;c&quot;&gt;# Enable this if you want statistics to be logged.
-#statsdir /var/log/ntpstats/
-&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;statistics&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;loopstats&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;peerstats&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;clockstats&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;filegen&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;loopstats&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;file&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;loopstats&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;type&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;day&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;enable&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;filegen&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;peerstats&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;file&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;peerstats&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;type&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;day&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;enable&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;filegen&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;clockstats&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;file&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;clockstats&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;type&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;day&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;enable&lt;/span&gt;
-
-
-&lt;span class=&quot;c&quot;&gt;# You do need to talk to an NTP server or two (or three).
-#server ntp.your-provider.example
-&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# pool.ntp.org maps to about 1000 low-stratum NTP servers.  Your server will
-# pick a different set every time it starts up.  Please consider joining the
-# pool: &amp;lt;http://www.pool.ntp.org/join.html&amp;gt;
-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;server&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;3&lt;/span&gt;.&lt;span class=&quot;n&quot;&gt;gr&lt;/span&gt;.&lt;span class=&quot;n&quot;&gt;pool&lt;/span&gt;.&lt;span class=&quot;n&quot;&gt;ntp&lt;/span&gt;.&lt;span class=&quot;n&quot;&gt;org&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;iburst&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;minpoll&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;6&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;maxpoll&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;8&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;server&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;.&lt;span class=&quot;n&quot;&gt;europe&lt;/span&gt;.&lt;span class=&quot;n&quot;&gt;pool&lt;/span&gt;.&lt;span class=&quot;n&quot;&gt;ntp&lt;/span&gt;.&lt;span class=&quot;n&quot;&gt;org&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;iburst&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;minpoll&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;6&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;maxpoll&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;8&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;server&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;.&lt;span class=&quot;n&quot;&gt;europe&lt;/span&gt;.&lt;span class=&quot;n&quot;&gt;pool&lt;/span&gt;.&lt;span class=&quot;n&quot;&gt;ntp&lt;/span&gt;.&lt;span class=&quot;n&quot;&gt;org&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;iburst&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;minpoll&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;6&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;maxpoll&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;8&lt;/span&gt;
-
-&lt;span class=&quot;c&quot;&gt;# Undisciplined Local Clock. This is a fake driver intended for backup
-# and when no outside source of synchronized time is available. 
-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;server&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;127&lt;/span&gt;.&lt;span class=&quot;m&quot;&gt;127&lt;/span&gt;.&lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;.&lt;span class=&quot;m&quot;&gt;0&lt;/span&gt;     &lt;span class=&quot;c&quot;&gt;# local clock
-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fudge&lt;/span&gt;   &lt;span class=&quot;m&quot;&gt;127&lt;/span&gt;.&lt;span class=&quot;m&quot;&gt;127&lt;/span&gt;.&lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;.&lt;span class=&quot;m&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;stratum&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;8&lt;/span&gt;
-
-&lt;span class=&quot;c&quot;&gt;# Access control configuration; see /usr/share/doc/ntp-doc/html/accopt.html for
-# details.  The web page &amp;lt;http://support.ntp.org/bin/view/Support/AccessRestrictions&amp;gt;
-# might also be helpful.
-#
-# Note that &quot;restrict&quot; applies to both servers and clients, so a configuration
-# that might be intended to block requests from certain clients could also end
-# up blocking replies from your own upstream servers.
-&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# By default, exchange time with everybody, but don't allow configuration.
-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;restrict&lt;/span&gt; -&lt;span class=&quot;m&quot;&gt;4&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;default&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;kod&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;notrap&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;nomodify&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;nopeer&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;noquery&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;limited&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;restrict&lt;/span&gt; -&lt;span class=&quot;m&quot;&gt;6&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;default&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;kod&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;notrap&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;nomodify&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;nopeer&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;noquery&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;limited&lt;/span&gt;
-
-&lt;span class=&quot;c&quot;&gt;# Local users may interrogate the ntp server more closely.
-#restrict 127.0.0.1
-#restrict ::1
-&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# Needed for adding pool entries
-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;restrict&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;source&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;notrap&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;nomodify&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;noquery&lt;/span&gt;
-
-&lt;span class=&quot;c&quot;&gt;# Clients from this (example!) subnet have unlimited access, but only if
-# cryptographically authenticated.
-#restrict 192.168.123.0 mask 255.255.255.0 notrust
-&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# If you want to provide time to your local subnet, change the next line.
-# (Again, the address is an example only.)
-#broadcast 192.168.123.255
-&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# If you want to listen to time broadcasts on your local subnet, de-comment the
-# next lines.  Please do this only if you trust everybody on the network!
-#disable auth
-#broadcastclient
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;&lt;strong&gt;NOTES&lt;/strong&gt;:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;We have put &lt;code class=&quot;highlighter-rouge&quot;&gt;minpoll&lt;/code&gt; to 6 (2^6 = 64 sec) and &lt;code class=&quot;highlighter-rouge&quot;&gt;maxpoll&lt;/code&gt; to 8 (2^8 = 256 sec) as we noticed that our local NTP servers tended to drift for minutes. Sometimes, +4 minutes in a day! You can find more information about &lt;code class=&quot;highlighter-rouge&quot;&gt;minpoll&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;maxpoll&lt;/code&gt; &lt;a href=&quot;https://access.redhat.com/solutions/625863&quot;&gt;here&lt;/a&gt;.&lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;The following lines:&lt;/p&gt;
-
-    &lt;div class=&quot;language-conf highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;   &lt;span class=&quot;n&quot;&gt;server&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;127&lt;/span&gt;.&lt;span class=&quot;m&quot;&gt;127&lt;/span&gt;.&lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;.&lt;span class=&quot;m&quot;&gt;0&lt;/span&gt;     &lt;span class=&quot;c&quot;&gt;# local clock
-&lt;/span&gt;   &lt;span class=&quot;n&quot;&gt;fudge&lt;/span&gt;   &lt;span class=&quot;m&quot;&gt;127&lt;/span&gt;.&lt;span class=&quot;m&quot;&gt;127&lt;/span&gt;.&lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;.&lt;span class=&quot;m&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;stratum&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;8&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
-    &lt;p&gt;are used  in order to instruct the local server to act as a low stratum server and be preferred from the local clients. (more information : &lt;a href=&quot;http://en.linuxreviews.org/NTP_-_Howto_make_the_clock_show_the_correct_time&quot;&gt;here&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;configure-linux-ntp-client&quot;&gt;Configure Linux NTP Client&lt;/h2&gt;
-
-&lt;p&gt;We edit &lt;code class=&quot;highlighter-rouge&quot;&gt;/etc/ntp.conf&lt;/code&gt; of VM4 and replace any external pools with our local NTP servers (VM1, VM2, VM3). Your configuration might look like the following:&lt;/p&gt;
-
-&lt;div class=&quot;language-conf highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# pool.ntp.org maps to about 1000 low-stratum NTP servers.  Your server will
-# pick a different set every time it starts up.  Please consider joining the
-# pool: &amp;lt;http://www.pool.ntp.org/join.html&amp;gt;
-#pool 0.debian.pool.ntp.org iburst
-#pool 1.debian.pool.ntp.org iburst
-#pool 2.debian.pool.ntp.org iburst
-#pool 3.debian.pool.ntp.org iburst
-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;server&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;192&lt;/span&gt;.&lt;span class=&quot;m&quot;&gt;168&lt;/span&gt;.&lt;span class=&quot;m&quot;&gt;10&lt;/span&gt;.&lt;span class=&quot;m&quot;&gt;1&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;iburst&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;minpoll&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;6&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;maxpoll&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;8&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;server&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;192&lt;/span&gt;.&lt;span class=&quot;m&quot;&gt;168&lt;/span&gt;.&lt;span class=&quot;m&quot;&gt;10&lt;/span&gt;.&lt;span class=&quot;m&quot;&gt;2&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;iburst&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;minpoll&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;6&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;maxpoll&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;8&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;server&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;192&lt;/span&gt;.&lt;span class=&quot;m&quot;&gt;168&lt;/span&gt;.&lt;span class=&quot;m&quot;&gt;10&lt;/span&gt;.&lt;span class=&quot;m&quot;&gt;3&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;iburst&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;minpoll&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;6&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;maxpoll&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;8&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Again as you can you may notice we have put &lt;code class=&quot;highlighter-rouge&quot;&gt;minpoll&lt;/code&gt; to 6 (2^6 = 64 sec) and &lt;code class=&quot;highlighter-rouge&quot;&gt;maxpoll&lt;/code&gt; to 8 (2^8 = 256 sec) as we noticed that our local NTP servers tended to drift for minutes. Sometimes, +4 minutes in a day! You can find more information about &lt;code class=&quot;highlighter-rouge&quot;&gt;minpoll&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;maxpoll&lt;/code&gt; &lt;a href=&quot;https://access.redhat.com/solutions/625863&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
-
-&lt;h2 id=&quot;configure-windows-ntp-client&quot;&gt;Configure Windows NTP Client&lt;/h2&gt;
-
-&lt;p&gt;Our virtual machines use Windows Server 2012 R2 (for Windows 2003 and older see &lt;a href=&quot;http://www.pool.ntp.org/en/use.html&quot;&gt;here&lt;/a&gt;). We followed the instructions from &lt;a href=&quot;http://www.pool.ntp.org/en/use.html&quot;&gt;pool.ntp.org&lt;/a&gt; and &lt;a href=&quot;https://serverfault.com/questions/294787/how-do-i-force-sync-the-time-on-windows-workstation-or-server&quot;&gt;this&lt;/a&gt; article. So we open a windows command line prompt with administrative privileges (WinKey + R + type “cmd” + hit enter key) and run :&lt;/p&gt;
-
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;w32tm /config /syncfromflags:manual /manualpeerlist:&lt;span class=&quot;s2&quot;&gt;&quot;192.168.10.1 192.168.10.2 192.168.10.3&quot;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;and then restart the time service so changes take effect and force it to resync:&lt;/p&gt;
-
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;net stop W32Time
-net start W32Time
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;h2 id=&quot;troubleshooting&quot;&gt;Troubleshooting&lt;/h2&gt;
-
-&lt;p&gt;This is going to be the longest of all sections! Yes! Debugging was hard, we dare say! For our debugging purposes in Linux VMs we used &lt;code class=&quot;highlighter-rouge&quot;&gt;ntpdate&lt;/code&gt; tool at first, although is &lt;a href=&quot;https://support.ntp.org/bin/view/Dev/DeprecatingNtpdate&quot;&gt;deprecated&lt;/a&gt;. Also we have used &lt;code class=&quot;highlighter-rouge&quot;&gt;ntpq&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;nmap&lt;/code&gt;. So this is what you have to do if you encounter the following errors both in your local NTP servers and clients.&lt;/p&gt;
-
-&lt;h3 id=&quot;ntp-server-dropped-strata-too-high&quot;&gt;NTP Server dropped: strata too high&lt;/h3&gt;
-
-&lt;p&gt;If you see in &lt;code class=&quot;highlighter-rouge&quot;&gt;syslog&lt;/code&gt; or in the output of the command:&lt;/p&gt;
-
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;ntpdate &lt;span class=&quot;nt&quot;&gt;-dv&lt;/span&gt; 2.europe.pool.ntp.org
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;the error:&lt;/p&gt;
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;91.228.108.200: Server dropped: strata too high
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;then, acccording to &lt;a href=&quot;http://www.markelov.org/wiki/index.php?title=NTP._Server_dropped:_strata_too_high&quot;&gt;this&lt;/a&gt; and &lt;a href=&quot;http://www.tuxradar.com/answers/547&quot;&gt;this&lt;/a&gt; article, the server is too far out of sync with the upstream servers, so it sets an artificially high stratum value to prevent other computers trusting it.&lt;/p&gt;
-
-&lt;p&gt;A possible solution is to set the time in the server manually as described &lt;a href=&quot;https://www.cyberciti.biz/faq/howto-set-date-time-from-linux-command-prompt/&quot;&gt;here&lt;/a&gt; and then restart &lt;code class=&quot;highlighter-rouge&quot;&gt;ntp&lt;/code&gt; service to see what happens.&lt;/p&gt;
-
-&lt;h3 id=&quot;no-server-suitable-for-synchronization-found&quot;&gt;No server suitable for synchronization found&lt;/h3&gt;
-
-&lt;p&gt;If you use &lt;code class=&quot;highlighter-rouge&quot;&gt;ntpdate&lt;/code&gt; to debug like this:&lt;/p&gt;
-
-&lt;p class=&quot;notice--warning&quot;&gt;&lt;strong&gt;WARNING!&lt;/strong&gt; NTP service has to be stopped in order to perform the following test.&lt;/p&gt;
-
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;ntpdate &lt;span class=&quot;nt&quot;&gt;-s&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-B&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-v&lt;/span&gt; 3.gr.pool.ntp.org
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;and the output in syslog is like this:&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;bobos@WEBSRV01:~$ sudo tail -f -n 10 /var/log/syslog
-Nov 24 13:33:39 WEBWEBSRV01 ntpdate[26635]: ntpdate 4.2.8p10@1.3728-o Sat Nov 24 19:02:40 UTC 2017 (1)
-Nov 24 13:33:48 WEBSRV01 ntpdate[26635]: no server suitable for synchronization found
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;then it might a network issue. To be sure, run &lt;code class=&quot;highlighter-rouge&quot;&gt;nmap&lt;/code&gt; :&lt;/p&gt;
-
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;bobos@WEBSRV01:~&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;nmap &lt;span class=&quot;nt&quot;&gt;-p123&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-sU&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-P0&lt;/span&gt; 3.gr.pool.ntp.org
-Starting Nmap 7.40 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt; https://nmap.org &lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; at 2017-11-24 13:43 EEST
-Nmap scan report &lt;span class=&quot;k&quot;&gt;for &lt;/span&gt;3.gr.pool.ntp.org &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;194.177.210.54&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-Host is up &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;0.00011s latency&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;.&lt;/span&gt;
-Other addresses &lt;span class=&quot;k&quot;&gt;for &lt;/span&gt;3.gr.pool.ntp.org &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;not scanned&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;: ::1
-PORT    STATE  SERVICE
-123/udp closed ntp
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;As you can see UTDP port 123 is closed, so we cannot communicate. Let’s run a second test:&lt;/p&gt;
-
-&lt;p class=&quot;notice--warning&quot;&gt;&lt;strong&gt;WARNING!&lt;/strong&gt; NTP service has to be stopped in order to perform the following test.&lt;/p&gt;
-
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;bobos@WEBSRV01:~&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;ntpdate &lt;span class=&quot;nt&quot;&gt;-dv&lt;/span&gt; 2.europe.pool.ntp.org
-24 Oct 12:02:20 ntpdate[26399]: ntpdate 4.2.8p10@1.3728-o Sat Sep 23 19:02:40 UTC 2017 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;1&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-transmit&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;87.118.124.35&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-transmit&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;91.228.108.200&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-transmit&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;194.177.4.1&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-transmit&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;81.16.38.161&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-transmit&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;87.118.124.35&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-transmit&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;91.228.108.200&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-transmit&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;194.177.4.1&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-transmit&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;81.16.38.161&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-transmit&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;87.118.124.35&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-transmit&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;91.228.108.200&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-transmit&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;194.177.4.1&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-transmit&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;81.16.38.161&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-transmit&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;87.118.124.35&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-transmit&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;91.228.108.200&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-transmit&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;194.177.4.1&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-transmit&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;81.16.38.161&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-transmit&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;87.118.124.35&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-transmit&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;91.228.108.200&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-transmit&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;194.177.4.1&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-transmit&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;81.16.38.161&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-87.118.124.35: Server dropped: no data
-91.228.108.200: Server dropped: no data
-194.177.4.1: Server dropped: no data
-81.16.38.161: Server dropped: no data
-server 87.118.124.35, port 123
-stratum 0, precision 0, leap 00, trust 000
-refid &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;87.118.124.35], delay 0.00000, dispersion 64.00000
-transmitted 4, &lt;span class=&quot;k&quot;&gt;in &lt;/span&gt;filter 4
-reference &lt;span class=&quot;nb&quot;&gt;time&lt;/span&gt;:    00000000.00000000  Thu, Feb  7 2036  8:28:16.000
-originate timestamp: 00000000.00000000  Thu, Feb  7 2036  8:28:16.000
-transmit timestamp:  dd998022.d88eee1a  Tue, Oct 24 2017 12:02:26.845
-filter delay:  0.00000  0.00000  0.00000  0.00000 
-         0.00000  0.00000  0.00000  0.00000 
-filter offset: 0.000000 0.000000 0.000000 0.000000
-         0.000000 0.000000 0.000000 0.000000
-delay 0.00000, dispersion 64.00000
-offset 0.000000
-
-server 91.228.108.200, port 123
-stratum 0, precision 0, leap 00, trust 000
-refid &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;91.228.108.200], delay 0.00000, dispersion 64.00000
-transmitted 4, &lt;span class=&quot;k&quot;&gt;in &lt;/span&gt;filter 4
-reference &lt;span class=&quot;nb&quot;&gt;time&lt;/span&gt;:    00000000.00000000  Thu, Feb  7 2036  8:28:16.000
-originate timestamp: 00000000.00000000  Thu, Feb  7 2036  8:28:16.000
-transmit timestamp:  dd998023.0bc09a0a  Tue, Oct 24 2017 12:02:27.045
-filter delay:  0.00000  0.00000  0.00000  0.00000 
-         0.00000  0.00000  0.00000  0.00000 
-filter offset: 0.000000 0.000000 0.000000 0.000000
-         0.000000 0.000000 0.000000 0.000000
-delay 0.00000, dispersion 64.00000
-offset 0.000000
-
-server 194.177.4.1, port 123
-stratum 0, precision 0, leap 00, trust 000
-refid &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;194.177.4.1], delay 0.00000, dispersion 64.00000
-transmitted 4, &lt;span class=&quot;k&quot;&gt;in &lt;/span&gt;filter 4
-reference &lt;span class=&quot;nb&quot;&gt;time&lt;/span&gt;:    00000000.00000000  Thu, Feb  7 2036  8:28:16.000
-originate timestamp: 00000000.00000000  Thu, Feb  7 2036  8:28:16.000
-transmit timestamp:  dd998023.3ef4248c  Tue, Oct 24 2017 12:02:27.245
-filter delay:  0.00000  0.00000  0.00000  0.00000 
-         0.00000  0.00000  0.00000  0.00000 
-filter offset: 0.000000 0.000000 0.000000 0.000000
-         0.000000 0.000000 0.000000 0.000000
-delay 0.00000, dispersion 64.00000
-offset 0.000000
-
-server 81.16.38.161, port 123
-stratum 0, precision 0, leap 00, trust 000
-refid &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;81.16.38.161], delay 0.00000, dispersion 64.00000
-transmitted 4, &lt;span class=&quot;k&quot;&gt;in &lt;/span&gt;filter 4
-reference &lt;span class=&quot;nb&quot;&gt;time&lt;/span&gt;:    00000000.00000000  Thu, Feb  7 2036  8:28:16.000
-originate timestamp: 00000000.00000000  Thu, Feb  7 2036  8:28:16.000
-transmit timestamp:  dd998023.72276991  Tue, Oct 24 2017 12:02:27.445
-filter delay:  0.00000  0.00000  0.00000  0.00000 
-         0.00000  0.00000  0.00000  0.00000 
-filter offset: 0.000000 0.000000 0.000000 0.000000
-         0.000000 0.000000 0.000000 0.000000
-delay 0.00000, dispersion 64.00000
-offset 0.000000
-
-24 Oct 12:02:29 ntpdate[26399]: no server suitable &lt;span class=&quot;k&quot;&gt;for &lt;/span&gt;synchronization found
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;As you can see from the output above, we cannot communicate with any server. Contact your network administrator.&lt;/p&gt;
-
-&lt;h3 id=&quot;ntpq-tool-command-shows-zeroes-in-output&quot;&gt;NTPQ tool command shows zeroes in output&lt;/h3&gt;
-
-&lt;p&gt;If you use &lt;code class=&quot;highlighter-rouge&quot;&gt;ntpq&lt;/code&gt; tool and the output is the following:&lt;/p&gt;
-
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;bobos@WEBSRV01:~&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo date&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; ntpq &lt;span class=&quot;nt&quot;&gt;-p&lt;/span&gt;
-Tue Nov 24 13:26:45 EEST 2017
-     remote           refid      st t when poll reach   delay   offset  jitter
-&lt;span class=&quot;o&quot;&gt;==============================================================================&lt;/span&gt;
- 3.gr.pool.ntp.o .POOL.          16 p    -   64    0    0.000    0.000   0.000
- 1.europe.pool.n .POOL.          16 p    -   64    0    0.000    0.000   0.000
- 2.europe.pool.n .POOL.          16 p    -   64    0    0.000    0.000   0.000
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;then it means that you have no communication at all with your NTP servers.  Contact your network administrator. A valid and working output would be:&lt;/p&gt;
-
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;bobos@WEBSRV01:~&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;date&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; ntpq &lt;span class=&quot;nt&quot;&gt;-p&lt;/span&gt;
-Tue Nov 24 11:00:34 EEST 2017
-     remote           refid      st t when poll reach   delay   offset  jitter
-&lt;span class=&quot;o&quot;&gt;==============================================================================&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;*&lt;/span&gt; 3.gr.pool.ntp.o    .POOL.      4 u  988 1024  377    1.180   39.213  24.397
-&lt;span class=&quot;k&quot;&gt;*&lt;/span&gt; 1.europe.pool.n    .POOL.      4 u  986 1024  377    1.080   38.984  24.397
-&lt;span class=&quot;k&quot;&gt;*&lt;/span&gt; 2.europe.pool.n    .POOL.      4 u  985 1024  377    1.710   39.213  24.397
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;h2 id=&quot;bibliography&quot;&gt;Bibliography&lt;/h2&gt;
-
-&lt;p&gt;For a more “in depth dive” you can find more in the following links:&lt;/p&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;&lt;a href=&quot;https://help.ubuntu.com/lts/serverguide/NTP.html&quot;&gt;https://help.ubuntu.com/lts/serverguide/NTP.html&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://wiki.debian.org/NTP&quot;&gt;https://wiki.debian.org/NTP&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://askubuntu.com/questions/429306/ntpdate-no-server-suitable-for-synchronization-found&quot;&gt;https://askubuntu.com/questions/429306/ntpdate-no-server-suitable-for-synchronization-found&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://askubuntu.com/questions/825869/ntpd-does-not-sync-clock-while-ntpdate-does&quot;&gt;https://askubuntu.com/questions/825869/ntpd-does-not-sync-clock-while-ntpdate-does&lt;/a&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;That’s it! We hope it helped you! It was a long story to debug and actually narrate afterwards!&lt;/p&gt;</content><author><name>cmanios</name></author><category term="linux" /><category term="ntp" /><category term="debian" /><category term="ubuntu" /><category term="server" /><category term="time" /><category term="sync" /><category term="synchronisation" /><category term="install" /><category term="configure" /><category term="error" /><category term="network" /><category term="ntpdate" /><category term="ntpq" /><category term="service" /><category term="strata" /><category term="high" /><category term="suitable" /><category term="minpoll" /><category term="maxpoll" /><category term="pool" /><category term="iburst" /><summary type="html">If you are reading this article, perhaps you have searched a lot about NTP server installation in Linux, issues and problems encountered and how to troubleshoot them! We know that there are so many articles about how to configure NTP servers but we could not find any which contains all the issues we faced in the same place!</summary></entry></feed>
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name>cmanios</name></author><category term="java" /><category term="soap" /><category term="basic" /><category term="auth" /><category term="authentication" /><category term="client" /><category term="jax" /><category term="ws" /><category term="jax-ws" /><category term="web" /><category term="service" /><category term="http" /><category term="netbeans" /><category term="wsdl" /><summary type="html">Today I had to create a Java client for a SOAP web service. So I opened Netbeans IDE and used the great tool which generates JAX-WS client code using the respective service .wsdl file. However, the service needed to be called using Basic Http Authentication.</summary></entry></feed>
