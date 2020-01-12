@@ -280,29 +280,29 @@
 
 <p>We prepared quickly a small Bash script, which is the following (Listing of <code class="highlighter-rouge">convertMdToPdf.sh</code>):</p>
 
-<pre><code class="language-ssh">#!/bin/bash
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#!/bin/bash</span>
 
-set -eux
+<span class="nb">set</span> <span class="nt">-eux</span>
 
-INPUT_MD_FILE=bob.md
-OUT_ADOC_FILE=tmpOut.adoc 
-OUT_TMP_PDF_FILE=tmpOut.pdf
-OUT_PDF_FILE=documentation.pdf
+<span class="nv">INPUT_MD_FILE</span><span class="o">=</span>bob.md
+<span class="nv">OUT_ADOC_FILE</span><span class="o">=</span>tmpOut.adoc 
+<span class="nv">OUT_TMP_PDF_FILE</span><span class="o">=</span>tmpOut.pdf
+<span class="nv">OUT_PDF_FILE</span><span class="o">=</span>documentation.pdf
 
-echo "Clear temporary files (if exist)"
+<span class="nb">echo</span> <span class="s2">"Clear temporary files (if exist)"</span>
 
-# Clear any temporary files
-(rm -f "${OUT_ADOC_FILE}" "${OUT_PDF_FILE}" "${OUT_TMP_PDF_FILE}" || true)
+<span class="c"># Clear any temporary files</span>
+<span class="o">(</span><span class="nb">rm</span> <span class="nt">-f</span> <span class="s2">"</span><span class="k">${</span><span class="nv">OUT_ADOC_FILE</span><span class="k">}</span><span class="s2">"</span> <span class="s2">"</span><span class="k">${</span><span class="nv">OUT_PDF_FILE</span><span class="k">}</span><span class="s2">"</span> <span class="s2">"</span><span class="k">${</span><span class="nv">OUT_TMP_PDF_FILE</span><span class="k">}</span><span class="s2">"</span> <span class="o">||</span> <span class="nb">true</span><span class="o">)</span>
 
-# Convert Markdown to Asciidoctor
-docker run --rm -v "$(pwd)":/data pandoc/core  -f markdown -t asciidoc -i "${INPUT_MD_FILE}" -o "${OUT_ADOC_FILE}"
+<span class="c"># Convert Markdown to Asciidoctor</span>
+docker run <span class="nt">--rm</span> <span class="nt">-v</span> <span class="s2">"</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span><span class="s2">"</span>:/data pandoc/core  <span class="nt">-f</span> markdown <span class="nt">-t</span> asciidoc <span class="nt">-i</span> <span class="s2">"</span><span class="k">${</span><span class="nv">INPUT_MD_FILE</span><span class="k">}</span><span class="s2">"</span> <span class="nt">-o</span> <span class="s2">"</span><span class="k">${</span><span class="nv">OUT_ADOC_FILE</span><span class="k">}</span><span class="s2">"</span>
 
-# Convert Asciidoctor to PDF
-docker run --rm -v $(pwd):/documents/ asciidoctor/docker-asciidoctor asciidoctor-pdf "${OUT_ADOC_FILE}"
+<span class="c"># Convert Asciidoctor to PDF</span>
+docker run <span class="nt">--rm</span> <span class="nt">-v</span> <span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>:/documents/ asciidoctor/docker-asciidoctor asciidoctor-pdf <span class="s2">"</span><span class="k">${</span><span class="nv">OUT_ADOC_FILE</span><span class="k">}</span><span class="s2">"</span>
 
-# Rename the output PDF to a more proper one
-mv "${OUT_TMP_PDF_FILE}"  "${OUT_PDF_FILE}"
-</code></pre>
+<span class="c"># Rename the output PDF to a more proper one</span>
+<span class="nb">mv</span> <span class="s2">"</span><span class="k">${</span><span class="nv">OUT_TMP_PDF_FILE</span><span class="k">}</span><span class="s2">"</span>  <span class="s2">"</span><span class="k">${</span><span class="nv">OUT_PDF_FILE</span><span class="k">}</span><span class="s2">"</span>
+</code></pre></div></div>
 
 <p>This is it! Very simple and straightforward! I hope this article helps you and you will not devote much time to do the same. Have a nice day from a stormy Greece!</p>
 
