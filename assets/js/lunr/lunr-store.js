@@ -293,4 +293,14 @@ var store = [{
         "excerpt":"Debugging an application which runs on a remote Virtual Machine can prove to be very hard, especially if your client has “exceptional” conditions due to security, company or any other psycological measures/policies. For example, your VM can be a Windows machine (yes, Windows servers are an exception themselves and impose...","categories": ["MongoDB","Database","NoSQL"],
         "tags": ["maven","offline","goal","dependencies","without","internet","connection","parent","pom","non","resolvable"],
         "url": "https://manios.org/2019/08/21/force-maven-offline-execute-goal-dependencies",
+        "teaser":null},{
+        "title": "Convert Markdown to PDF using Docker, Pandoc and Asciidoctor",
+        "excerpt":"Today we had to deliver a .pdf file to a customer containing documentation about a system. The documentation was written in Markdown and needed to be converted to PDF. After some thoughts we did not find some straightforward way to do it, so we need it to convert Markdown to...","categories": ["Markdown","PDF","File","Conversion"],
+        "tags": ["markdown","md","pdf","docker","asciidoctor","convert","file","container"],
+        "url": "https://manios.org/2020/01/08/convert-markdown-to-pdf-using-docker-pandoc-asciidoctor",
+        "teaser":null},{
+        "title": "Lenovo Thinkpad T470p camera problem switching on and off in Windows 10",
+        "excerpt":"Issues After Windows 10 performed its updates in our Lenovo Thinkpad T470p laptop, we could not use the camera. The symptoms were the following: When we tried to use the laptop camera, the camera turned on (led light is green) and after 2 seconds it turned off (led light off)....","categories": ["Lenovo","Camera"],
+        "tags": ["lenovo","thinkpad","t470p","camera","issue","problem"],
+        "url": "https://manios.org/2020/01/12/lenovo-thinkpad-t470p-camera-problem-windows-10",
         "teaser":null}]

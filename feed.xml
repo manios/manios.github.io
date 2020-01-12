@@ -1,4 +1,128 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.0">Jekyll</generator><link href="https://manios.org/feed.xml" rel="self" type="application/atom+xml" /><link href="https://manios.org/" rel="alternate" type="text/html" /><updated>2019-08-21T21:26:19+03:00</updated><id>https://manios.org/</id><title type="html">cmanios</title><subtitle>Developer life is a NullPointerException</subtitle><author><name>Christos Manios</name></author><entry><title type="html">Force Maven to execute offline with local repository dependencies in a machine without Internet connection</title><link href="https://manios.org/2019/08/21/force-maven-offline-execute-goal-dependencies" rel="alternate" type="text/html" title="Force Maven to execute offline with local repository dependencies in a machine without Internet connection" /><published>2019-08-21T20:57:53+03:00</published><updated>2019-08-21T20:57:53+03:00</updated><id>https://manios.org/2019/08/21/force-maven-offline-execute-goal-dependencies</id><content type="html" xml:base="https://manios.org/2019/08/21/force-maven-offline-execute-goal-dependencies">&lt;p&gt;Debugging an application which runs on a remote Virtual Machine can prove to be very hard, especially if your client has “exceptional” conditions due to security, company or any other psycological measures/policies. For example, your VM can be a Windows machine (yes, Windows servers are an exception themselves and impose many issues and difficulties), it may have no internet connection or accept no traffic other than http and RDP. Typically we as developers are called to confront such installations and make them work. As a paralellism, we are asked to fix a vehicle engine through the exhaust pipe without having access to the hood!&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.0">Jekyll</generator><link href="https://manios.org/feed.xml" rel="self" type="application/atom+xml" /><link href="https://manios.org/" rel="alternate" type="text/html" /><updated>2020-01-12T15:03:24+02:00</updated><id>https://manios.org/</id><title type="html">cmanios</title><subtitle>Developer life is a NullPointerException</subtitle><author><name>Christos Manios</name></author><entry><title type="html">Lenovo Thinkpad T470p camera problem switching on and off in Windows 10</title><link href="https://manios.org/2020/01/12/lenovo-thinkpad-t470p-camera-problem-windows-10" rel="alternate" type="text/html" title="Lenovo Thinkpad T470p camera problem switching on and off in Windows 10" /><published>2020-01-12T12:19:00+02:00</published><updated>2020-01-12T12:19:00+02:00</updated><id>https://manios.org/2020/01/12/lenovo-thinkpad-t470p-camera-problem-windows-10</id><content type="html" xml:base="https://manios.org/2020/01/12/lenovo-thinkpad-t470p-camera-problem-windows-10">&lt;h2 id=&quot;issues&quot;&gt;Issues&lt;/h2&gt;
+
+&lt;p&gt;After Windows 10 performed its updates in our Lenovo Thinkpad T470p laptop, we could not use the camera. The symptoms were the following:  When we tried to use the laptop camera, the camera turned on (led light is green) and after 2 seconds it turned off (led light off).&lt;/p&gt;
+
+&lt;p&gt;The laptop has Windows 10. In detail:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;PS C:\Users\sbobos&amp;gt; [System.Environment]::OSVersion.Version
+
+Major  Minor  Build  Revision
+-----  -----  -----  --------
+10     0      18362  0
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;We had searched through the web and followed multiple steps, but the camera was still not working:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;&lt;a href=&quot;https://www.itsupportguides.com/knowledge-base/windows-10/solved-lenovo-built-in-webcam-camera-not-working-windows-10/&quot;&gt;[SOLVED] Lenovo – Built-in webcam camera not working (Windows 10)&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;https://www.techjunkie.com/lenovo-webcam-not-working-issue/&lt;/li&gt;
+  &lt;li&gt;https://forums.lenovo.com/t5/ThinkPad-T400-T500-and-newer-T/T410-Webcam-turning-off-after-3-10-seconds/td-p/1184859&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://www.google.com/search?client=firefox-b-d&amp;amp;ei=sP2vXbbFFszIwALWrKeYDA&amp;amp;q=lenovo+camera+switches+off+automatically&amp;amp;oq=lenovo+camera+switches+off+automa&amp;amp;gs_l=psy-ab.3.0.33i22i29i30l2.16104.24085..24883...0.0..0.127.977.3j6......0....1..gws-wiz.......0i8i13i30j0i22i30.y8k_Tu2u8mM&quot;&gt;Google : lenovo camera switches off automatically&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://www.google.com/search?client=firefox-b-d&amp;amp;ei=N_yvXdeoOc6tkwWG8av4CA&amp;amp;q=lenovo+camera+not+working+windows+10+update&amp;amp;oq=lenovo+camera+not+working+windows+10+update&amp;amp;gs_l=psy-ab.3..33i22i29i30l2.23492.24453..24552...0.2..0.176.769.0j5......0....1..gws-wiz.......0i71j0i19j0i22i30i19.AzKXz9G1Cac&amp;amp;ved=0ahUKEwiXoLKS6bHlAhXO1qQKHYb4Co8Q4dUDCAo&amp;amp;uact=5&quot;&gt;Google: lenovo camera not working windows 10 update&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;My computer looked like as it the solutions described above:&lt;/p&gt;
+
+&lt;p&gt;The camera permissions:&lt;/p&gt;
+
+&lt;figure&gt;
+    &lt;a href=&quot;/images/2020-01-12-lenovo-thinkpad-camera-issue/thinkpad-camera-issue1.png&quot;&gt;&lt;img src=&quot;/images/2020-01-12-lenovo-thinkpad-camera-issue/thinkpad-camera-issue1.png&quot; alt=&quot;Windows 10 Camera permissions&quot; /&gt;&lt;/a&gt;
+&lt;/figure&gt;
+
+&lt;figure&gt;
+    &lt;a href=&quot;/images/2020-01-12-lenovo-thinkpad-camera-issue/thinkpad-camera-issue2.png&quot;&gt;&lt;img src=&quot;/images/2020-01-12-lenovo-thinkpad-camera-issue/thinkpad-camera-issue2.png&quot; alt=&quot;Windows 10 Camera permissions&quot; /&gt;&lt;/a&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;The Lenovo Vantage configuration was:&lt;/p&gt;
+
+&lt;figure&gt;
+    &lt;a href=&quot;/images/2020-01-12-lenovo-thinkpad-camera-issue/thinkpad-camera-issue3.jpg&quot;&gt;&lt;img src=&quot;/images/2020-01-12-lenovo-thinkpad-camera-issue/thinkpad-camera-issue3.jpg&quot; alt=&quot;Windows 10 Camera Lenovo Vantage configuration&quot; /&gt;&lt;/a&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;Camera driver properties:&lt;/p&gt;
+
+&lt;figure&gt;
+    &lt;a href=&quot;/images/2020-01-12-lenovo-thinkpad-camera-issue/thinkpad-camera-issue4.png&quot;&gt;&lt;img src=&quot;/images/2020-01-12-lenovo-thinkpad-camera-issue/thinkpad-camera-issue4.png&quot; alt=&quot;Windows 10 Camera Lenovo Vantage configuration&quot; /&gt;&lt;/a&gt;
+&lt;/figure&gt;
+
+&lt;h2 id=&quot;the-actual-problem&quot;&gt;The actual problem:&lt;/h2&gt;
+
+&lt;p&gt;After more than 3 hours it struck us in the head: “Why don’t we have a look in Windows log?”. While inspecting it, we stumbled upon this error:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Faulting application name: svchost.exe_FrameServer, version: 10.0.18362.1, time stamp: 0x32d6c210
+Faulting module name: RsProvider.dll, version: 1.30.0.0, time stamp: 0x57ee1a06
+Exception code: 0xc0000005
+Fault offset: 0x000000000007bd6d
+Faulting process id: 0x24b4
+Faulting application start time: 0x01d5a4ef579b77f9
+Faulting application path: C:\WINDOWS\System32\svchost.exe
+Faulting module path: C:\Program Files\Realtek\RsProviders\RsProvider.dll
+Report Id: c07bcfb8-dfcc-401d-b116-72ccc3417d71
+Faulting package full name: 
+Faulting package-relative application ID: 
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;The error appeared whenever we were trying to use the Camera.&lt;/p&gt;
+
+&lt;h2 id=&quot;final-solution&quot;&gt;Final solution&lt;/h2&gt;
+
+&lt;p&gt;After searching this error at Google, I found this blog &lt;a href=&quot;https://www.winhelponline.com/blog/webcam-anniversary-update-windows-10-yuys-standard/&quot;&gt;post&lt;/a&gt; where it gives the final solution using registry.&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Create a Restore Point first.&lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Start &lt;code class=&quot;highlighter-rouge&quot;&gt;Regedit.exe&lt;/code&gt; and go to the following key:&lt;/p&gt;
+
+    &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt; HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\Platform
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Create a REG_DWORD value named EnableFrameServerMode and leave the data to 0.
+If you’re using Windows 64-bit, make the changes here, in addition:&lt;/p&gt;
+
+    &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt; HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows Media Foundation\Platform
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
+    &lt;p&gt;The above key is for 32-bit applications running on a Windows 64-bit computer.
+Exit the Registry Editor.&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;No other solution had worked for us. We hope that FrameServer is not used by another program so this trick will not cause any more issues.&lt;/p&gt;
+
+&lt;p&gt;I hope it helped! Happy new year 2020!&lt;/p&gt;</content><author><name>cmanios</name></author><category term="lenovo" /><category term="thinkpad" /><category term="t470p" /><category term="camera" /><category term="issue" /><category term="problem" /><summary type="html">Issues After Windows 10 performed its updates in our Lenovo Thinkpad T470p laptop, we could not use the camera. The symptoms were the following: When we tried to use the laptop camera, the camera turned on (led light is green) and after 2 seconds it turned off (led light off). The laptop has Windows 10. In detail: PS C:\Users\sbobos&amp;gt; [System.Environment]::OSVersion.Version Major Minor Build Revision ----- ----- ----- -------- 10 0 18362 0 We had searched through the web and followed multiple steps, but the camera was still not working: [SOLVED] Lenovo – Built-in webcam camera not working (Windows 10) https://www.techjunkie.com/lenovo-webcam-not-working-issue/ https://forums.lenovo.com/t5/ThinkPad-T400-T500-and-newer-T/T410-Webcam-turning-off-after-3-10-seconds/td-p/1184859 Google : lenovo camera switches off automatically Google: lenovo camera not working windows 10 update My computer looked like as it the solutions described above: The camera permissions: The Lenovo Vantage configuration was: Camera driver properties: The actual problem: After more than 3 hours it struck us in the head: “Why don’t we have a look in Windows log?”. While inspecting it, we stumbled upon this error: Faulting application name: svchost.exe_FrameServer, version: 10.0.18362.1, time stamp: 0x32d6c210 Faulting module name: RsProvider.dll, version: 1.30.0.0, time stamp: 0x57ee1a06 Exception code: 0xc0000005 Fault offset: 0x000000000007bd6d Faulting process id: 0x24b4 Faulting application start time: 0x01d5a4ef579b77f9 Faulting application path: C:\WINDOWS\System32\svchost.exe Faulting module path: C:\Program Files\Realtek\RsProviders\RsProvider.dll Report Id: c07bcfb8-dfcc-401d-b116-72ccc3417d71 Faulting package full name: Faulting package-relative application ID: The error appeared whenever we were trying to use the Camera. Final solution After searching this error at Google, I found this blog post where it gives the final solution using registry. Create a Restore Point first. Start Regedit.exe and go to the following key: HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Media Foundation\Platform Create a REG_DWORD value named EnableFrameServerMode and leave the data to 0. If you’re using Windows 64-bit, make the changes here, in addition: HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows Media Foundation\Platform The above key is for 32-bit applications running on a Windows 64-bit computer. Exit the Registry Editor. No other solution had worked for us. We hope that FrameServer is not used by another program so this trick will not cause any more issues. I hope it helped! Happy new year 2020!</summary></entry><entry><title type="html">Convert Markdown to PDF using Docker, Pandoc and Asciidoctor</title><link href="https://manios.org/2020/01/08/convert-markdown-to-pdf-using-docker-pandoc-asciidoctor" rel="alternate" type="text/html" title="Convert Markdown to PDF using Docker, Pandoc and Asciidoctor" /><published>2020-01-08T18:01:00+02:00</published><updated>2020-01-08T18:01:00+02:00</updated><id>https://manios.org/2020/01/08/convert-markdown-to-pdf-using-docker-pandoc-asciidoctor</id><content type="html" xml:base="https://manios.org/2020/01/08/convert-markdown-to-pdf-using-docker-pandoc-asciidoctor">&lt;p&gt;Today we had to deliver a .pdf file to a customer containing documentation about a system. The documentation was written in &lt;a href=&quot;https://daringfireball.net/projects/markdown/syntax&quot;&gt;Markdown&lt;/a&gt; and needed to be converted to PDF. After some thoughts we did not find some straightforward way to do it, so we need it to convert Markdown to Asciidoctor using &lt;a href=&quot;https://pandoc.org/&quot;&gt;Pandoc&lt;/a&gt; first and then from Asciidoctor to PDF. In addition to that, we love Docker, so we used Docker containers to achieve that. The containers used:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;https://hub.docker.com/r/pandoc/core&quot;&gt;pandoc/core&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://hub.docker.com/r/asciidoctor/docker-asciidoctor&quot;&gt;asciidoctor/docker-asciidoctor&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;We prepared quickly a small Bash script, which is the following (Listing of &lt;code class=&quot;highlighter-rouge&quot;&gt;convertMdToPdf.sh&lt;/code&gt;):&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-ssh&quot;&gt;#!/bin/bash
+
+set -eux
+
+INPUT_MD_FILE=bob.md
+OUT_ADOC_FILE=tmpOut.adoc 
+OUT_TMP_PDF_FILE=tmpOut.pdf
+OUT_PDF_FILE=documentation.pdf
+
+echo &quot;Clear temporary files (if exist)&quot;
+
+# Clear any temporary files
+(rm -f &quot;${OUT_ADOC_FILE}&quot; &quot;${OUT_PDF_FILE}&quot; &quot;${OUT_TMP_PDF_FILE}&quot; || true)
+
+# Convert Markdown to Asciidoctor
+docker run --rm -v &quot;$(pwd)&quot;:/data pandoc/core  -f markdown -t asciidoc -i &quot;${INPUT_MD_FILE}&quot; -o &quot;${OUT_ADOC_FILE}&quot;
+
+# Convert Asciidoctor to PDF
+docker run --rm -v $(pwd):/documents/ asciidoctor/docker-asciidoctor asciidoctor-pdf &quot;${OUT_ADOC_FILE}&quot;
+
+# Rename the output PDF to a more proper one
+mv &quot;${OUT_TMP_PDF_FILE}&quot;  &quot;${OUT_PDF_FILE}&quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This is it! Very simple and straightforward! I hope this article helps you and you will not devote much time to do the same. Have a nice day from a stormy Greece!&lt;/p&gt;</content><author><name>cmanios</name></author><category term="markdown" /><category term="md" /><category term="pdf" /><category term="docker" /><category term="asciidoctor" /><category term="convert" /><category term="file" /><category term="container" /><summary type="html">Today we had to deliver a .pdf file to a customer containing documentation about a system. The documentation was written in Markdown and needed to be converted to PDF. After some thoughts we did not find some straightforward way to do it, so we need it to convert Markdown to Asciidoctor using Pandoc first and then from Asciidoctor to PDF. In addition to that, we love Docker, so we used Docker containers to achieve that. The containers used: pandoc/core asciidoctor/docker-asciidoctor We prepared quickly a small Bash script, which is the following (Listing of convertMdToPdf.sh): #!/bin/bash set -eux INPUT_MD_FILE=bob.md OUT_ADOC_FILE=tmpOut.adoc OUT_TMP_PDF_FILE=tmpOut.pdf OUT_PDF_FILE=documentation.pdf echo &quot;Clear temporary files (if exist)&quot; # Clear any temporary files (rm -f &quot;${OUT_ADOC_FILE}&quot; &quot;${OUT_PDF_FILE}&quot; &quot;${OUT_TMP_PDF_FILE}&quot; || true) # Convert Markdown to Asciidoctor docker run --rm -v &quot;$(pwd)&quot;:/data pandoc/core -f markdown -t asciidoc -i &quot;${INPUT_MD_FILE}&quot; -o &quot;${OUT_ADOC_FILE}&quot; # Convert Asciidoctor to PDF docker run --rm -v $(pwd):/documents/ asciidoctor/docker-asciidoctor asciidoctor-pdf &quot;${OUT_ADOC_FILE}&quot; # Rename the output PDF to a more proper one mv &quot;${OUT_TMP_PDF_FILE}&quot; &quot;${OUT_PDF_FILE}&quot; This is it! Very simple and straightforward! I hope this article helps you and you will not devote much time to do the same. Have a nice day from a stormy Greece!</summary></entry><entry><title type="html">Force Maven to execute offline with local repository dependencies in a machine without Internet connection</title><link href="https://manios.org/2019/08/21/force-maven-offline-execute-goal-dependencies" rel="alternate" type="text/html" title="Force Maven to execute offline with local repository dependencies in a machine without Internet connection" /><published>2019-08-21T20:57:53+03:00</published><updated>2019-08-21T20:57:53+03:00</updated><id>https://manios.org/2019/08/21/force-maven-offline-execute-goal-dependencies</id><content type="html" xml:base="https://manios.org/2019/08/21/force-maven-offline-execute-goal-dependencies">&lt;p&gt;Debugging an application which runs on a remote Virtual Machine can prove to be very hard, especially if your client has “exceptional” conditions due to security, company or any other psycological measures/policies. For example, your VM can be a Windows machine (yes, Windows servers are an exception themselves and impose many issues and difficulties), it may have no internet connection or accept no traffic other than http and RDP. Typically we as developers are called to confront such installations and make them work. As a paralellism, we are asked to fix a vehicle engine through the exhaust pipe without having access to the hood!&lt;/p&gt;
 
 &lt;p&gt;If you are not bored to death yet, you may proceed!&lt;/p&gt;
 
@@ -965,90 +1089,4 @@ The &lt;code class=&quot;highlighter-rouge&quot;&gt;core&lt;/code&gt; section is
 
 &lt;p&gt;In this image, conflicts are marked with red and the automatically merged lines are marked with yellow. Left side (Theirs) is the version of the file which comes from repository and right side (Mine) is your local version with your changes.&lt;/p&gt;
 
-&lt;p&gt;That’s it. We hope this quick guide helped you!&lt;/p&gt;</content><author><name>cmanios</name></author><category term="git" /><category term="merge" /><category term="mergetool" /><category term="tortoise" /><category term="conflict" /><category term="windows" /><category term="client" /><summary type="html">Today we wanted to use Tortoise Git Merge, a Windows Git utility which comes with Tortoise Git. It helps us do a 3 way merge and solve our conflicts easily. The advantage of it is that it automatically merges the lines that where uniquely modified in every file and you only need to merge the common changes where the conflicts are. So in our case we had a file , let’s call it README.md, in which we had 1000 changed lines out of which only 2 had a conflict with the file pulled from upstream server. Eclipse and IntelliJ do provide a merge editor but as far as we are concerned they are not automatically merging your unique changes (please correct us if we are wrong). After some searching on the web of how to do so, we found StackOverflow Question 5190188 : Why can’t I use TortoiseMerge as my git merge tool on Windows? which explains different approaches.</summary></entry><entry><title type="html">Debug HTTP request of Java SOAP JAX-WS web service client</title><link href="https://manios.org/2018/04/03/java-soap-service-client-debug-http-message" rel="alternate" type="text/html" title="Debug HTTP request of Java SOAP JAX-WS web service client" /><published>2018-04-03T19:42:00+03:00</published><updated>2018-04-03T19:42:00+03:00</updated><id>https://manios.org/2018/04/03/java-soap-service-client-debug-http-message</id><content type="html" xml:base="https://manios.org/2018/04/03/java-soap-service-client-debug-http-message">&lt;p&gt;Today I wanted to debug in Java a JAX-WS SOAP web service client and see the exact message that is send as an &lt;a href=&quot;https://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html&quot;&gt;HTTP request&lt;/a&gt;. So after searching, I found in this   &lt;a href=&quot;https://stackoverflow.com/questions/1945618/tracing-xml-request-responses-with-jax-ws&quot;&gt;StackOverflow question&lt;/a&gt; that if we insert the following lines before calling the service:&lt;/p&gt;
-
-&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;System&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;setProperty&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;com.sun.xml.ws.transport.http.client.HttpTransportPipe.dump&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;true&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;System&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;setProperty&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;com.sun.xml.internal.ws.transport.http.client.HttpTransportPipe.dump&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;true&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;System&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;setProperty&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;com.sun.xml.ws.transport.http.HttpAdapter.dump&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;true&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;System&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;setProperty&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;com.sun.xml.internal.ws.transport.http.HttpAdapter.dump&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;true&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;when we call the service it will produce the following output in logs (or console output):&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&quot;language-txt&quot;&gt;---[HTTP request - http://localhost:9090/ContactRequestServicePort]---
-Accept: text/xml, multipart/related
-Content-Type: text/xml; charset=utf-8
-SOAPAction: &quot;newContact&quot;
-User-Agent: JAX-WS RI 2.2.9-b130926.1035 svn-revision#5f6196f2b90e9460065a4c2f4e30e065b245e51e
-&amp;lt;?xml version=&quot;1.0&quot; ?&amp;gt;&amp;lt;S:Envelope xmlns:S=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;&amp;gt;&amp;lt;S:Body&amp;gt;&amp;lt;ns2:newContact xmlns:ns4=&quot;http://www.acmecorp.com/contacts/Exception&quot; xmlns:ns3=&quot;http://www.acmecorp.com/contacts/RequestMetaInfo&quot; xmlns:ns2=&quot;http://www.acmecorp.com/contacts/crm-contact/Service&quot;&amp;gt;&amp;lt;ns2:contact&amp;gt;&amp;lt;ns2:prefix&amp;gt;Mr&amp;lt;/ns2:prefix&amp;gt;&amp;lt;ns2:name&amp;gt;John&amp;lt;/ns2:name&amp;gt;&amp;lt;ns2:surname&amp;gt;Longjohn&amp;lt;/ns2:surname&amp;gt;&amp;lt;/ns2:contact&amp;gt;&amp;lt;/ns2:newContact&amp;gt;&amp;lt;/S:Body&amp;gt;&amp;lt;/S:Envelope&amp;gt;--------------------
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;It works! Now we have the entire HTTP request and we can pretty print the XML which is included in the message body of HTTP request to see what we send to the web service:&lt;/p&gt;
-
-&lt;div class=&quot;language-xml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;cp&quot;&gt;&amp;lt;?xml version=&quot;1.0&quot; ?&amp;gt;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;S:Envelope&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;xmlns:S=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
-    &lt;span class=&quot;nt&quot;&gt;&amp;lt;S:Body&amp;gt;&lt;/span&gt;
-        &lt;span class=&quot;nt&quot;&gt;&amp;lt;ns2:newContact&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;xmlns:ns4=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;http://www.acmecorp.com/contacts/Exception&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;xmlns:ns3=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;http://www.acmecorp.com/contacts/RequestMetaInfo&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;xmlns:ns2=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;http://www.acmecorp.com/contacts/crm-contact/Service&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
-            &lt;span class=&quot;nt&quot;&gt;&amp;lt;ns2:contact&amp;gt;&lt;/span&gt;
-                &lt;span class=&quot;nt&quot;&gt;&amp;lt;ns2:prefix&amp;gt;&lt;/span&gt;Mr&lt;span class=&quot;nt&quot;&gt;&amp;lt;/ns2:prefix&amp;gt;&lt;/span&gt;
-                &lt;span class=&quot;nt&quot;&gt;&amp;lt;ns2:name&amp;gt;&lt;/span&gt;John&lt;span class=&quot;nt&quot;&gt;&amp;lt;/ns2:name&amp;gt;&lt;/span&gt;
-                &lt;span class=&quot;nt&quot;&gt;&amp;lt;ns2:surname&amp;gt;&lt;/span&gt;Longjohn&lt;span class=&quot;nt&quot;&gt;&amp;lt;/ns2:surname&amp;gt;&lt;/span&gt;
-            &lt;span class=&quot;nt&quot;&gt;&amp;lt;/ns2:contact&amp;gt;&lt;/span&gt;
-        &lt;span class=&quot;nt&quot;&gt;&amp;lt;/ns2:newContact&amp;gt;&lt;/span&gt;
-    &lt;span class=&quot;nt&quot;&gt;&amp;lt;/S:Body&amp;gt;&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;&amp;lt;/S:Envelope&amp;gt;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name>cmanios</name></author><category term="java" /><category term="http" /><category term="request" /><category term="message" /><category term="debug" /><category term="soap" /><category term="client" /><category term="jax" /><category term="ws" /><category term="jax-ws" /><category term="web" /><category term="service" /><category term="print" /><category term="log" /><category term="console" /><category term="wsdl" /><summary type="html">Today I wanted to debug in Java a JAX-WS SOAP web service client and see the exact message that is send as an HTTP request. So after searching, I found in this StackOverflow question that if we insert the following lines before calling the service:</summary></entry><entry><title type="html">HTTP Basic Authentication in Java SOAP JAX-WS web service client</title><link href="https://manios.org/2018/03/30/java-soap-jax-ws-client-basic-auth" rel="alternate" type="text/html" title="HTTP Basic Authentication in Java SOAP JAX-WS web service client" /><published>2018-03-30T17:42:00+03:00</published><updated>2018-03-30T17:42:00+03:00</updated><id>https://manios.org/2018/03/30/java-soap-jax-ws-client-basic-auth</id><content type="html" xml:base="https://manios.org/2018/03/30/java-soap-jax-ws-client-basic-auth">&lt;p&gt;Today I had to create a Java client for a SOAP web service. So I opened &lt;a href=&quot;http://netbeans.org/&quot;&gt;Netbeans&lt;/a&gt; IDE and used the great tool which generates JAX-WS client code using the respective service &lt;code class=&quot;highlighter-rouge&quot;&gt;.wsdl&lt;/code&gt; file. However, the service needed to be called using &lt;a href=&quot;https://en.wikipedia.org/wiki/Basic_access_authentication&quot;&gt;Basic Http Authentication&lt;/a&gt;.&lt;/p&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;&lt;strong&gt;NOTE&lt;/strong&gt;: The solution provided works if the WSDL is not protected itself by Basic Http Authentication. The Basic Authentication &lt;u&gt;is added as a header in the HTTP request&lt;/u&gt;.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;After a lot of searching I found that (StackOverflow question) this is possible:&lt;/p&gt;
-
-&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;ContactCreationRequestService_Service&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;srv&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ContactCreationRequestService_Service&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;ContactCreationRequestService&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;porta&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
-
-&lt;span class=&quot;c1&quot;&gt;// Get service port&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;try&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;porta&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;srv&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getContactCreationRequestServicePort&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;catch&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Exception&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;){&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;logger&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;error&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-
-&lt;span class=&quot;c1&quot;&gt;// Add username and password for Basic Authentication&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;Map&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Object&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;reqContext&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;((&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;BindingProvider&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;porta&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getRequestContext&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;reqContext&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;put&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;BindingProvider&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;USERNAME_PROPERTY&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;username&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;reqContext&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;put&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;BindingProvider&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;PASSWORD_PROPERTY&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;password&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
-
-&lt;span class=&quot;c1&quot;&gt;// Create a contact request&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;ContactRequest&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ka&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ContactRequest&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;ka&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;setPrefix&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Mr&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;ka&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;setName&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Christos&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;ka&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;setSurname&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Manios&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;NewContact&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;nka&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;NewContact&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;nka&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;setContactRequest&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ka&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
-
-&lt;span class=&quot;c1&quot;&gt;// Call the web service&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;try&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;porta&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;newContactCreationRequest&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;nka&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;catch&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;SoapServiceException&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;logger&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;error&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;If we enable debugging to see the actual HTTP request, then the logs will show output like the following:&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;---[HTTP request - http://localhost:9090/ContactRequestServicePort]---
-Accept: text/xml, multipart/related
-Authorization: Basic dXNlcm5hbWU6cGFzc3dvcmQ=
-Content-Type: text/xml; charset=utf-8
-SOAPAction: &quot;newContact&quot;
-User-Agent: JAX-WS RI 2.2.9-b130926.1035 svn-revision#5f6196f2b90e9460065a4c2f4e30e065b245e51e
-&amp;lt;?xml version=&quot;1.0&quot; ?&amp;gt;&amp;lt;S:Envelope xmlns:S=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;&amp;gt;&amp;lt;S:Body&amp;gt;&amp;lt;ns2:newContact xmlns:ns4=&quot;http://www.acmecorp.com/contacts/Exception&quot; xmlns:ns3=&quot;http://www.acmecorp.com/contacts/RequestMetaInfo&quot; xmlns:ns2=&quot;http://www.acmecorp.com/contacts/crm-contact/Service&quot;&amp;gt;&amp;lt;ns2:contact&amp;gt;&amp;lt;ns2:prefix&amp;gt;Mr&amp;lt;/ns2:prefix&amp;gt;&amp;lt;ns2:name&amp;gt;John&amp;lt;/ns2:name&amp;gt;&amp;lt;ns2:surname&amp;gt;Longjohn&amp;lt;/ns2:surname&amp;gt;&amp;lt;/ns2:contact&amp;gt;&amp;lt;/ns2:newContact&amp;gt;&amp;lt;/S:Body&amp;gt;&amp;lt;/S:Envelope&amp;gt;--------------------
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;You can observe that the request contains the &lt;code class=&quot;highlighter-rouge&quot;&gt;Authorization&lt;/code&gt; header as expected:&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Authorization: Basic dXNlcm5hbWU6cGFzc3dvcmQ=
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name>cmanios</name></author><category term="java" /><category term="soap" /><category term="basic" /><category term="auth" /><category term="authentication" /><category term="client" /><category term="jax" /><category term="ws" /><category term="jax-ws" /><category term="web" /><category term="service" /><category term="http" /><category term="netbeans" /><category term="wsdl" /><summary type="html">Today I had to create a Java client for a SOAP web service. So I opened Netbeans IDE and used the great tool which generates JAX-WS client code using the respective service .wsdl file. However, the service needed to be called using Basic Http Authentication.</summary></entry></feed>
+&lt;p&gt;That’s it. We hope this quick guide helped you!&lt;/p&gt;</content><author><name>cmanios</name></author><category term="git" /><category term="merge" /><category term="mergetool" /><category term="tortoise" /><category term="conflict" /><category term="windows" /><category term="client" /><summary type="html">Today we wanted to use Tortoise Git Merge, a Windows Git utility which comes with Tortoise Git. It helps us do a 3 way merge and solve our conflicts easily. The advantage of it is that it automatically merges the lines that where uniquely modified in every file and you only need to merge the common changes where the conflicts are. So in our case we had a file , let’s call it README.md, in which we had 1000 changed lines out of which only 2 had a conflict with the file pulled from upstream server. Eclipse and IntelliJ do provide a merge editor but as far as we are concerned they are not automatically merging your unique changes (please correct us if we are wrong). After some searching on the web of how to do so, we found StackOverflow Question 5190188 : Why can’t I use TortoiseMerge as my git merge tool on Windows? which explains different approaches.</summary></entry></feed>
