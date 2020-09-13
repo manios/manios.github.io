@@ -1,6 +1,6 @@
 <!doctype html>
 <!--
-  Minimal Mistakes Jekyll Theme 4.2.2 by Michael Rose
+  Minimal Mistakes Jekyll Theme 4.20.2 by Michael Rose
   Copyright 2017 Michael Rose - mademistakes.com | @mmistakes
   Free for personal and commercial use under the MIT license
   https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE.txt
@@ -9,9 +9,12 @@
   <head>
     <meta charset="utf-8">
 
-<!-- begin _includes/seo.html --><title>cmanios - Page 3</title>
+<!-- begin _includes/seo.html --><title>Camera - cmanios - Page 3</title>
 <meta name="description" content="Developer life is a NullPointerException">
 
+
+  <meta name="author" content="Christos Manios">
+  
 
 
 <meta property="og:type" content="website">
@@ -20,6 +23,8 @@
 <meta property="og:title" content="cmanios">
 <meta property="og:url" content="https://manios.org/page3/">
 
+
+  <meta property="og:description" content="Developer life is a NullPointerException">
 
 
 
@@ -45,19 +50,16 @@
   <link rel="next" href="https://manios.org/page4/">
 
 
-
-
-
-  <script type="application/ld+json">
-    {
-      "@context": "http://schema.org",
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
       "@type": "Person",
       "name": "Christos Manios",
-      "url": "https://manios.org",
-      "sameAs": null
-    }
-  </script>
-
+      "url": "https://manios.org/"
+    
+  }
+</script>
 
 
 
@@ -69,9 +71,7 @@
 
 <link href="/feed.xml" type="application/atom+xml" rel="alternate" title="cmanios Feed">
 
-<!-- http://t.co/dKP3o1e -->
-<meta name="HandheldFriendly" content="True">
-<meta name="MobileOptimized" content="320">
+<!-- https://t.co/dKP3o1e -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <script>
@@ -80,8 +80,9 @@
 
 <!-- For all browsers -->
 <link rel="stylesheet" href="/assets/css/main.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css">
 
-<!--[if lte IE 9]>
+<!--[if IE]>
   <style>
     /* old IE unsupported flexbox fixes */
     .greedy-nav .site-title {
@@ -95,6 +96,7 @@
     }
   </style>
 <![endif]-->
+
 
 
     <!-- start custom head snippets -->
@@ -111,37 +113,29 @@
 <div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
 <![endif]-->
 
-    <div class="masthead">
+    
+
+<div class="masthead">
   <div class="masthead__inner-wrap">
     <div class="masthead__menu">
       <nav id="site-nav" class="greedy-nav">
-        <a class="site-title" href="/">cmanios</a>
-        <ul class="visible-links">
+        
+        <a class="site-title" href="/">
+          cmanios
           
-            
-            <li class="masthead__menu-item">
-              <a href="https://manios.org/year-archive/" >Posts archive</a>
-            </li>
-          
-            
-            <li class="masthead__menu-item">
-              <a href="https://manios.org/categories/" >Categories</a>
-            </li>
-          
-            
-            <li class="masthead__menu-item">
-              <a href="https://manios.org/tags/" >Tags</a>
-            </li>
-          
-            
-            <li class="masthead__menu-item">
-              <a href="https://manios.org/about/" >About</a>
-            </li>
-          
-        </ul>
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/year-archive/">Posts archive</a>
+            </li><li class="masthead__menu-item">
+              <a href="/categories/">Categories</a>
+            </li><li class="masthead__menu-item">
+              <a href="/tags/">Tags</a>
+            </li><li class="masthead__menu-item">
+              <a href="/about/">About</a>
+            </li></ul>
         
         <button class="greedy-nav__toggle hidden" type="button">
-          <span class="visually-hidden">Toggle Menu</span>
+          <span class="visually-hidden">Toggle menu</span>
           <div class="navicon"></div>
         </button>
         <ul class="hidden-links hidden"></ul>
@@ -149,6 +143,7 @@
     </div>
   </div>
 </div>
+
 
    
 
@@ -165,7 +160,7 @@
   
 
 
-<div itemscope itemtype="http://schema.org/Person">
+<div itemscope itemtype="https://schema.org/Person">
 
   
 
@@ -174,9 +169,10 @@
       <h3 class="author__name" itemprop="name">Christos Manios</h3>
     
     
-      <p class="author__bio" itemprop="description">
-        Developer life is a NullPointerException
-      </p>
+      <div class="author__bio" itemprop="description">
+        <p>Developer life is a NullPointerException</p>
+
+      </div>
     
   </div>
 
@@ -184,24 +180,40 @@
     <button class="btn btn--inverse">Follow</button>
     <ul class="author__urls social-icons">
       
-        <li itemprop="homeLocation" itemscope itemtype="http://schema.org/Place">
+        <li itemprop="homeLocation" itemscope itemtype="https://schema.org/Place">
           <i class="fas fa-fw fa-map-marker-alt" aria-hidden="true"></i> <span itemprop="name">Thessaloniki, GR</span>
         </li>
       
 
       
+        
+          
+        
+          
+        
+          
+            <li><a href="https://twitter.com/maniosolr" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-twitter-square" aria-hidden="true"></i><span class="label">Twitter</span></a></li>
+          
+        
+          
+        
+          
+            <li><a href="https://github.com/manios" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i><span class="label">GitHub</span></a></li>
+          
+        
+          
+        
+      
+
+      
+
+      
 
       
 
       
 
       
-        <li>
-          <a href="https://twitter.com/maniosolr" itemprop="sameAs">
-            <i class="fab fa-fw fa-twitter-square" aria-hidden="true"></i> Twitter
-          </a>
-        </li>
-      
 
       
 
@@ -213,16 +225,6 @@
 
       
 
-      
-
-      
-
-      
-        <li>
-          <a href="https://github.com/manios" itemprop="sameAs">
-            <i class="fab fa-fw fa-github" aria-hidden="true"></i> GitHub
-          </a>
-        </li>
       
 
       
@@ -253,7 +255,7 @@
 
       <!--
   <li>
-    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs">
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer">
       <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
     </a>
   </li>
@@ -266,150 +268,222 @@
   </div>
 
 
+
   <div class="archive">
     
       <h1 id="page-title" class="page__title"></h1>
     
-    <h3 class="archive__subtitle">Recent Posts</h3>
+    
+
+<h3 class="archive__subtitle">Recent Posts</h3>
 
 
+
+
+<div class="entries-list">
   
+    
 
 
 
 <div class="list__item">
-  <article class="archive__item" itemscope itemtype="http://schema.org/CreativeWork">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
     
-    <h2 class="archive__item-title" itemprop="headline">
+    <h2 class="archive__item-title no_toc" itemprop="headline">
       
         <a href="/2018/04/03/java-soap-service-client-debug-http-message" rel="permalink">Debug HTTP request of Java SOAP JAX-WS web service client
 </a>
       
     </h2>
     
-      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
 
-
-
-
-  less than 1 minute read
-</p>
+  <p class="page__meta">
     
+
+    
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          less than 1 minute read
+        
+      </span>
+    
+  </p>
+
+
     <p class="archive__item-excerpt" itemprop="description">Today I wanted to debug in Java a JAX-WS SOAP web service client and see the exact message that is send as an HTTP request. So after searching, I found in th...</p>
   </article>
 </div>
 
   
+    
 
 
 
 <div class="list__item">
-  <article class="archive__item" itemscope itemtype="http://schema.org/CreativeWork">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
     
-    <h2 class="archive__item-title" itemprop="headline">
+    <h2 class="archive__item-title no_toc" itemprop="headline">
       
         <a href="/2018/03/30/java-soap-jax-ws-client-basic-auth" rel="permalink">HTTP Basic Authentication in Java SOAP JAX-WS web service client
 </a>
       
     </h2>
     
-      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
 
-
-
-
-  1 minute read
-</p>
+  <p class="page__meta">
     
+
+    
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          1 minute read
+        
+      </span>
+    
+  </p>
+
+
     <p class="archive__item-excerpt" itemprop="description">Today I had to create a Java client for a SOAP web service. So I opened Netbeans IDE and used the great tool which generates JAX-WS client code using the res...</p>
   </article>
 </div>
 
   
+    
 
 
 
 <div class="list__item">
-  <article class="archive__item" itemscope itemtype="http://schema.org/CreativeWork">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
     
-    <h2 class="archive__item-title" itemprop="headline">
+    <h2 class="archive__item-title no_toc" itemprop="headline">
       
         <a href="/2017/12/14/install-and-configure-and-troubleshoot-ntp-servers-in-debian-linux" rel="permalink">Install, configure and troubleshoot NTP servers in Debian Linux
 </a>
       
     </h2>
     
-      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
 
-
-
-
-  13 minute read
-</p>
+  <p class="page__meta">
     
+
+    
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          13 minute read
+        
+      </span>
+    
+  </p>
+
+
     <p class="archive__item-excerpt" itemprop="description">If you are reading this article, perhaps you have searched a lot about NTP server installation in Linux, issues and problems encountered and how to troublesh...</p>
   </article>
 </div>
 
   
+    
 
 
 
 <div class="list__item">
-  <article class="archive__item" itemscope itemtype="http://schema.org/CreativeWork">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
     
-    <h2 class="archive__item-title" itemprop="headline">
+    <h2 class="archive__item-title no_toc" itemprop="headline">
       
         <a href="/2017/11/23/mongodb-replica-stale-during-recovery" rel="permalink">MongoDB replica error RS102 too stale to catch up during full recovery
 </a>
       
     </h2>
     
-      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
 
-
-
-
-  3 minute read
-</p>
+  <p class="page__meta">
     
+
+    
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          3 minute read
+        
+      </span>
+    
+  </p>
+
+
     <p class="archive__item-excerpt" itemprop="description">We run MongoDB 2.6.0 on a production system configured with a replica set of 3 members:
 
   Primary
   Secondary
   Arbiter
 
-
 </p>
   </article>
 </div>
 
   
+    
 
 
 
 <div class="list__item">
-  <article class="archive__item" itemscope itemtype="http://schema.org/CreativeWork">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
     
-    <h2 class="archive__item-title" itemprop="headline">
+    <h2 class="archive__item-title no_toc" itemprop="headline">
       
         <a href="/2017/11/15/use-haproxy-and-docker-for-solr-load-balancing" rel="permalink">Use HAProxy and Docker to load balance requests to Solr and SolrCloud
 </a>
       
     </h2>
     
-      <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> 
 
-
-
-
-  2 minute read
-</p>
+  <p class="page__meta">
     
+
+    
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          2 minute read
+        
+      </span>
+    
+  </p>
+
+
     <p class="archive__item-excerpt" itemprop="description">We use Solr 4.6 with SolrCloud configuration in a production system. You may say: “It is hight time you upgraded to the latest version, isn’t it?”. And you w...</p>
   </article>
 </div>
 
+  
+</div>
 
 
 <nav class="pagination">
@@ -507,15 +581,29 @@
         <div class="page__footer-follow">
   <ul class="social-icons">
     
-      <li><strong>Follow:</strong></li>
+
     
+      
+        
+          <li><a href="https://twitter.com/maniosolr" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-twitter-square" aria-hidden="true"></i> Twitter</a></li>
+        
+      
+        
+      
+        
+          <li><a href="https://github.com/manios" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i> GitHub</a></li>
+        
+      
+        
+          <li><a href="https://gitlab.com/manios" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-gitlab" aria-hidden="true"></i> GitLab</a></li>
+        
+      
+        
+      
+        
+      
     
-    
-    
-      <li><a href="https://github.com/manios"><i class="fab fa-fw fa-github" aria-hidden="true"></i> GitHub</a></li>
-    
-    
-    
+
     <li><a href="/feed.xml"><i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
   </ul>
 </div>
@@ -527,7 +615,6 @@
 
     
   <script src="/assets/js/main.min.js"></script>
-  <script src="https://use.fontawesome.com/releases/v5.2.0/js/all.js"></script>
 
 
 
@@ -536,15 +623,14 @@
 
 
   <script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-  ga('create', 'UA-96500199-2', 'auto');
-  ga('set', 'anonymizeIp', false)
-  ga('send', 'pageview');
+  window.ga=function(){ga.q.push(arguments)};ga.q=[];ga.l=+new Date;
+  ga('create','UA-96500199-2','auto');
+  ga('set', 'anonymizeIp', false);
+  ga('send','pageview')
 </script>
+<script src="https://www.google-analytics.com/analytics.js" async></script>
+
+
 
 
 
