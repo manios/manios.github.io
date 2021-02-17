@@ -364,4 +364,10 @@ var store = [{
         "tags": ["lenovo","thinkpad","t470p","camera","issue","problem","not","working","error","windows","update","driver"],
         "url": "https://manios.org/2020/01/12/lenovo-thinkpad-t470p-camera-problem-windows-10",
         "teaser": null
+      },{
+        "title": "PostgreSQL case and accent insentitive SQL queries",
+        "excerpt":"A few days ago we were implementing a Spring Boot application which stored its data into a PostgreSQL database. As a requirement we needed to search into the database with LIKE operator in our SQL queries and at the same time perform case and accent insensitive searches. Since we are...","categories": ["Postgres","Database","SQL"],
+        "tags": ["postgres","postgresql","database","case","accent","insensitive","query","sql","like","statement","search","docker"],
+        "url": "https://manios.org/2021/02/17/postgresql-case-accent-insentitive-sql-queries",
+        "teaser": null
       }]

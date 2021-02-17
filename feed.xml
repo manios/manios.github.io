@@ -1,4 +1,92 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.0">Jekyll</generator><link href="https://manios.org/feed.xml" rel="self" type="application/atom+xml" /><link href="https://manios.org/" rel="alternate" type="text/html" /><updated>2020-09-13T07:31:50-05:00</updated><id>https://manios.org/feed.xml</id><title type="html">cmanios</title><subtitle>Developer life is a NullPointerException</subtitle><author><name>Christos Manios</name></author><entry><title type="html">Lenovo Thinkpad T470p camera problem switching on and off in Windows 10</title><link href="https://manios.org/2020/01/12/lenovo-thinkpad-t470p-camera-problem-windows-10" rel="alternate" type="text/html" title="Lenovo Thinkpad T470p camera problem switching on and off in Windows 10" /><published>2020-01-12T04:19:00-06:00</published><updated>2020-09-13T05:44:00-05:00</updated><id>https://manios.org/2020/01/12/lenovo-thinkpad-t470p-camera-problem-windows-10</id><content type="html" xml:base="https://manios.org/2020/01/12/lenovo-thinkpad-t470p-camera-problem-windows-10">&lt;h2 id=&quot;issues&quot;&gt;Issues&lt;/h2&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.0">Jekyll</generator><link href="https://manios.org/feed.xml" rel="self" type="application/atom+xml" /><link href="https://manios.org/" rel="alternate" type="text/html" /><updated>2021-02-17T12:14:39-06:00</updated><id>https://manios.org/feed.xml</id><title type="html">cmanios</title><subtitle>Developer life is a NullPointerException</subtitle><author><name>Christos Manios</name></author><entry><title type="html">PostgreSQL case and accent insentitive SQL queries</title><link href="https://manios.org/2021/02/17/postgresql-case-accent-insentitive-sql-queries" rel="alternate" type="text/html" title="PostgreSQL case and accent insentitive SQL queries" /><published>2021-02-17T12:00:00-06:00</published><updated>2021-02-17T12:00:00-06:00</updated><id>https://manios.org/2021/02/17/postgresql-case--accent-insentitive-sql-queries</id><content type="html" xml:base="https://manios.org/2021/02/17/postgresql-case-accent-insentitive-sql-queries">&lt;p&gt;A few days ago we were implementing a Spring Boot application which stored its data into a PostgreSQL database. As a requirement we needed to search into the database with &lt;a href=&quot;https://www.w3schools.com/sql/sql_like.asp&quot;&gt;LIKE&lt;/a&gt; operator in our &lt;code class=&quot;highlighter-rouge&quot;&gt;SQL&lt;/code&gt; queries and at the same time perform case and accent insensitive searches. Since we are Greek, this is pretty typical for us because our letters have diacritics (“tonos”). So a query like the following&lt;/p&gt;
+
+&lt;div class=&quot;language-sql highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;select&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;blablatable&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;where&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;name&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;like&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'%χρη%'&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;should return results for:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;Χρή&lt;/strong&gt;στος&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;ΧΡΗΣ&lt;/strong&gt;ΤΟΣ&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;χΡή&lt;/strong&gt;στος&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;The aforementioned SQL query works perfectly normal in a MySQL or MariaDB database with collation &lt;code class=&quot;highlighter-rouge&quot;&gt;utf8_general_ci&lt;/code&gt;. However in PostgreSQL this is not the case. So after some searching and reading StackOverflow &lt;a href=&quot;https://stackoverflow.com/questions/11005036/does-postgresql-support-accent-insensitive-collations&quot;&gt;#11005036&lt;/a&gt;, we figured out how to make case and accent insensitive search SQL queries.&lt;/p&gt;
+
+&lt;h2 id=&quot;fire-up-a-postgresql-docker-container&quot;&gt;Fire up a PostgreSQL Docker container&lt;/h2&gt;
+
+&lt;p&gt;We chose to use PostgreSQL inside a Docker container, so we fire up one:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;docker run &lt;span class=&quot;nt&quot;&gt;--name&lt;/span&gt; postgres &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+  &lt;span class=&quot;nt&quot;&gt;-p&lt;/span&gt; 5432:5432 &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+  &lt;span class=&quot;nt&quot;&gt;-e&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;POSTGRES_PASSWORD&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;strongpassword &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+  &lt;span class=&quot;nt&quot;&gt;-e&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;POSTGRES_USER&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;stronguser &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+  &lt;span class=&quot;nt&quot;&gt;-e&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;POSTGRES_DB&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;airplanes &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+  &lt;span class=&quot;nt&quot;&gt;-d&lt;/span&gt; postgres:13.0
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;connect-to-postgresql-using-a-docker-container&quot;&gt;Connect to PostgreSQL using a Docker container&lt;/h2&gt;
+
+&lt;p&gt;We used a temporary container to connect to our newly created database. You can skip this step and use another client such as &lt;a href=&quot;https://www.pgadmin.org/&quot;&gt;pgAdmin&lt;/a&gt; or &lt;a href=&quot;https://dbeaver.io/&quot;&gt;DBeaver&lt;/a&gt;.&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;docker run &lt;span class=&quot;nt&quot;&gt;-it&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--rm&lt;/span&gt; postgres:13.0 psql &lt;span class=&quot;nt&quot;&gt;-h&lt;/span&gt; host.docker.internal &lt;span class=&quot;nt&quot;&gt;-d&lt;/span&gt; airplanes &lt;span class=&quot;nt&quot;&gt;--user&lt;/span&gt; stronguser
+Password &lt;span class=&quot;k&quot;&gt;for &lt;/span&gt;user stronguser:
+&amp;lt;enter thy password&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Mind the &lt;code class=&quot;highlighter-rouge&quot;&gt;host.docker.internal&lt;/code&gt;. This host name is used &lt;u&gt;only in Docker for Windows&lt;/u&gt; to mark the host computer where Docker runs.&lt;/p&gt;
+
+&lt;h2 id=&quot;create-an-extension-in-postgresql&quot;&gt;Create an extension in PostgreSQL&lt;/h2&gt;
+
+&lt;p&gt;In order to use case and accent insensitive search SQL queries, we need to use a PostgreSQL extension. So, execute in your favourite PostgreSQL client:&lt;/p&gt;
+
+&lt;div class=&quot;language-sql highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;CREATE&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;EXTENSION&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;unaccent&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;create-a-table-and-insert-some-data&quot;&gt;Create a table and insert some data&lt;/h2&gt;
+
+&lt;p&gt;Then we need to create a simple table in the default schema &lt;code class=&quot;highlighter-rouge&quot;&gt;public&lt;/code&gt;, which will have some text data with accents:&lt;/p&gt;
+
+&lt;div class=&quot;language-sql highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;create&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sequence&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;public&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;BOBOS_SEQUENCE&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;start&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;increment&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;create&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;table&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;public&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;bobos&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;ID&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;int8&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;not&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;null&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;DEFAULT&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;nextval&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'BOBOS_SEQUENCE'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;name&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;varchar&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;255&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;primary&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;key&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ID&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;After that we populate it with some test data:&lt;/p&gt;
+
+&lt;div class=&quot;language-sql highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;INSERT&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;INTO&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;public&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;bobos&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;VALUES&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'Τάκης, the best handmade gyros of Triandria'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;INSERT&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;INTO&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;public&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;bobos&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;VALUES&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'Χρήστος'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;INSERT&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;INTO&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;public&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;bobos&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;VALUES&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'ΧΡΗΣΤΟΣ'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;INSERT&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;INTO&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;public&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;bobos&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;VALUES&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'χΡήστος'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;sql-case-and-accent-insensitive-queries&quot;&gt;SQL case and accent insensitive queries&lt;/h2&gt;
+
+&lt;p&gt;Finally in order to perform case and accent insensitive SQL queries , execute the following statement:&lt;/p&gt;
+
+&lt;div class=&quot;language-sql highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;select&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; 
+&lt;span class=&quot;k&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;public&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;bobos&lt;/span&gt; 
+&lt;span class=&quot;k&quot;&gt;where&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;unaccent&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;LOWER&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;NAME&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;like&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;unaccent&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;LOWER&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'%χρη%'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;The results will be like the following:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;id|name   |
+--|-------|
+ 2|Χρήστος|
+ 3|ΧΡΗΣΤΟΣ|
+ 4|χΡήστος|
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;As you might have noticed, we need to use both &lt;code class=&quot;highlighter-rouge&quot;&gt;unaccent()&lt;/code&gt; extension and &lt;code class=&quot;highlighter-rouge&quot;&gt;LOWER()&lt;/code&gt; function in order to meet the desired result.&lt;/p&gt;
+
+&lt;p&gt;I hope you found this article useful and you do not waste any more time searching in the web. Have a nice day and love thy neighbour!&lt;/p&gt;</content><author><name>cmanios</name></author><category term="Postgres" /><category term="Database" /><category term="SQL" /><category term="postgres" /><category term="postgresql" /><category term="database" /><category term="case" /><category term="accent" /><category term="insensitive" /><category term="query" /><category term="sql" /><category term="like" /><category term="statement" /><category term="search" /><category term="docker" /><summary type="html">A few days ago we were implementing a Spring Boot application which stored its data into a PostgreSQL database. As a requirement we needed to search into the database with LIKE operator in our SQL queries and at the same time perform case and accent insensitive searches. Since we are Greek, this is pretty typical for us because our letters have diacritics (“tonos”). So a query like the following</summary></entry><entry><title type="html">Lenovo Thinkpad T470p camera problem switching on and off in Windows 10</title><link href="https://manios.org/2020/01/12/lenovo-thinkpad-t470p-camera-problem-windows-10" rel="alternate" type="text/html" title="Lenovo Thinkpad T470p camera problem switching on and off in Windows 10" /><published>2020-01-12T04:19:00-06:00</published><updated>2020-09-13T05:44:00-05:00</updated><id>https://manios.org/2020/01/12/lenovo-thinkpad-t470p-camera-problem-windows-10</id><content type="html" xml:base="https://manios.org/2020/01/12/lenovo-thinkpad-t470p-camera-problem-windows-10">&lt;h2 id=&quot;issues&quot;&gt;Issues&lt;/h2&gt;
 
 &lt;p&gt;After Windows 10 performed its updates in our Lenovo Thinkpad T470p laptop, we could not use the camera. The symptoms were the following:  When we tried to use the laptop camera, the camera turned on (led light is green) and after 2 seconds it turned off (led light off).&lt;/p&gt;
 
@@ -1066,40 +1154,4 @@ make[1]: Leaving directory '/go/src/github.com/manios/weatherbeat'
         `-- hydro.go
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;That’s it! I hope it helps!&lt;/p&gt;</content><author><name>cmanios</name></author><category term="Go" /><category term="Golang" /><category term="Elasticsearch" /><category term="elastic" /><category term="metricbeat" /><category term="beats" /><category term="elasticsearch" /><category term="create" /><category term="generator" /><category term="go" /><category term="golang" /><category term="elk" /><category term="search" /><category term="kibana" /><category term="index" /><category term="monitor" /><summary type="html">I suspect that you are reading this post after having trouble creating a new Elastic Beat based on Metricbeat. Bud do not worry! We have you covered and solved the issues for you!</summary></entry><entry><title type="html">Git merge conflicts using Tortoise Git merge in Windows</title><link href="https://manios.org/2018/05/30/git-merge-conflicts-using-tortoise-git-merge-windows" rel="alternate" type="text/html" title="Git merge conflicts using Tortoise Git merge in Windows" /><published>2018-05-30T12:42:00-05:00</published><updated>2018-05-30T12:42:00-05:00</updated><id>https://manios.org/2018/05/30/git-merge-conflicts-using-tortoise-git-merge-windows</id><content type="html" xml:base="https://manios.org/2018/05/30/git-merge-conflicts-using-tortoise-git-merge-windows">&lt;p&gt;Today we wanted to use Tortoise Git Merge, a Windows Git utility which comes with &lt;a href=&quot;https://tortoisegit.org&quot;&gt;Tortoise Git&lt;/a&gt;. It helps us do a 3 way merge and solve our conflicts easily. The advantage of it is that it automatically merges the lines that where uniquely modified in every file and you only need to merge the common changes where the conflicts are. So in our case we had a file , let’s call it &lt;code class=&quot;highlighter-rouge&quot;&gt;README.md&lt;/code&gt;, in which we had 1000 changed lines out of which only 2 had a conflict with the file pulled from upstream server. Eclipse and IntelliJ do provide a merge editor but as far as we are concerned they are not automatically merging your unique changes (please correct us if we are wrong). After some searching on the web of how to do so, we found &lt;a href=&quot;https://stackoverflow.com/questions/5190188/why-cant-i-use-tortoisemerge-as-my-git-merge-tool-on-windows/19711169#19711169&quot;&gt;StackOverflow Question 5190188 : Why can’t I use TortoiseMerge as my git merge tool on Windows?&lt;/a&gt; which explains different approaches.&lt;/p&gt;
-
-&lt;p&gt;So according to the aforementioned question and our experiments, in order to use Tortoise Git Merge you have to download and install &lt;a href=&quot;https://tortoisegit.org&quot;&gt;Tortoise Git&lt;/a&gt; and configure your local &lt;code class=&quot;highlighter-rouge&quot;&gt;.gitconfig&lt;/code&gt; file with the following lines:&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;[core]
-	longpaths = true
-	autocrlf = true
-[merge]
-	tool=tortoisemerge
-[mergetool &quot;tortoisemerge&quot;]
-	cmd = \&quot;C:\\Program Files\\TortoiseGit\\bin\\TortoiseGitMerge.exe\&quot; -base:\&quot;$BASE\&quot; -theirs:\&quot;$LOCAL\&quot; -mine:\&quot;$REMOTE\&quot; -merged:\&quot;$MERGED\&quot;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;If you want an one liner equivalent command, you can run the following:&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;git config --global mergetool.tortoisemerge.cmd &quot;\&quot;C:\\Program Files\\TortoiseGit\\bin\\TortoiseGitMerge.exe\&quot; -base:\&quot;$BASE\&quot; -theirs:\&quot;$LOCAL\&quot; -mine:\&quot;$REMOTE\&quot; -merged:\&quot;$MERGED\&quot;&quot;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;NOTE:
-The &lt;code class=&quot;highlighter-rouge&quot;&gt;core&lt;/code&gt; section is complimentary for Windows in order to help Git use long paths and overcome Windows 260 character &lt;a href=&quot;https://msdn.microsoft.com/en-us/library/windows/desktop/aa365247(v=vs.85).aspx&quot;&gt;MAX_PATH&lt;/a&gt; limitation. Furthermore we need to automatically checkout with file ending using &lt;code class=&quot;highlighter-rouge&quot;&gt;CRLF&lt;/code&gt; and push to &lt;code class=&quot;highlighter-rouge&quot;&gt;LF&lt;/code&gt;, thus the &lt;code class=&quot;highlighter-rouge&quot;&gt;autocrlf&lt;/code&gt; is set to &lt;code class=&quot;highlighter-rouge&quot;&gt;true&lt;/code&gt;.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;After this short parenthesis, back in action! When you pull from a remote repository, or you merge, or rebase a branch and Git complains about conflicts you can use in your shell or in &lt;a href=&quot;https://gitforwindows.org/&quot;&gt;Git Bash&lt;/a&gt;:&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;git mergetool
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Tortoise merge will appear with a display like the following:&lt;/p&gt;
-
-&lt;figure&gt;
-    &lt;a href=&quot;/images/2018-05-30-git-merge-with-tortoise-git/tortoiseMerge3WayMerge.png&quot;&gt;&lt;img src=&quot;/images/2018-05-30-git-merge-with-tortoise-git/tortoiseMerge3WayMerge.png&quot; alt=&quot;Tortoise merge open to merge conflicts&quot; /&gt;&lt;/a&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;In this image, conflicts are marked with red and the automatically merged lines are marked with yellow. Left side (Theirs) is the version of the file which comes from repository and right side (Mine) is your local version with your changes.&lt;/p&gt;
-
-&lt;p&gt;That’s it. We hope this quick guide helped you!&lt;/p&gt;</content><author><name>cmanios</name></author><category term="Git" /><category term="Linux" /><category term="git" /><category term="merge" /><category term="mergetool" /><category term="tortoise" /><category term="conflict" /><category term="windows" /><category term="client" /><summary type="html">Today we wanted to use Tortoise Git Merge, a Windows Git utility which comes with Tortoise Git. It helps us do a 3 way merge and solve our conflicts easily. The advantage of it is that it automatically merges the lines that where uniquely modified in every file and you only need to merge the common changes where the conflicts are. So in our case we had a file , let’s call it README.md, in which we had 1000 changed lines out of which only 2 had a conflict with the file pulled from upstream server. Eclipse and IntelliJ do provide a merge editor but as far as we are concerned they are not automatically merging your unique changes (please correct us if we are wrong). After some searching on the web of how to do so, we found StackOverflow Question 5190188 : Why can’t I use TortoiseMerge as my git merge tool on Windows? which explains different approaches.</summary></entry></feed>
+&lt;p&gt;That’s it! I hope it helps!&lt;/p&gt;</content><author><name>cmanios</name></author><category term="Go" /><category term="Golang" /><category term="Elasticsearch" /><category term="elastic" /><category term="metricbeat" /><category term="beats" /><category term="elasticsearch" /><category term="create" /><category term="generator" /><category term="go" /><category term="golang" /><category term="elk" /><category term="search" /><category term="kibana" /><category term="index" /><category term="monitor" /><summary type="html">I suspect that you are reading this post after having trouble creating a new Elastic Beat based on Metricbeat. Bud do not worry! We have you covered and solved the issues for you!</summary></entry></feed>
