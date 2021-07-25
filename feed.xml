@@ -1,4 +1,78 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.0">Jekyll</generator><link href="https://manios.org/feed.xml" rel="self" type="application/atom+xml" /><link href="https://manios.org/" rel="alternate" type="text/html" /><updated>2021-02-17T12:14:39-06:00</updated><id>https://manios.org/feed.xml</id><title type="html">cmanios</title><subtitle>Developer life is a NullPointerException</subtitle><author><name>Christos Manios</name></author><entry><title type="html">PostgreSQL case and accent insentitive SQL queries</title><link href="https://manios.org/2021/02/17/postgresql-case-accent-insentitive-sql-queries" rel="alternate" type="text/html" title="PostgreSQL case and accent insentitive SQL queries" /><published>2021-02-17T12:00:00-06:00</published><updated>2021-02-17T12:00:00-06:00</updated><id>https://manios.org/2021/02/17/postgresql-case--accent-insentitive-sql-queries</id><content type="html" xml:base="https://manios.org/2021/02/17/postgresql-case-accent-insentitive-sql-queries">&lt;p&gt;A few days ago we were implementing a Spring Boot application which stored its data into a PostgreSQL database. As a requirement we needed to search into the database with &lt;a href=&quot;https://www.w3schools.com/sql/sql_like.asp&quot;&gt;LIKE&lt;/a&gt; operator in our &lt;code class=&quot;highlighter-rouge&quot;&gt;SQL&lt;/code&gt; queries and at the same time perform case and accent insensitive searches. Since we are Greek, this is pretty typical for us because our letters have diacritics (“tonos”). So a query like the following&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.0">Jekyll</generator><link href="https://manios.org/feed.xml" rel="self" type="application/atom+xml" /><link href="https://manios.org/" rel="alternate" type="text/html" /><updated>2021-07-25T06:48:01-05:00</updated><id>https://manios.org/feed.xml</id><title type="html">cmanios</title><subtitle>Developer life is a NullPointerException</subtitle><author><name>Christos Manios</name></author><entry><title type="html">Convert from/to JSON decimal fields in Go (golang) structs</title><link href="https://manios.org/2021/07/24/golang-decimal-field-in-struct-json-convert" rel="alternate" type="text/html" title="Convert from/to JSON decimal fields in Go (golang) structs" /><published>2021-07-24T11:27:00-05:00</published><updated>2021-07-24T11:27:00-05:00</updated><id>https://manios.org/2021/07/24/golang-decimal-field-in-struct-json-convert</id><content type="html" xml:base="https://manios.org/2021/07/24/golang-decimal-field-in-struct-json-convert">&lt;p&gt;Yesterday we had to marshal and umarshal to/from JSON some HTTP requests and responses in a &lt;a href=&quot;https://golang.org/&quot;&gt;Go&lt;/a&gt; microservice we are building. We already use &lt;a href=&quot;https://github.com/ericlagergren/decimal&quot;&gt;ericlagergren/decimal&lt;/a&gt;. However we have spotted that the &lt;code class=&quot;highlighter-rouge&quot;&gt;struct&lt;/code&gt; for the response were declared like this:&lt;/p&gt;
+
+&lt;div class=&quot;language-go highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;type&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;IncomeExpensesResponse&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;Income&lt;/span&gt;   &lt;span class=&quot;kt&quot;&gt;string&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;`json:&quot;income&quot;`&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;Expenses&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;string&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;`json:&quot;expenses&quot;`&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;and inside the source code, my colleagues were trying to manually convert from/to string to &lt;code class=&quot;highlighter-rouge&quot;&gt;*decimal.Big&lt;/code&gt; for responses like:&lt;/p&gt;
+
+&lt;div class=&quot;language-json highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;income&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;14.67&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;expenses&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;340.75&quot;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;This is actually not needed! Why should we reinvent the wheel?&lt;/p&gt;
+
+&lt;p&gt;Hence I created a small test to demonstrate &lt;a href=&quot;https://github.com/ericlagergren/decimal&quot;&gt;ericlagergren/decimal&lt;/a&gt; JSON marshalling and unmarshalling capabilities:&lt;/p&gt;
+
+&lt;div class=&quot;language-go highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;package&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;main&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+	&lt;span class=&quot;s&quot;&gt;&quot;encoding/json&quot;&lt;/span&gt;
+	&lt;span class=&quot;s&quot;&gt;&quot;testing&quot;&lt;/span&gt;
+
+	&lt;span class=&quot;s&quot;&gt;&quot;github.com/ericlagergren/decimal&quot;&lt;/span&gt;
+	&lt;span class=&quot;s&quot;&gt;&quot;github.com/stretchr/testify/assert&quot;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;type&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;IncomeExpenses&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;Income&lt;/span&gt;   &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;decimal&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Big&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;`json:&quot;income&quot;`&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;Expenses&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;decimal&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Big&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;`json:&quot;expenses&quot;`&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;func&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;TestMarshalIncomeExpensesToJson&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;t&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;testing&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+
+	&lt;span class=&quot;n&quot;&gt;pentochiliaro&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;:=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;decimal&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;New&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;1467&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;drachmaEuro&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;:=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;decimal&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;New&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;34075&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+	&lt;span class=&quot;n&quot;&gt;testExpense&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;:=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;IncomeExpenses&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+		&lt;span class=&quot;n&quot;&gt;Income&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;   &lt;span class=&quot;n&quot;&gt;pentochiliaro&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+		&lt;span class=&quot;n&quot;&gt;Expenses&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;drachmaEuro&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+	&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+	&lt;span class=&quot;n&quot;&gt;expectedJson&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;:=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;`{&quot;income&quot;: &quot;14.67&quot;, &quot;expenses&quot;: &quot;340.75&quot;}`&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;jsonStr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;_&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;:=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;json&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Marshal&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;testExpense&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+	&lt;span class=&quot;n&quot;&gt;assert&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;JSONEq&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;t&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;expectedJson&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;string&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;jsonStr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;func&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;TestUnMarshalIncomeExpensesFromJson&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;t&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;testing&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+
+	&lt;span class=&quot;n&quot;&gt;pentochiliaro&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;:=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;decimal&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;New&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;1467&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;drachmaEuro&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;:=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;decimal&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;New&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;34075&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+	&lt;span class=&quot;n&quot;&gt;expectedExpense&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;:=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;IncomeExpenses&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+		&lt;span class=&quot;n&quot;&gt;Income&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;   &lt;span class=&quot;n&quot;&gt;pentochiliaro&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+		&lt;span class=&quot;n&quot;&gt;Expenses&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;drachmaEuro&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+	&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+	&lt;span class=&quot;n&quot;&gt;inputJson&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;:=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;`{&quot;income&quot;: &quot;14.67&quot;, &quot;expenses&quot;: &quot;340.75&quot;}`&lt;/span&gt;
+	&lt;span class=&quot;k&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;incomeExpences&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;IncomeExpenses&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;_&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;json&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Unmarshal&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([]&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;byte&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;inputJson&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;incomeExpences&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+	&lt;span class=&quot;n&quot;&gt;assert&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Equal&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;t&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;expectedExpense&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;incomeExpences&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;If you are puzzled by the words &lt;code class=&quot;highlighter-rouge&quot;&gt;pentochiliaro&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;drachmaEuro&lt;/code&gt;, let me explain!&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;Pentochiliaro&lt;/strong&gt; (πεντοχίλιαρο) is a complex word consisting of the words &lt;strong&gt;Pente&lt;/strong&gt; (Πέντε), which means &lt;strong&gt;five&lt;/strong&gt; in Greek and &lt;strong&gt;Chiliades&lt;/strong&gt; (Χιλιάδες) which means &lt;strong&gt;thousands&lt;/strong&gt; in Greek. This how it the &lt;a href=&quot;https://en.wikipedia.org/wiki/Greek_drachma#Banknotes&quot;&gt;5000 drachma banknote&lt;/a&gt; was called before Euro currency came!&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;drachmaEuro&lt;/strong&gt;: This is the currency exchange rate while we used both Drachmas and Euros in Greece. 1 Euro was 340.75 Greek &lt;a href=&quot;https://en.wikipedia.org/wiki/Greek_drachma&quot;&gt;Drachmas&lt;/a&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;I hope this helps! Have a nice evening from sunny Greece!&lt;/p&gt;</content><author><name>cmanios</name></author><category term="Go" /><category term="Golang" /><category term="JSON" /><category term="go" /><category term="golang" /><category term="struct" /><category term="json" /><category term="field" /><category term="decimal" /><category term="number" /><category term="floating" /><category term="point" /><category term="marshal" /><category term="unmarshal" /><summary type="html">Yesterday we had to marshal and umarshal to/from JSON some HTTP requests and responses in a Go microservice we are building. We already use ericlagergren/decimal. However we have spotted that the struct for the response were declared like this:</summary></entry><entry><title type="html">PostgreSQL case and accent insentitive SQL queries</title><link href="https://manios.org/2021/02/17/postgresql-case-accent-insentitive-sql-queries" rel="alternate" type="text/html" title="PostgreSQL case and accent insentitive SQL queries" /><published>2021-02-17T13:00:00-06:00</published><updated>2021-02-17T13:00:00-06:00</updated><id>https://manios.org/2021/02/17/postgresql-case--accent-insentitive-sql-queries</id><content type="html" xml:base="https://manios.org/2021/02/17/postgresql-case-accent-insentitive-sql-queries">&lt;p&gt;A few days ago we were implementing a Spring Boot application which stored its data into a PostgreSQL database. As a requirement we needed to search into the database with &lt;a href=&quot;https://www.w3schools.com/sql/sql_like.asp&quot;&gt;LIKE&lt;/a&gt; operator in our &lt;code class=&quot;highlighter-rouge&quot;&gt;SQL&lt;/code&gt; queries and at the same time perform case and accent insensitive searches. Since we are Greek, this is pretty typical for us because our letters have diacritics (“tonos”). So a query like the following&lt;/p&gt;
 
 &lt;div class=&quot;language-sql highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;select&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;
 &lt;span class=&quot;k&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;blablatable&lt;/span&gt;
@@ -1041,117 +1115,4 @@ $&lt;span class=&quot;n&quot;&gt;PrivDropToGroup&lt;/span&gt; &lt;span class=&qu
 &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
 &lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;Thank God we have a geolocation result! We hope this article helped you get up and running!&lt;/p&gt;</content><author><name>cmanios</name></author><category term="Logstash" /><category term="Elasticsearch" /><category term="logstash" /><category term="geolocation" /><category term="ip" /><category term="geoip" /><category term="maxmind" /><category term="geo" /><category term="geolite" /><category term="geolite2" /><category term="database" /><category term="json" /><category term="parse" /><category term="message" /><category term="log" /><summary type="html">Today we wanted to parse some json logs which we had in a file using Logstash and enrich them with Geolocation information regarding the city and the ISP an IP belongs. The file, (let’s call it /var/log/input-geo.json) had the following structure:</summary></entry><entry><title type="html">Creating a Beat based on Metricbeat resolving Init and create metricset failures</title><link href="https://manios.org/2018/07/23/create-a-beat-based-on-metricbeat-resolving-bugs" rel="alternate" type="text/html" title="Creating a Beat based on Metricbeat resolving Init and create metricset failures" /><published>2018-07-23T14:31:00-05:00</published><updated>2018-07-23T14:31:00-05:00</updated><id>https://manios.org/2018/07/23/create-a-beat-based-on-metricbeat-resolving-bugs</id><content type="html" xml:base="https://manios.org/2018/07/23/create-a-beat-based-on-metricbeat-resolving-bugs">&lt;p&gt;I suspect that you are reading this post after having trouble creating a new Elastic Beat based on Metricbeat. Bud do not worry! We have you covered and solved the issues for you!&lt;/p&gt;
-
-&lt;p&gt;Long story short, a few days ago we wanted to create a new Metricbeat. After reading and executing step by step the official guide “&lt;a href=&quot;https://www.elastic.co/guide/en/beats/devguide/current/creating-beat-from-metricbeat.html&quot;&gt;Creating a Beat based on Metricbeat&lt;/a&gt;” we stumpled upon a series of issues like &lt;a href=&quot;https://discuss.elastic.co/t/step-3-init-and-create-the-metricset-failure/112046/12&quot;&gt;Step 3 - Init and create the metricset failure&lt;/a&gt;. After spending 2 days trying to resolve our local dependencies and solve the issues in our development environment, we decided to make everything in a sterilized environment, hence a Docker container.&lt;/p&gt;
-
-&lt;p&gt;To begin with, we used Go language &lt;a href=&quot;https://hub.docker.com/_/golang/&quot;&gt;official Docker image&lt;/a&gt; with tag &lt;code class=&quot;highlighter-rouge&quot;&gt;golang:1.10.2-stretch&lt;/code&gt; and we run everything in it. So in a shell, we executed:&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;docker run -it --rm --name go1.10 golang:1.10.2-stretch /bin/bash
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;When the container is started, a new shell is loaded and we can download all the dependencies needed, by executing inside it:&lt;/p&gt;
-
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;apt-get update &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
- &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; apt-get &lt;span class=&quot;nb&quot;&gt;install&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-y&lt;/span&gt; wget curl git vim &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
- &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;set number&quot;&lt;/span&gt; | &lt;span class=&quot;nb&quot;&gt;tee&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-a&lt;/span&gt; /etc/vim/vimrc &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
- &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;syntax on&quot;&lt;/span&gt; | &lt;span class=&quot;nb&quot;&gt;tee&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-a&lt;/span&gt; /etc/vim/vimrc &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
- &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;colorscheme evening&quot;&lt;/span&gt; | &lt;span class=&quot;nb&quot;&gt;tee&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-a&lt;/span&gt; /etc/vim/vimrc  &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
- &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; wget https://bootstrap.pypa.io/get-pip.py &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
- &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; python get-pip.py &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
- &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;rm &lt;/span&gt;get-pip.py &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
- &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; pip &lt;span class=&quot;nb&quot;&gt;install &lt;/span&gt;virtualenv &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
- &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-e&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n\n&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;Our environment:&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;===================================&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
- &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; go version &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
- &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Python version: &quot;&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
- &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; python &lt;span class=&quot;nt&quot;&gt;--version&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
- &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;virtualenv version: &quot;&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
- &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; virtualenv &lt;span class=&quot;nt&quot;&gt;--version&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
- &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;===================================&quot;&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
- &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Fetching metricbeat source code: &quot;&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
- &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; go get github.com/elastic/beats/metricbeat &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
- &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;[OK]&quot;&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
- &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;cd&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;GOPATH&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;/src/github.com/elastic/beats &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
- &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Checking out commit 2619e137c1f7eb031fc89132045117a85c7ef818 to new branch in order to avoid bug&quot;&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
- &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; git checkout &lt;span class=&quot;nt&quot;&gt;-b&lt;/span&gt; working 2619e137c1f7eb031fc89132045117a85c7ef818 &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
- &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;cd&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$GOPATH&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
- &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;sed&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-i&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'s/@-cp -r module\/[*]\/_meta\/kibana _meta\//@-cp -r ${GOPATH}\/src\/github.com\/elastic\/beats\/metricbeat\/module\/*\/_meta\/kibana _meta\//'&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;GOPATH&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;/src/github.com/elastic/beats/metricbeat/Makefile &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
- &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Elastic beats environment has been initialised successfully! You can now generate a new Metricbeat!&quot;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;If everything works as expected you should see something like this in the output:&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Our environment:
-===================================
-go version go1.10.2 linux/amd64
-Python version: Python 2.7.13
-virtualenv version: 16.0.0
-===================================
-Fetching metricbeat source code: [OK]
-Checking out commit 2619e137c1f7eb031fc89132045117a85c7ef818 to new branch in order to avoid bug
-Switched to a new branch 'working'
-Elastic beats environment has been initialised successfully! You can now generate a new Metricbeat!
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;The environment is set up correctly. Let’s create a new Metricbeat. So execute:&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;python ${GOPATH}/src/github.com/elastic/beats/script/generate.py --type=metricbeat
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;and respond to the input as the example:&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;root@1e407b4d73a7:/go# python ${GOPATH}/src/github.com/elastic/beats/script/generate.py --type=metricbeat
-Beat Name [Examplebeat]: weatherbeat
-Your Github Name [your-github-name]: manios
-Beat Path [github.com/manios/weatherbeat]:
-Firstname Lastname: Christos Manios
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;The newly created Metricbeat will be stored in &lt;code class=&quot;highlighter-rouge&quot;&gt;${GOPATH}/src/github.com/manios/weatherbeat/&lt;/code&gt;.&lt;/p&gt;
-
-&lt;p&gt;Navigate to the Metricbeat directory. Execute the following to avoid weird errors when creating a metricset:&lt;/p&gt;
-
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;cd&lt;/span&gt;  &lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;GOPATH&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;/src/github.com/manios/weatherbeat &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;cp&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-r&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$GOPATH&lt;/span&gt;/src/github.com/elastic/beats/metricbeat/scripts &lt;span class=&quot;nb&quot;&gt;.&lt;/span&gt; 
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Now we are ready to create a new Metricset. The metricset module will be called &lt;code class=&quot;highlighter-rouge&quot;&gt;skgtemperatures&lt;/code&gt; and the metricset itself &lt;code class=&quot;highlighter-rouge&quot;&gt;hydro&lt;/code&gt;. According to the official guide we execute &lt;code class=&quot;highlighter-rouge&quot;&gt;make setup&lt;/code&gt; and the output will be the following:&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;mkdir -p vendor/github.com/elastic/
-cp -R /go/src/github.com/elastic/beats vendor/github.com/elastic/
-rm -rf vendor/github.com/elastic/beats/.git
-make create-metricset
-make[1]: Entering directory '/go/src/github.com/manios/weatherbeat'
-New python executable in /go/src/github.com/manios/weatherbeat/build/python-env/bin/python
-Installing setuptools, pip, wheel...done.
-docker-compose 1.22.0 has requirement requests!=2.11.0,!=2.12.2,!=2.18.0,&amp;lt;2.19,&amp;gt;=2.6.1, but you'll have requests 2.19.1 which is incompatible.
-# Work around pip bug. See: https://github.com/pypa/pip/issues/4464
-find /go/src/github.com/manios/weatherbeat/build/python-env -type d -name 'dist-packages' -exec sh -c &quot;echo dist-packages &amp;gt; {}.pth&quot; ';'
-Module name: skgtemperature
-Metricset name: hydro
-Module skgtemperature created.
-Metricset hydro created.
-make[1]: Leaving directory '/go/src/github.com/manios/weatherbeat'
-make collect
-make[1]: Entering directory '/go/src/github.com/manios/weatherbeat'
-# Work around pip bug. See: https://github.com/pypa/pip/issues/4464
-find /go/src/github.com/manios/weatherbeat/build/python-env -type d -name 'dist-packages' -exec sh -c &quot;echo dist-packages &amp;gt; {}.pth&quot; ';'
-make[1]: Leaving directory '/go/src/github.com/manios/weatherbeat'
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;If everything works as expected then if you execute a &lt;code class=&quot;highlighter-rouge&quot;&gt;tree&lt;/code&gt; command, to &lt;code class=&quot;highlighter-rouge&quot;&gt;module&lt;/code&gt; directory you will probably have the following structure:&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;-- skgtemperature
-    |-- _meta
-    |   |-- config.yml
-    |   |-- docs.asciidoc
-    |   `-- fields.yml
-    |-- doc.go
-    `-- hydro
-        |-- _meta
-        |   |-- data.json
-        |   |-- docs.asciidoc
-        |   `-- fields.yml
-        `-- hydro.go
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;That’s it! I hope it helps!&lt;/p&gt;</content><author><name>cmanios</name></author><category term="Go" /><category term="Golang" /><category term="Elasticsearch" /><category term="elastic" /><category term="metricbeat" /><category term="beats" /><category term="elasticsearch" /><category term="create" /><category term="generator" /><category term="go" /><category term="golang" /><category term="elk" /><category term="search" /><category term="kibana" /><category term="index" /><category term="monitor" /><summary type="html">I suspect that you are reading this post after having trouble creating a new Elastic Beat based on Metricbeat. Bud do not worry! We have you covered and solved the issues for you!</summary></entry></feed>
+&lt;p&gt;Thank God we have a geolocation result! We hope this article helped you get up and running!&lt;/p&gt;</content><author><name>cmanios</name></author><category term="Logstash" /><category term="Elasticsearch" /><category term="logstash" /><category term="geolocation" /><category term="ip" /><category term="geoip" /><category term="maxmind" /><category term="geo" /><category term="geolite" /><category term="geolite2" /><category term="database" /><category term="json" /><category term="parse" /><category term="message" /><category term="log" /><summary type="html">Today we wanted to parse some json logs which we had in a file using Logstash and enrich them with Geolocation information regarding the city and the ISP an IP belongs. The file, (let’s call it /var/log/input-geo.json) had the following structure:</summary></entry></feed>

@@ -370,4 +370,10 @@ var store = [{
         "tags": ["postgres","postgresql","database","case","accent","insensitive","query","sql","like","statement","search","docker"],
         "url": "https://manios.org/2021/02/17/postgresql-case-accent-insentitive-sql-queries",
         "teaser": null
+      },{
+        "title": "Convert from/to JSON decimal fields in Go (golang) structs",
+        "excerpt":"Yesterday we had to marshal and umarshal to/from JSON some HTTP requests and responses in a Go microservice we are building. We already use ericlagergren/decimal. However we have spotted that the struct for the response were declared like this: type IncomeExpensesResponse struct { Income string `json:\"income\"` Expenses string `json:\"expenses\"` }...","categories": ["Go","Golang","JSON"],
+        "tags": ["go","golang","struct","json","field","decimal","number","floating","point","marshal","unmarshal"],
+        "url": "https://manios.org/2021/07/24/golang-decimal-field-in-struct-json-convert",
+        "teaser": null
       }]
