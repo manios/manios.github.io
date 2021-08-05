@@ -1,0 +1,874 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.20.2 by Michael Rose
+  Copyright 2017 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE.txt
+-->
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>Go Mongodb Error Cannot create field X in element {Y: null} - cmanios</title>
+<meta name="description" content="Today we had a MongoDB 3.6 collection with the following documents:">
+
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="cmanios">
+<meta property="og:title" content="Go Mongodb Error Cannot create field X in element {Y: null}">
+<meta property="og:url" content="https://manios.org/2021/08/04/golang-decimal-field-in-struct-json-convert">
+
+
+  <meta property="og:description" content="Today we had a MongoDB 3.6 collection with the following documents:">
+
+
+
+
+
+
+
+  <meta property="article:published_time" content="2021-08-04T13:55:00-05:00">
+
+
+
+  <meta property="article:modified_time" content="2021-08-04T13:55:00-05:00">
+
+
+
+  
+
+  
+
+
+<link rel="canonical" href="https://manios.org/2021/08/04/golang-decimal-field-in-struct-json-convert">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": "Christos Manios",
+      "url": "https://manios.org/"
+    
+  }
+</script>
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="cmanios Feed">
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css">
+
+<!--[if IE]>
+  <style>
+    /* old IE unsupported flexbox fixes */
+    .greedy-nav .site-title {
+      padding-right: 3em;
+    }
+    .greedy-nav button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+    }
+  </style>
+<![endif]-->
+
+
+
+    <!-- start custom head snippets -->
+
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+  </head>
+
+  <body class="layout--single">
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+        <a class="site-title" href="/">
+          cmanios
+          
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/year-archive/">Posts archive</a>
+            </li><li class="masthead__menu-item">
+              <a href="/categories/">Categories</a>
+            </li><li class="masthead__menu-item">
+              <a href="/tags/">Tags</a>
+            </li><li class="masthead__menu-item">
+              <a href="/about/">About</a>
+            </li></ul>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+   
+
+    <!-- TODO add Google AdSense -->
+    <div class="initial-content">
+
+        
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope itemtype="https://schema.org/Person">
+
+  
+
+  <div class="author__content">
+    
+      <h3 class="author__name" itemprop="name"></h3>
+    
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+
+  <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
+    <meta itemprop="headline" content="Go Mongodb Error Cannot create field X in element {Y: null}">
+    <meta itemprop="description" content="Today we had a MongoDB 3.6 collection with the following documents:">
+    <meta itemprop="datePublished" content="2021-08-04T13:55:00-05:00">
+    <meta itemprop="dateModified" content="2021-08-04T13:55:00-05:00">
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title" itemprop="headline">Go Mongodb Error Cannot create field X in element {Y: null}
+</h1>
+          
+
+  <p class="page__meta">
+    
+
+    
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          3 minute read
+        
+      </span>
+    
+  </p>
+
+
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+        <p>Today we had a MongoDB 3.6 collection with the following documents:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">db</span><span class="p">.</span><span class="nx">getCollection</span><span class="p">(</span><span class="dl">'</span><span class="s1">person</span><span class="dl">'</span><span class="p">).</span><span class="nx">insertMany</span><span class="p">([</span>
+    <span class="p">{</span><span class="dl">"</span><span class="s2">name</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Odyseas</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">surname</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Androutsos</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">profilePicture</span><span class="dl">"</span><span class="p">:</span> <span class="kc">null</span><span class="p">},</span>
+    <span class="p">{</span><span class="dl">"</span><span class="s2">name</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Theodoros</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">surname</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Kolokotronis</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">profilePicture</span><span class="dl">"</span><span class="p">:</span> <span class="kc">null</span><span class="p">},</span>
+    <span class="p">{</span><span class="dl">"</span><span class="s2">name</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Ioannis</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">surname</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Makrygiannis</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">profilePicture</span><span class="dl">"</span><span class="p">:</span> <span class="kc">null</span><span class="p">},</span>
+    <span class="p">{</span><span class="dl">"</span><span class="s2">name</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Ioannis</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">surname</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Kapodistrias</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">profilePicture</span><span class="dl">"</span><span class="p">:</span> <span class="kc">null</span><span class="p">},</span>
+    <span class="p">{</span><span class="dl">"</span><span class="s2">name</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Emanouil</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">surname</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Pappas</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">profilePicture</span><span class="dl">"</span><span class="p">:</span> <span class="kc">null</span><span class="p">}</span>
+<span class="p">])</span>
+</code></pre></div></div>
+
+<p>and we wanted to update them with Go using <a href="https://github.com/mongodb/mongo-go-driver">mongodb/mongo-go-driver</a> in order to become like this:</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[{</span><span class="w">
+    </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Ioannis"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"surname"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Kapodistrias"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"profilePicture"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="nl">"image"</span><span class="p">:{</span><span class="w">
+            </span><span class="nl">"iconUrl"</span><span class="p">:</span><span class="kc">null</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"retrievalStatus"</span><span class="p">:</span><span class="w"> </span><span class="s2">"NOT_FOUND"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"lastSuccessfulRetrieval"</span><span class="p">:</span><span class="w"> </span><span class="err">ISODate(</span><span class="s2">"2021-07-13T10:00:00.000Z"</span><span class="err">)</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+</span><span class="p">},</span><span class="w">
+</span><span class="p">{</span><span class="w">
+    </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Ioannis"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"surname"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Makrygiannis"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"profilePicture"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="nl">"image"</span><span class="p">:{</span><span class="w">
+            </span><span class="nl">"iconUrl"</span><span class="p">:</span><span class="kc">null</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"retrievalStatus"</span><span class="p">:</span><span class="w"> </span><span class="s2">"NOT_FOUND"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"lastSuccessfulRetrieval"</span><span class="p">:</span><span class="w"> </span><span class="err">ISODate(</span><span class="s2">"2021-07-13T10:00:00.000Z"</span><span class="err">)</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+</span><span class="p">}]</span><span class="w">
+</span></code></pre></div></div>
+
+<p>. We were using the following update statement:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">db</span><span class="p">.</span><span class="nx">getCollection</span><span class="p">(</span><span class="dl">'</span><span class="s1">person</span><span class="dl">'</span><span class="p">).</span><span class="nx">update</span><span class="p">(</span>
+    <span class="p">{</span> <span class="dl">"</span><span class="s2">name</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Ioannis</span><span class="dl">"</span> <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="dl">"</span><span class="s2">$set</span><span class="dl">"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="dl">"</span><span class="s2">profilePicture.image.iconUrl</span><span class="dl">"</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+            <span class="dl">"</span><span class="s2">profilePicture.image.retrievalStatus</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">NOT_FOUND</span><span class="dl">"</span><span class="p">,</span>
+            <span class="dl">"</span><span class="s2">profilePicture.image.lastSuccessfulRetrieval</span><span class="dl">"</span><span class="p">:</span>   <span class="nx">ISODate</span><span class="p">(</span><span class="dl">"</span><span class="s2">2021-07-13T10:00:00.000Z</span><span class="dl">"</span><span class="p">),</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="p">{</span><span class="na">multi</span><span class="p">:</span><span class="kc">true</span><span class="p">})</span>
+</code></pre></div></div>
+
+<p>however the MongoDB driver was returning this error:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Cannot create field 'image' in element {profilePicture: null}
+</code></pre></div></div>
+
+<p>Initially we thought that something is wrong with the single <code class="highlighter-rouge">update()</code> command and we tried in mongo shell the <code class="highlighter-rouge">updateMany()</code>:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">db</span><span class="p">.</span><span class="nx">getCollection</span><span class="p">(</span><span class="dl">'</span><span class="s1">person</span><span class="dl">'</span><span class="p">).</span><span class="nx">updateMany</span><span class="p">(</span>
+    <span class="p">{</span> <span class="dl">"</span><span class="s2">name</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Ioannis</span><span class="dl">"</span> <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="dl">"</span><span class="s2">$set</span><span class="dl">"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="dl">"</span><span class="s2">profilePicture.image.iconUrl</span><span class="dl">"</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+            <span class="dl">"</span><span class="s2">profilePicture.image.retrievalStatus</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">NOT_FOUND</span><span class="dl">"</span><span class="p">,</span>
+            <span class="dl">"</span><span class="s2">profilePicture.image.lastSuccessfulRetrieval</span><span class="dl">"</span><span class="p">:</span>   <span class="nx">ISODate</span><span class="p">(</span><span class="dl">"</span><span class="s2">2021-07-13T10:00:00.000Z</span><span class="dl">"</span><span class="p">),</span>
+        <span class="p">}</span>
+    <span class="p">})</span>
+</code></pre></div></div>
+
+<p>However it returned a quite similar error:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+Failed to execute script.
+
+Error:
+WriteError({
+	"index" : 0,
+	"code" : 28,
+	"errmsg" : "Cannot create field 'image' in element {profilePicture: null}",
+	"op" : {
+		"q" : {
+			"surname" : "Manios"
+		},
+		"u" : {
+			"$set" : {
+				"profilePicture.image.iconUrl" : null,
+				"profilePicture.image.retrievalStatus" : "NOT_FOUND",
+				"profilePicture.image.lastSuccessfulRetrieval" : ISODate("2021-07-13T10:00:00Z")
+			}
+		},
+		"multi" : true,
+		"upsert" : false
+	}
+}) :
+WriteError({
+	"index" : 0,
+	"code" : 28,
+	"errmsg" : "Cannot create field 'image' in element {profilePicture: null}",
+	"op" : {
+		"q" : {
+			"surname" : "Manios"
+		},
+		"u" : {
+			"$set" : {
+				"profilePicture.image.iconUrl" : null,
+				"profilePicture.image.retrievalStatus" : "NOT_FOUND",
+				"profilePicture.image.lastSuccessfulRetrieval" : ISODate("2021-07-13T10:00:00Z")
+			}
+		},
+		"multi" : true,
+		"upsert" : false
+	}
+})
+WriteError@src/mongo/shell/bulk_api.js:458:48
+mergeBatchResults@src/mongo/shell/bulk_api.js:855:49
+executeBatch@src/mongo/shell/bulk_api.js:919:13
+Bulk/this.execute@src/mongo/shell/bulk_api.js:1163:21
+DBCollection.prototype.updateMany@src/mongo/shell/crud_api.js:690:17
+@(shell):1:1
+</code></pre></div></div>
+
+<p>We searched for the error in the internet but we could not understand where we are wrong:</p>
+
+<ul>
+  <li><a href="https://www.google.com/search?client=firefox-b-d&amp;q=code%22+%3A+28%2C+%09%22errmsg%22+%3A+%22Cannot+create+element+in+Null%22%2C">Google: code: 28, “errmsg” : “Cannot create element in Null”,</a></li>
+  <li><a href="https://stackoverflow.com/questions/55670619/mongodb-cannot-create-field-x-in-element">Mongodb “Cannot create field ‘x’ in element” [duplicate]</a></li>
+  <li><a href="https://forum.golangbridge.org/t/null-data-type-in-mongodb/5501">NULL data type in MongoDB</a></li>
+</ul>
+
+<p>After some time and numerous attempts, we realised that MongoDB was trying to tell us that it cannot create the subdocument:</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nl">"image"</span><span class="p">:{</span><span class="w">
+    </span><span class="nl">"iconUrl"</span><span class="p">:</span><span class="kc">null</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"retrievalStatus"</span><span class="p">:</span><span class="w"> </span><span class="s2">"NOT_FOUND"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"lastSuccessfulRetrieval"</span><span class="p">:</span><span class="w"> </span><span class="err">ISODate(</span><span class="s2">"2021-07-13T10:00:00.000Z"</span><span class="err">)</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+<p>inside a field which is alread assigned to <code class="highlighter-rouge">null</code>:</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nl">"profilePicture"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="w">
+</span></code></pre></div></div>
+
+<p>So with a small change, the update statement works:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// ------</span>
+<span class="c1">// BEFORE</span>
+<span class="c1">// ------</span>
+<span class="c1">// THIS DOES NOT WORK AND CONFUSES MONGODB. </span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">getCollection</span><span class="p">(</span><span class="dl">'</span><span class="s1">person</span><span class="dl">'</span><span class="p">).</span><span class="nx">update</span><span class="p">(</span>
+    <span class="p">{</span> <span class="dl">"</span><span class="s2">name</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Ioannis</span><span class="dl">"</span> <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="dl">"</span><span class="s2">$set</span><span class="dl">"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="dl">"</span><span class="s2">profilePicture.image.iconUrl</span><span class="dl">"</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+            <span class="dl">"</span><span class="s2">profilePicture.image.retrievalStatus</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">NOT_FOUND</span><span class="dl">"</span><span class="p">,</span>
+            <span class="dl">"</span><span class="s2">profilePicture.image.lastSuccessfulRetrieval</span><span class="dl">"</span><span class="p">:</span>   <span class="nx">ISODate</span><span class="p">(</span><span class="dl">"</span><span class="s2">2021-07-13T10:00:00.000Z</span><span class="dl">"</span><span class="p">),</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="p">{</span><span class="na">multi</span><span class="p">:</span><span class="kc">true</span><span class="p">}</span>
+<span class="p">)</span>
+
+<span class="c1">// ------</span>
+<span class="c1">// AFTER</span>
+<span class="c1">// ------</span>
+<span class="c1">// THIS WORKS</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">getCollection</span><span class="p">(</span><span class="dl">'</span><span class="s1">person</span><span class="dl">'</span><span class="p">).</span><span class="nx">update</span><span class="p">(</span>
+    <span class="p">{</span> <span class="dl">"</span><span class="s2">name</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">Ioannis</span><span class="dl">"</span> <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="dl">"</span><span class="s2">$set</span><span class="dl">"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="dl">"</span><span class="s2">profilePicture</span><span class="dl">"</span><span class="p">:</span> <span class="p">{</span>
+                <span class="dl">"</span><span class="s2">image</span><span class="dl">"</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="dl">"</span><span class="s2">iconUrl</span><span class="dl">"</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+                    <span class="dl">"</span><span class="s2">retrievalStatus</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">NOT_FOUND</span><span class="dl">"</span><span class="p">,</span>
+                    <span class="dl">"</span><span class="s2">lastSuccessfulRetrieval</span><span class="dl">"</span><span class="p">:</span>   <span class="nx">ISODate</span><span class="p">(</span><span class="dl">"</span><span class="s2">2021-07-13T10:00:00.000Z</span><span class="dl">"</span><span class="p">),</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="p">{</span><span class="na">multi</span><span class="p">:</span><span class="kc">true</span><span class="p">}</span>
+<span class="p">)</span>
+</code></pre></div></div>
+
+<p>We tested the example in the following versions (running <code class="highlighter-rouge">db.version()</code> in Mongo shell):</p>
+
+<ol>
+  <li>CosmosDB for MongoDB 3.6.0</li>
+  <li>MongoDB 3.6.22</li>
+  <li>MongoDB 4.4.0</li>
+</ol>
+
+<p>and all behave identically.</p>
+
+<p>We hope this helped you and you gain some minutes instead of searching in the web to find a solution! Greetings from our hot Greece with 40 °C!</p>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+  
+
+
+  
+  
+  
+
+  <p class="page__taxonomy">
+    <strong><i class="fas fa-fw fa-tags" aria-hidden="true"></i> Tags: </strong>
+    <span itemprop="keywords">
+    
+      
+      
+      <a href="/tags/#database" class="page__taxonomy-item" rel="tag">database</a><span class="sep">, </span>
+    
+      
+      
+      <a href="/tags/#dot" class="page__taxonomy-item" rel="tag">dot</a><span class="sep">, </span>
+    
+      
+      
+      <a href="/tags/#driver" class="page__taxonomy-item" rel="tag">driver</a><span class="sep">, </span>
+    
+      
+      
+      <a href="/tags/#error" class="page__taxonomy-item" rel="tag">error</a><span class="sep">, </span>
+    
+      
+      
+      <a href="/tags/#field" class="page__taxonomy-item" rel="tag">field</a><span class="sep">, </span>
+    
+      
+      
+      <a href="/tags/#golang" class="page__taxonomy-item" rel="tag">golang</a><span class="sep">, </span>
+    
+      
+      
+      <a href="/tags/#go" class="page__taxonomy-item" rel="tag">go</a><span class="sep">, </span>
+    
+      
+      
+      <a href="/tags/#mongodb" class="page__taxonomy-item" rel="tag">mongodb</a><span class="sep">, </span>
+    
+      
+      
+      <a href="/tags/#nested" class="page__taxonomy-item" rel="tag">nested</a>
+    
+    </span>
+  </p>
+
+
+
+
+  
+
+
+  
+  
+  
+
+  <p class="page__taxonomy">
+    <strong><i class="fas fa-fw fa-folder-open" aria-hidden="true"></i> Categories: </strong>
+    <span itemprop="keywords">
+    
+      
+      
+      <a href="/categories/#golang" class="page__taxonomy-item" rel="tag">Golang</a><span class="sep">, </span>
+    
+      
+      
+      <a href="/categories/#go" class="page__taxonomy-item" rel="tag">Go</a><span class="sep">, </span>
+    
+      
+      
+      <a href="/categories/#mongodb" class="page__taxonomy-item" rel="tag">MongoDB</a>
+    
+    </span>
+  </p>
+
+
+        
+  <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="2021-08-04">August 4, 2021</time></p>
+
+
+      </footer>
+
+      <section class="page__share">
+  
+
+  <a href="https://twitter.com/intent/tweet?text=Go+Mongodb+Error+Cannot+create+field+X+in+element+%7BY%3A+null%7D%20https%3A%2F%2Fmanios.org%2F2021%2F08%2F04%2Fgolang-decimal-field-in-struct-json-convert" class="btn btn--twitter" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Twitter"><i class="fab fa-fw fa-twitter" aria-hidden="true"></i><span> Twitter</span></a>
+
+  <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fmanios.org%2F2021%2F08%2F04%2Fgolang-decimal-field-in-struct-json-convert" class="btn btn--facebook" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Facebook"><i class="fab fa-fw fa-facebook" aria-hidden="true"></i><span> Facebook</span></a>
+
+  <a href="https://www.linkedin.com/shareArticle?mini=true&url=https%3A%2F%2Fmanios.org%2F2021%2F08%2F04%2Fgolang-decimal-field-in-struct-json-convert" class="btn btn--linkedin" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on LinkedIn"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i><span> LinkedIn</span></a>
+</section>
+
+
+      
+  <nav class="pagination">
+    
+      <a href="/2021/07/24/golang-decimal-field-in-struct-json-convert" class="pagination--pager" title="Convert from/to JSON decimal fields in Go (golang) structs
+">Previous</a>
+    
+    
+      <a href="/2021/08/04/go-mongodb-error-cannot-create-field-in-element-null" class="pagination--pager" title="Go Mongodb Error Cannot create field X in element {Y: null}
+">Next</a>
+    
+  </nav>
+
+    </div>
+
+    
+      <div class="page__comments">
+  
+  
+      <h4 class="page__comments-title">Comments</h4>
+      <section id="disqus_thread"></section>
+    
+</div>
+
+    
+  </article>
+
+  
+  
+    <div class="page__related">
+      <h4 class="page__related-title">You May Also Enjoy</h4>
+      <div class="grid__wrapper">
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/2021/08/04/go-mongodb-error-cannot-create-field-in-element-null" rel="permalink">Go Mongodb Error Cannot create field X in element {Y: null}
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+
+    
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          3 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">Today we had a MongoDB 3.6 collection with the following documents:
+</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/2021/07/24/golang-decimal-field-in-struct-json-convert" rel="permalink">Convert from/to JSON decimal fields in Go (golang) structs
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+
+    
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          1 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">Yesterday we had to marshal and umarshal to/from JSON some HTTP requests and responses in a Go microservice we are building. We already use ericlagergren/dec...</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/2021/02/17/postgresql-case-accent-insentitive-sql-queries" rel="permalink">PostgreSQL case and accent insentitive SQL queries
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+
+    
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          3 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">A few days ago we were implementing a Spring Boot application which stored its data into a PostgreSQL database. As a requirement we needed to search into the...</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/2020/01/12/lenovo-thinkpad-t470p-camera-problem-windows-10" rel="permalink">Lenovo Thinkpad T470p camera problem switching on and off in Windows 10
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+
+    
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          3 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">Issues
+</p>
+  </article>
+</div>
+
+        
+      </div>
+    </div>
+  
+  
+</div>
+
+        
+        <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <div align="center" style="margin: 1em 0;">
+        <!-- manios-first -->
+        <!-- WARNING! Do not forget data-ad-test="on" attribute on localhost! -->
+        <ins class="adsbygoogle"
+             style="display:block; border-bottom: initial;"
+             data-ad-client="ca-pub-6651682831425197"
+             data-ad-slot="2514320571"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+        </div>     
+        <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+
+    </div>
+
+    <div class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+
+    
+      
+        
+          <li><a href="https://twitter.com/maniosolr" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-twitter-square" aria-hidden="true"></i> Twitter</a></li>
+        
+      
+        
+      
+        
+          <li><a href="https://github.com/manios" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i> GitHub</a></li>
+        
+      
+        
+          <li><a href="https://gitlab.com/manios" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-gitlab" aria-hidden="true"></i> GitLab</a></li>
+        
+      
+        
+      
+        
+      
+    
+
+    <li><a href="/feed.xml"><i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2021 Christos Manios. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+
+
+
+
+
+
+
+  <script>
+  window.ga=function(){ga.q.push(arguments)};ga.q=[];ga.l=+new Date;
+  ga('create','UA-96500199-2','auto');
+  ga('set', 'anonymizeIp', false);
+  ga('send','pageview')
+</script>
+<script src="https://www.google-analytics.com/analytics.js" async></script>
+
+
+
+
+
+
+    
+  <script>
+    var disqus_config = function () {
+      this.page.url = "https://manios.org/2021/08/04/golang-decimal-field-in-struct-json-convert";  /* Replace PAGE_URL with your page's canonical URL variable */
+      this.page.identifier = "/2021/08/04/golang-decimal-field-in-struct-json-convert"; /* Replace PAGE_IDENTIFIER with your page's unique identifier variable */
+    };
+    (function() { /* DON'T EDIT BELOW THIS LINE */
+      var d = document, s = d.createElement('script');
+      s.src = 'https://manios-org.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  </script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+  
+
+
+
+
+
+  </body>
+</html>

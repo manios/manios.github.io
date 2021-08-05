@@ -1,4 +1,386 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.0">Jekyll</generator><link href="https://manios.org/feed.xml" rel="self" type="application/atom+xml" /><link href="https://manios.org/" rel="alternate" type="text/html" /><updated>2021-07-25T06:48:01-05:00</updated><id>https://manios.org/feed.xml</id><title type="html">cmanios</title><subtitle>Developer life is a NullPointerException</subtitle><author><name>Christos Manios</name></author><entry><title type="html">Convert from/to JSON decimal fields in Go (golang) structs</title><link href="https://manios.org/2021/07/24/golang-decimal-field-in-struct-json-convert" rel="alternate" type="text/html" title="Convert from/to JSON decimal fields in Go (golang) structs" /><published>2021-07-24T11:27:00-05:00</published><updated>2021-07-24T11:27:00-05:00</updated><id>https://manios.org/2021/07/24/golang-decimal-field-in-struct-json-convert</id><content type="html" xml:base="https://manios.org/2021/07/24/golang-decimal-field-in-struct-json-convert">&lt;p&gt;Yesterday we had to marshal and umarshal to/from JSON some HTTP requests and responses in a &lt;a href=&quot;https://golang.org/&quot;&gt;Go&lt;/a&gt; microservice we are building. We already use &lt;a href=&quot;https://github.com/ericlagergren/decimal&quot;&gt;ericlagergren/decimal&lt;/a&gt;. However we have spotted that the &lt;code class=&quot;highlighter-rouge&quot;&gt;struct&lt;/code&gt; for the response were declared like this:&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.0">Jekyll</generator><link href="https://manios.org/feed.xml" rel="self" type="application/atom+xml" /><link href="https://manios.org/" rel="alternate" type="text/html" /><updated>2021-08-05T12:03:35-05:00</updated><id>https://manios.org/feed.xml</id><title type="html">cmanios</title><subtitle>Developer life is a NullPointerException</subtitle><author><name>Christos Manios</name></author><entry><title type="html">Go Mongodb Error Cannot create field X in element {Y: null}</title><link href="https://manios.org/2021/08/04/go-mongodb-error-cannot-create-field-in-element-null" rel="alternate" type="text/html" title="Go Mongodb Error Cannot create field X in element {Y: null}" /><published>2021-08-04T13:55:00-05:00</published><updated>2021-08-04T13:55:00-05:00</updated><id>https://manios.org/2021/08/04/go-mongodb-error-cannot-create-field-in-element-null</id><content type="html" xml:base="https://manios.org/2021/08/04/go-mongodb-error-cannot-create-field-in-element-null">&lt;p&gt;Today we had a MongoDB 3.6 collection with the following documents:&lt;/p&gt;
+
+&lt;div class=&quot;language-javascript highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nx&quot;&gt;db&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;getCollection&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;person&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;insertMany&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;Odyseas&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;surname&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;Androutsos&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;profilePicture&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;Theodoros&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;surname&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;Kolokotronis&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;profilePicture&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;Ioannis&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;surname&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;Makrygiannis&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;profilePicture&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;Ioannis&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;surname&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;Kapodistrias&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;profilePicture&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;Emanouil&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;surname&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;Pappas&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;profilePicture&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;and we wanted to update them with Go using &lt;a href=&quot;https://github.com/mongodb/mongo-go-driver&quot;&gt;mongodb/mongo-go-driver&lt;/a&gt; in order to become like this:&lt;/p&gt;
+
+&lt;div class=&quot;language-json highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;[{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;name&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Ioannis&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;surname&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Kapodistrias&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;profilePicture&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;image&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+            &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;iconUrl&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+            &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;retrievalStatus&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;NOT_FOUND&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+            &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;lastSuccessfulRetrieval&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;err&quot;&gt;ISODate(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;2021-07-13T10:00:00.000Z&quot;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;name&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Ioannis&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;surname&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Makrygiannis&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;profilePicture&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;image&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+            &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;iconUrl&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+            &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;retrievalStatus&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;NOT_FOUND&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+            &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;lastSuccessfulRetrieval&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;err&quot;&gt;ISODate(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;2021-07-13T10:00:00.000Z&quot;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}]&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;. We were using the following update statement:&lt;/p&gt;
+
+&lt;div class=&quot;language-javascript highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nx&quot;&gt;db&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;getCollection&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;person&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;update&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;Ioannis&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;$set&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+            &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;profilePicture.image.iconUrl&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+            &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;profilePicture.image.retrievalStatus&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;NOT_FOUND&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+            &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;profilePicture.image.lastSuccessfulRetrieval&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;   &lt;span class=&quot;nx&quot;&gt;ISODate&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;2021-07-13T10:00:00.000Z&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;multi&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;})&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;however the MongoDB driver was returning this error:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Cannot create field 'image' in element {profilePicture: null}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Initially we thought that something is wrong with the single &lt;code class=&quot;highlighter-rouge&quot;&gt;update()&lt;/code&gt; command and we tried in mongo shell the &lt;code class=&quot;highlighter-rouge&quot;&gt;updateMany()&lt;/code&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;language-javascript highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nx&quot;&gt;db&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;getCollection&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;person&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;updateMany&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;Ioannis&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;$set&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+            &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;profilePicture.image.iconUrl&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+            &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;profilePicture.image.retrievalStatus&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;NOT_FOUND&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+            &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;profilePicture.image.lastSuccessfulRetrieval&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;   &lt;span class=&quot;nx&quot;&gt;ISODate&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;2021-07-13T10:00:00.000Z&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;})&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;However it returned a quite similar error:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;
+Failed to execute script.
+
+Error:
+WriteError({
+	&quot;index&quot; : 0,
+	&quot;code&quot; : 28,
+	&quot;errmsg&quot; : &quot;Cannot create field 'image' in element {profilePicture: null}&quot;,
+	&quot;op&quot; : {
+		&quot;q&quot; : {
+			&quot;surname&quot; : &quot;Manios&quot;
+		},
+		&quot;u&quot; : {
+			&quot;$set&quot; : {
+				&quot;profilePicture.image.iconUrl&quot; : null,
+				&quot;profilePicture.image.retrievalStatus&quot; : &quot;NOT_FOUND&quot;,
+				&quot;profilePicture.image.lastSuccessfulRetrieval&quot; : ISODate(&quot;2021-07-13T10:00:00Z&quot;)
+			}
+		},
+		&quot;multi&quot; : true,
+		&quot;upsert&quot; : false
+	}
+}) :
+WriteError({
+	&quot;index&quot; : 0,
+	&quot;code&quot; : 28,
+	&quot;errmsg&quot; : &quot;Cannot create field 'image' in element {profilePicture: null}&quot;,
+	&quot;op&quot; : {
+		&quot;q&quot; : {
+			&quot;surname&quot; : &quot;Manios&quot;
+		},
+		&quot;u&quot; : {
+			&quot;$set&quot; : {
+				&quot;profilePicture.image.iconUrl&quot; : null,
+				&quot;profilePicture.image.retrievalStatus&quot; : &quot;NOT_FOUND&quot;,
+				&quot;profilePicture.image.lastSuccessfulRetrieval&quot; : ISODate(&quot;2021-07-13T10:00:00Z&quot;)
+			}
+		},
+		&quot;multi&quot; : true,
+		&quot;upsert&quot; : false
+	}
+})
+WriteError@src/mongo/shell/bulk_api.js:458:48
+mergeBatchResults@src/mongo/shell/bulk_api.js:855:49
+executeBatch@src/mongo/shell/bulk_api.js:919:13
+Bulk/this.execute@src/mongo/shell/bulk_api.js:1163:21
+DBCollection.prototype.updateMany@src/mongo/shell/crud_api.js:690:17
+@(shell):1:1
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;We searched for the error in the internet but we could not understand where we are wrong:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;https://www.google.com/search?client=firefox-b-d&amp;amp;q=code%22+%3A+28%2C+%09%22errmsg%22+%3A+%22Cannot+create+element+in+Null%22%2C&quot;&gt;Google: code: 28, “errmsg” : “Cannot create element in Null”,&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://stackoverflow.com/questions/55670619/mongodb-cannot-create-field-x-in-element&quot;&gt;Mongodb “Cannot create field ‘x’ in element” [duplicate]&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://forum.golangbridge.org/t/null-data-type-in-mongodb/5501&quot;&gt;NULL data type in MongoDB&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;After some time and numerous attempts, we realised that MongoDB was trying to tell us that it cannot create the subdocument:&lt;/p&gt;
+
+&lt;div class=&quot;language-json highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nl&quot;&gt;&quot;image&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;iconUrl&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;retrievalStatus&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;NOT_FOUND&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;lastSuccessfulRetrieval&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;err&quot;&gt;ISODate(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;2021-07-13T10:00:00.000Z&quot;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;inside a field which is alread assigned to &lt;code class=&quot;highlighter-rouge&quot;&gt;null&lt;/code&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;language-json highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nl&quot;&gt;&quot;profilePicture&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;So with a small change, the update statement works:&lt;/p&gt;
+
+&lt;div class=&quot;language-javascript highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;// ------&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;// BEFORE&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;// ------&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;// THIS DOES NOT WORK AND CONFUSES MONGODB. &lt;/span&gt;
+&lt;span class=&quot;nx&quot;&gt;db&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;getCollection&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;person&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;update&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;Ioannis&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;$set&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+            &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;profilePicture.image.iconUrl&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+            &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;profilePicture.image.retrievalStatus&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;NOT_FOUND&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+            &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;profilePicture.image.lastSuccessfulRetrieval&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;   &lt;span class=&quot;nx&quot;&gt;ISODate&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;2021-07-13T10:00:00.000Z&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;multi&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;c1&quot;&gt;// ------&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;// AFTER&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;// ------&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;// THIS WORKS&lt;/span&gt;
+&lt;span class=&quot;nx&quot;&gt;db&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;getCollection&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;person&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;update&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;Ioannis&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;$set&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+            &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;profilePicture&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+                &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;image&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+                    &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;iconUrl&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+                    &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;retrievalStatus&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;NOT_FOUND&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+                    &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;lastSuccessfulRetrieval&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;   &lt;span class=&quot;nx&quot;&gt;ISODate&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;2021-07-13T10:00:00.000Z&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
+                &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+            &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;multi&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;We tested the example in the following versions (running &lt;code class=&quot;highlighter-rouge&quot;&gt;db.version()&lt;/code&gt; in Mongo shell):&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;CosmosDB for MongoDB 3.6.0&lt;/li&gt;
+  &lt;li&gt;MongoDB 3.6.22&lt;/li&gt;
+  &lt;li&gt;MongoDB 4.4.0&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;and all behave identically.&lt;/p&gt;
+
+&lt;p&gt;We hope this helped you and you gain some minutes instead of searching in the web to find a solution! Greetings from our hot Greece with 40 °C!&lt;/p&gt;</content><author><name>cmanios</name></author><category term="Go" /><category term="Golang" /><category term="MongoDB" /><category term="go" /><category term="golang" /><category term="mongodb" /><category term="driver" /><category term="database" /><category term="error" /><category term="dot" /><category term="field" /><category term="nested" /><summary type="html">Today we had a MongoDB 3.6 collection with the following documents:</summary></entry><entry><title type="html">Go Mongodb Error Cannot create field X in element {Y: null}</title><link href="https://manios.org/2021/08/04/golang-decimal-field-in-struct-json-convert" rel="alternate" type="text/html" title="Go Mongodb Error Cannot create field X in element {Y: null}" /><published>2021-08-04T13:55:00-05:00</published><updated>2021-08-04T13:55:00-05:00</updated><id>https://manios.org/2021/08/04/golang-decimal-field-in-struct-json-convert</id><content type="html" xml:base="https://manios.org/2021/08/04/golang-decimal-field-in-struct-json-convert">&lt;p&gt;Today we had a MongoDB 3.6 collection with the following documents:&lt;/p&gt;
+
+&lt;div class=&quot;language-javascript highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nx&quot;&gt;db&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;getCollection&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;person&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;insertMany&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;Odyseas&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;surname&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;Androutsos&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;profilePicture&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;Theodoros&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;surname&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;Kolokotronis&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;profilePicture&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;Ioannis&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;surname&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;Makrygiannis&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;profilePicture&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;Ioannis&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;surname&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;Kapodistrias&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;profilePicture&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;Emanouil&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;surname&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;Pappas&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;profilePicture&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;and we wanted to update them with Go using &lt;a href=&quot;https://github.com/mongodb/mongo-go-driver&quot;&gt;mongodb/mongo-go-driver&lt;/a&gt; in order to become like this:&lt;/p&gt;
+
+&lt;div class=&quot;language-json highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;[{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;name&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Ioannis&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;surname&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Kapodistrias&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;profilePicture&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;image&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+            &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;iconUrl&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+            &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;retrievalStatus&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;NOT_FOUND&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+            &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;lastSuccessfulRetrieval&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;err&quot;&gt;ISODate(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;2021-07-13T10:00:00.000Z&quot;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;name&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Ioannis&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;surname&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Makrygiannis&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;profilePicture&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;image&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+            &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;iconUrl&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+            &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;retrievalStatus&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;NOT_FOUND&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+            &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;lastSuccessfulRetrieval&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;err&quot;&gt;ISODate(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;2021-07-13T10:00:00.000Z&quot;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}]&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;. We were using the following update statement:&lt;/p&gt;
+
+&lt;div class=&quot;language-javascript highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nx&quot;&gt;db&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;getCollection&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;person&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;update&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;Ioannis&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;$set&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+            &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;profilePicture.image.iconUrl&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+            &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;profilePicture.image.retrievalStatus&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;NOT_FOUND&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+            &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;profilePicture.image.lastSuccessfulRetrieval&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;   &lt;span class=&quot;nx&quot;&gt;ISODate&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;2021-07-13T10:00:00.000Z&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;multi&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;})&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;however the MongoDB driver was returning this error:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Cannot create field 'image' in element {profilePicture: null}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Initially we thought that something is wrong with the single &lt;code class=&quot;highlighter-rouge&quot;&gt;update()&lt;/code&gt; command and we tried in mongo shell the &lt;code class=&quot;highlighter-rouge&quot;&gt;updateMany()&lt;/code&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;language-javascript highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nx&quot;&gt;db&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;getCollection&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;person&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;updateMany&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;Ioannis&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;$set&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+            &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;profilePicture.image.iconUrl&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+            &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;profilePicture.image.retrievalStatus&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;NOT_FOUND&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+            &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;profilePicture.image.lastSuccessfulRetrieval&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;   &lt;span class=&quot;nx&quot;&gt;ISODate&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;2021-07-13T10:00:00.000Z&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;})&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;However it returned a quite similar error:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;
+Failed to execute script.
+
+Error:
+WriteError({
+	&quot;index&quot; : 0,
+	&quot;code&quot; : 28,
+	&quot;errmsg&quot; : &quot;Cannot create field 'image' in element {profilePicture: null}&quot;,
+	&quot;op&quot; : {
+		&quot;q&quot; : {
+			&quot;surname&quot; : &quot;Manios&quot;
+		},
+		&quot;u&quot; : {
+			&quot;$set&quot; : {
+				&quot;profilePicture.image.iconUrl&quot; : null,
+				&quot;profilePicture.image.retrievalStatus&quot; : &quot;NOT_FOUND&quot;,
+				&quot;profilePicture.image.lastSuccessfulRetrieval&quot; : ISODate(&quot;2021-07-13T10:00:00Z&quot;)
+			}
+		},
+		&quot;multi&quot; : true,
+		&quot;upsert&quot; : false
+	}
+}) :
+WriteError({
+	&quot;index&quot; : 0,
+	&quot;code&quot; : 28,
+	&quot;errmsg&quot; : &quot;Cannot create field 'image' in element {profilePicture: null}&quot;,
+	&quot;op&quot; : {
+		&quot;q&quot; : {
+			&quot;surname&quot; : &quot;Manios&quot;
+		},
+		&quot;u&quot; : {
+			&quot;$set&quot; : {
+				&quot;profilePicture.image.iconUrl&quot; : null,
+				&quot;profilePicture.image.retrievalStatus&quot; : &quot;NOT_FOUND&quot;,
+				&quot;profilePicture.image.lastSuccessfulRetrieval&quot; : ISODate(&quot;2021-07-13T10:00:00Z&quot;)
+			}
+		},
+		&quot;multi&quot; : true,
+		&quot;upsert&quot; : false
+	}
+})
+WriteError@src/mongo/shell/bulk_api.js:458:48
+mergeBatchResults@src/mongo/shell/bulk_api.js:855:49
+executeBatch@src/mongo/shell/bulk_api.js:919:13
+Bulk/this.execute@src/mongo/shell/bulk_api.js:1163:21
+DBCollection.prototype.updateMany@src/mongo/shell/crud_api.js:690:17
+@(shell):1:1
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;We searched for the error in the internet but we could not understand where we are wrong:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;https://www.google.com/search?client=firefox-b-d&amp;amp;q=code%22+%3A+28%2C+%09%22errmsg%22+%3A+%22Cannot+create+element+in+Null%22%2C&quot;&gt;Google: code: 28, “errmsg” : “Cannot create element in Null”,&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://stackoverflow.com/questions/55670619/mongodb-cannot-create-field-x-in-element&quot;&gt;Mongodb “Cannot create field ‘x’ in element” [duplicate]&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://forum.golangbridge.org/t/null-data-type-in-mongodb/5501&quot;&gt;NULL data type in MongoDB&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;After some time and numerous attempts, we realised that MongoDB was trying to tell us that it cannot create the subdocument:&lt;/p&gt;
+
+&lt;div class=&quot;language-json highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nl&quot;&gt;&quot;image&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;iconUrl&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;retrievalStatus&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;NOT_FOUND&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;lastSuccessfulRetrieval&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;err&quot;&gt;ISODate(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;2021-07-13T10:00:00.000Z&quot;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;inside a field which is alread assigned to &lt;code class=&quot;highlighter-rouge&quot;&gt;null&lt;/code&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;language-json highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nl&quot;&gt;&quot;profilePicture&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;So with a small change, the update statement works:&lt;/p&gt;
+
+&lt;div class=&quot;language-javascript highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;// ------&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;// BEFORE&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;// ------&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;// THIS DOES NOT WORK AND CONFUSES MONGODB. &lt;/span&gt;
+&lt;span class=&quot;nx&quot;&gt;db&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;getCollection&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;person&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;update&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;Ioannis&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;$set&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+            &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;profilePicture.image.iconUrl&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+            &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;profilePicture.image.retrievalStatus&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;NOT_FOUND&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+            &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;profilePicture.image.lastSuccessfulRetrieval&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;   &lt;span class=&quot;nx&quot;&gt;ISODate&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;2021-07-13T10:00:00.000Z&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;multi&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;c1&quot;&gt;// ------&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;// AFTER&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;// ------&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;// THIS WORKS&lt;/span&gt;
+&lt;span class=&quot;nx&quot;&gt;db&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;getCollection&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;person&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;update&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;Ioannis&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;$set&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+            &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;profilePicture&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+                &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;image&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+                    &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;iconUrl&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+                    &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;retrievalStatus&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;NOT_FOUND&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+                    &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;lastSuccessfulRetrieval&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;   &lt;span class=&quot;nx&quot;&gt;ISODate&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;2021-07-13T10:00:00.000Z&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
+                &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+            &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;multi&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;We tested the example in the following versions (running &lt;code class=&quot;highlighter-rouge&quot;&gt;db.version()&lt;/code&gt; in Mongo shell):&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;CosmosDB for MongoDB 3.6.0&lt;/li&gt;
+  &lt;li&gt;MongoDB 3.6.22&lt;/li&gt;
+  &lt;li&gt;MongoDB 4.4.0&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;and all behave identically.&lt;/p&gt;
+
+&lt;p&gt;We hope this helped you and you gain some minutes instead of searching in the web to find a solution! Greetings from our hot Greece with 40 °C!&lt;/p&gt;</content><author><name>cmanios</name></author><category term="Go" /><category term="Golang" /><category term="MongoDB" /><category term="go" /><category term="golang" /><category term="mongodb" /><category term="driver" /><category term="database" /><category term="error" /><category term="dot" /><category term="field" /><category term="nested" /><summary type="html">Today we had a MongoDB 3.6 collection with the following documents:</summary></entry><entry><title type="html">Convert from/to JSON decimal fields in Go (golang) structs</title><link href="https://manios.org/2021/07/24/golang-decimal-field-in-struct-json-convert" rel="alternate" type="text/html" title="Convert from/to JSON decimal fields in Go (golang) structs" /><published>2021-07-24T11:27:00-05:00</published><updated>2021-07-24T11:27:00-05:00</updated><id>https://manios.org/2021/07/24/golang-decimal-field-in-struct-json-convert</id><content type="html" xml:base="https://manios.org/2021/07/24/golang-decimal-field-in-struct-json-convert">&lt;p&gt;Yesterday we had to marshal and umarshal to/from JSON some HTTP requests and responses in a &lt;a href=&quot;https://golang.org/&quot;&gt;Go&lt;/a&gt; microservice we are building. We already use &lt;a href=&quot;https://github.com/ericlagergren/decimal&quot;&gt;ericlagergren/decimal&lt;/a&gt;. However we have spotted that the &lt;code class=&quot;highlighter-rouge&quot;&gt;struct&lt;/code&gt; for the response were declared like this:&lt;/p&gt;
 
 &lt;div class=&quot;language-go highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;type&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;IncomeExpensesResponse&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
 	&lt;span class=&quot;n&quot;&gt;Income&lt;/span&gt;   &lt;span class=&quot;kt&quot;&gt;string&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;`json:&quot;income&quot;`&lt;/span&gt;
@@ -678,441 +1060,4 @@ Build: &lt;span class=&quot;nv&quot;&gt;$Id&lt;/span&gt;: 1990ba12450cab9425a2ae
 
 &lt;p&gt;Have a nice night!&lt;/p&gt;
 
-&lt;p&gt;P.S. TAKIS R.I.P. ! We will never forget! We had eaten the best gyros in Triandria, Thessaloniki!&lt;/p&gt;</content><author><name>cmanios</name></author><category term="Go" /><category term="Golang" /><category term="Elastic" /><category term="Beats" /><category term="elastic" /><category term="metricbeat" /><category term="beats" /><category term="elasticsearch" /><category term="debug" /><category term="frame" /><category term="go" /><category term="golang" /><category term="elk" /><category term="error" /><category term="delve" /><category term="kibana" /><category term="index" /><category term="monitor" /><summary type="html">Today we were trying to debug Metricbeat (on commit #cff3e40c) using Visual Studio Code v1.27.2 and Delve debugger but it failed with the error:</summary></entry><entry><title type="html">Rsyslog - Parse Json and enrich IP with Geolocation using Maxmind GeoLite2 City and ISP</title><link href="https://manios.org/2018/08/18/logstash-geoip-json-logs-maxmint-geolite-docker" rel="alternate" type="text/html" title="Rsyslog - Parse Json and enrich IP with Geolocation using Maxmind GeoLite2 City and ISP" /><published>2018-08-18T02:13:44-05:00</published><updated>2018-08-18T02:13:44-05:00</updated><id>https://manios.org/2018/08/18/logstash-geoip-json-logs-maxmint-geolite-docker</id><content type="html" xml:base="https://manios.org/2018/08/18/logstash-geoip-json-logs-maxmint-geolite-docker">&lt;p&gt;Today we wanted to parse some json logs which we had in a file using &lt;a href=&quot;http://rsyslog.com/&quot;&gt;Rsyslog&lt;/a&gt; and enrich  them with Geolocation information regarding the city and the ISP an IP belongs. We initially tried with Logstash (see relevant &lt;a href=&quot;/2018/08/14/logstash-geoip-json-logs-maxmint-geolite-docker&quot;&gt;previous blog post&lt;/a&gt;) but it was too slow. Thus we decided to try with parsing with Rsyslog. The file, let’s call it &lt;code class=&quot;highlighter-rouge&quot;&gt;/var/log/input-geo.json&lt;/code&gt; had the following structure and content. (It is the same as in Logstash post):&lt;/p&gt;
-
-&lt;div class=&quot;language-json highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;name&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Christos&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;src_ip&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;63.145.248.101&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;age&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;12&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;name&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Nikos&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;src_ip&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;98.158.156.175&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;age&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Rsyslog has &lt;a href=&quot;https://www.rsyslog.com/doc/v8-stable/configuration/modules/mmdblookup.html&quot;&gt;MaxMind/GeoIP DB lookup (mmdblookup)&lt;/a&gt; module which adds information about the geographical location of IP addresses, based on data from the Maxmind GeoLite2 databases. In our case we used:&lt;/p&gt;
-&lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;https://dev.maxmind.com/geoip/geoip2/geolite2/&quot;&gt;GeoLite2 City&lt;/a&gt; database (free)&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://www.maxmind.com/en/geoip2-isp-database&quot;&gt;GeoIP2 ISP &lt;/a&gt; Database (commercial licence)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;We wanted to parse the JSON file enrich the &lt;code class=&quot;highlighter-rouge&quot;&gt;src_ip&lt;/code&gt; field and store the geolocation information to &lt;code class=&quot;highlighter-rouge&quot;&gt;src_geoip&lt;/code&gt;. Then we forward the message to Elasticsearch using &lt;a href=&quot;https://www.rsyslog.com/doc/v8-stable/configuration/modules/omelasticsearch.html&quot;&gt;omelasticsearch: Elasticsearch Output Module&lt;/a&gt;. For debugging purposes we also enabled &lt;a href=&quot;https://www.elastic.co/guide/en/logstash/current/plugins-outputs-file.html&quot;&gt;file output&lt;/a&gt;. Thus , the configuration (&lt;code class=&quot;highlighter-rouge&quot;&gt;rsyslog.conf&lt;/code&gt;) looked like the following:&lt;/p&gt;
-
-&lt;div class=&quot;language-conf highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;#  /etc/rsyslog.conf	Configuration file for rsyslog.
-#
-#			For more information see
-#			/usr/share/doc/rsyslog-doc/html/rsyslog_conf.html
-#
-#  Default logging rules can be found in /etc/rsyslog.d/50-default.conf
-&lt;/span&gt;
-
-&lt;span class=&quot;c&quot;&gt;#################
-#### MODULES ####
-#################
-&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;module&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;load&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;imuxsock&quot;&lt;/span&gt;) &lt;span class=&quot;c&quot;&gt;# provides support for local system logging
-# module(load=&quot;imklog&quot;)   # provides kernel logging support
-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;module&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;load&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;immark&quot;&lt;/span&gt;)  &lt;span class=&quot;c&quot;&gt;# provides --MARK-- message capability
-# $ModLoad imuxsock # provides support for local system logging
-# $ModLoad imklog   # provides kernel logging support (previously done by rklogd)
-#$ModLoad immark  # provides --MARK-- message capability
-&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# provides UDP syslog reception
-# $ModLoad imudp
-# $UDPServerRun 514
-&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# provides TCP syslog reception
-# $ModLoad imtcp
-# $InputTCPServerRun 514
-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;module&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;load&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;builtin:omfile&quot;&lt;/span&gt;)
-&lt;span class=&quot;n&quot;&gt;module&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;load&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;mmnormalize&quot;&lt;/span&gt;) &lt;span class=&quot;c&quot;&gt;# parser using liblognorm
-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;module&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;load&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;mmjsonparse&quot;&lt;/span&gt;) &lt;span class=&quot;c&quot;&gt;#for parsing CEE-enhanced syslog messages
-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;module&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;load&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;imfile&quot;&lt;/span&gt;)
-&lt;span class=&quot;n&quot;&gt;module&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;load&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;mmdblookup&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;container&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;!src_geo&quot;&lt;/span&gt;)
-
-&lt;span class=&quot;c&quot;&gt;###########################
-#### GLOBAL DIRECTIVES ####
-###########################
-&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;#
-# Use traditional timestamp format.
-# To enable high precision timestamps, comment out the following line.
-#
-&lt;/span&gt;$&lt;span class=&quot;n&quot;&gt;ActionFileDefaultTemplate&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;RSYSLOG_TraditionalFileFormat&lt;/span&gt;
-
-&lt;span class=&quot;c&quot;&gt;# Filter duplicated messages
-&lt;/span&gt;$&lt;span class=&quot;n&quot;&gt;RepeatedMsgReduction&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;on&lt;/span&gt;
-
-&lt;span class=&quot;c&quot;&gt;#
-# Set the default permissions for all log files.
-#
-&lt;/span&gt;$&lt;span class=&quot;n&quot;&gt;FileOwner&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;root&lt;/span&gt;
-$&lt;span class=&quot;n&quot;&gt;FileGroup&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;root&lt;/span&gt;
-$&lt;span class=&quot;n&quot;&gt;FileCreateMode&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;0640&lt;/span&gt;
-$&lt;span class=&quot;n&quot;&gt;DirCreateMode&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;0755&lt;/span&gt;
-$&lt;span class=&quot;n&quot;&gt;Umask&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;0022&lt;/span&gt;
-$&lt;span class=&quot;n&quot;&gt;PrivDropToUser&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;syslog&lt;/span&gt;
-$&lt;span class=&quot;n&quot;&gt;PrivDropToGroup&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;syslog&lt;/span&gt;
-
-&lt;span class=&quot;c&quot;&gt;# General globals
-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;global&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;net&lt;/span&gt;.&lt;span class=&quot;n&quot;&gt;enableDNS&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;off&quot;&lt;/span&gt;)
-
-&lt;span class=&quot;c&quot;&gt;# Remove Control Chars
-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;global&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;parser&lt;/span&gt;.&lt;span class=&quot;n&quot;&gt;escapeControlCharactersOnReceive&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;off&quot;&lt;/span&gt; )
-
-&lt;span class=&quot;c&quot;&gt;#
-# Where to place spool files
-#
-&lt;/span&gt;$&lt;span class=&quot;n&quot;&gt;WorkDirectory&lt;/span&gt; /&lt;span class=&quot;n&quot;&gt;var&lt;/span&gt;/&lt;span class=&quot;n&quot;&gt;spool&lt;/span&gt;/&lt;span class=&quot;n&quot;&gt;rsyslog&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;global&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;workDirectory&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;/var/spool/rsyslog&quot;&lt;/span&gt;)
-&lt;span class=&quot;c&quot;&gt;#
-# Include all config files in /etc/rsyslog.d/
-#
-# $IncludeConfig /etc/rsyslog.d/*.conf
-&lt;/span&gt;
-
-
-&lt;span class=&quot;c&quot;&gt;#################
-#### Inputs  ####
-#################
-&lt;/span&gt;
-
-&lt;span class=&quot;c&quot;&gt;# provides UDP syslog reception
-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;module&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;load&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;imudp&quot;&lt;/span&gt;)
-&lt;span class=&quot;n&quot;&gt;input&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;type&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;imudp&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;port&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;514&quot;&lt;/span&gt;)
-
-&lt;span class=&quot;c&quot;&gt;# provides TCP syslog reception
-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;module&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;load&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;imtcp&quot;&lt;/span&gt;)
-&lt;span class=&quot;n&quot;&gt;input&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;type&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;imtcp&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;port&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;514&quot;&lt;/span&gt; )
-
-&lt;span class=&quot;c&quot;&gt;# File 1
-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;input&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;type&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;imfile&quot;&lt;/span&gt;
-      &lt;span class=&quot;n&quot;&gt;File&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;/opt/input-geo.json&quot;&lt;/span&gt;
-      &lt;span class=&quot;n&quot;&gt;Tag&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;geoip&quot;&lt;/span&gt;
-      &lt;span class=&quot;n&quot;&gt;PersistStateInterval&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;1&quot;&lt;/span&gt;
-      &lt;span class=&quot;n&quot;&gt;freshStartTail&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;off&quot;&lt;/span&gt;)
-
-&lt;span class=&quot;c&quot;&gt;#################
-### Templates ###
-#################
-&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# this is for formatting our syslog in JSON with @timestamp for Json messages
-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;template&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;geoip&quot;&lt;/span&gt;
-  &lt;span class=&quot;n&quot;&gt;type&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;list&quot;&lt;/span&gt;) {
-    &lt;span class=&quot;n&quot;&gt;constant&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;{&quot;&lt;/span&gt;)
-      &lt;span class=&quot;n&quot;&gt;constant&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;\&quot;&lt;/span&gt;@&lt;span class=&quot;n&quot;&gt;version&lt;/span&gt;\&lt;span class=&quot;s2&quot;&gt;&quot;:\&quot;&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;&quot;&lt;/span&gt;)
-      &lt;span class=&quot;n&quot;&gt;constant&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;\&quot;&lt;/span&gt;,\&lt;span class=&quot;s2&quot;&gt;&quot;@timestamp\&quot;&lt;/span&gt;:\&lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;)		&lt;span class=&quot;n&quot;&gt;property&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;timegenerated&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dateFormat&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;rfc3339&quot;&lt;/span&gt;)
-      &lt;span class=&quot;n&quot;&gt;constant&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;\&quot;&lt;/span&gt;,\&lt;span class=&quot;s2&quot;&gt;&quot;host\&quot;&lt;/span&gt;:\&lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;)			    &lt;span class=&quot;n&quot;&gt;property&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;hostname&quot;&lt;/span&gt;) 
-      &lt;span class=&quot;n&quot;&gt;constant&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;\&quot;&lt;/span&gt;,\&lt;span class=&quot;s2&quot;&gt;&quot;type\&quot;&lt;/span&gt;:\&lt;span class=&quot;s2&quot;&gt;&quot;syslog&quot;&lt;/span&gt;)
-      &lt;span class=&quot;n&quot;&gt;constant&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;\&quot;&lt;/span&gt;,\&lt;span class=&quot;s2&quot;&gt;&quot;syslog_timestamp\&quot;&lt;/span&gt;:\&lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;)	&lt;span class=&quot;n&quot;&gt;property&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;timereported&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dateFormat&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;rfc3164&quot;&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;format&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;json&quot;&lt;/span&gt;)
-      &lt;span class=&quot;n&quot;&gt;constant&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;\&quot;&lt;/span&gt;,\&lt;span class=&quot;s2&quot;&gt;&quot;syslog_hostname\&quot;&lt;/span&gt;:\&lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;)	&lt;span class=&quot;n&quot;&gt;property&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;hostname&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;format&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;json&quot;&lt;/span&gt;)
-      &lt;span class=&quot;n&quot;&gt;constant&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;\&quot;&lt;/span&gt;,\&lt;span class=&quot;s2&quot;&gt;&quot;syslog_program\&quot;&lt;/span&gt;:\&lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;)	&lt;span class=&quot;n&quot;&gt;property&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;programname&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;format&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;json&quot;&lt;/span&gt;)
-      &lt;span class=&quot;n&quot;&gt;constant&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;\&quot;&lt;/span&gt;,\&lt;span class=&quot;s2&quot;&gt;&quot;syslog_message\&quot;&lt;/span&gt;:\&lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;)	&lt;span class=&quot;n&quot;&gt;property&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;msg&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;format&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;json&quot;&lt;/span&gt;)
-      &lt;span class=&quot;n&quot;&gt;constant&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;\&quot;&lt;/span&gt;,\&lt;span class=&quot;s2&quot;&gt;&quot;received_at\&quot;&lt;/span&gt;:\&lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;)		&lt;span class=&quot;n&quot;&gt;property&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;timegenerated&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dateFormat&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;rfc3339&quot;&lt;/span&gt;)
-      &lt;span class=&quot;n&quot;&gt;constant&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;\&quot;&lt;/span&gt;,\&lt;span class=&quot;s2&quot;&gt;&quot;received_from\&quot;&lt;/span&gt;:\&lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;)	    &lt;span class=&quot;n&quot;&gt;property&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;fromhost&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;format&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;json&quot;&lt;/span&gt;)
-      &lt;span class=&quot;n&quot;&gt;constant&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;\&quot;&lt;/span&gt;,\&lt;span class=&quot;s2&quot;&gt;&quot;path\&quot;&lt;/span&gt;:\&lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;)      	    &lt;span class=&quot;n&quot;&gt;property&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;$!metadata!filename&quot;&lt;/span&gt;)
-      &lt;span class=&quot;n&quot;&gt;constant&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;\&quot;&lt;/span&gt;,\&lt;span class=&quot;s2&quot;&gt;&quot;name\&quot;&lt;/span&gt;:\&lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;)              &lt;span class=&quot;n&quot;&gt;property&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;$!name&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;format&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;json&quot;&lt;/span&gt;)
-      &lt;span class=&quot;n&quot;&gt;constant&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;\&quot;&lt;/span&gt;,\&lt;span class=&quot;s2&quot;&gt;&quot;src_ip\&quot;&lt;/span&gt;:\&lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;)            &lt;span class=&quot;n&quot;&gt;property&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;$!src_ip&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;format&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;json&quot;&lt;/span&gt;)
-      &lt;span class=&quot;n&quot;&gt;constant&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;\&quot;&lt;/span&gt;,\&lt;span class=&quot;s2&quot;&gt;&quot;src_geoip\&quot;&lt;/span&gt;:{&lt;span class=&quot;s2&quot;&gt;&quot;)          property(name=&quot;&lt;/span&gt;$!&lt;span class=&quot;n&quot;&gt;src_geo&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot; position.from=&quot;&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;&quot;&lt;/span&gt;)
-      &lt;span class=&quot;n&quot;&gt;constant&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;}\n&quot;&lt;/span&gt;)
-}
-
-
-&lt;span class=&quot;c&quot;&gt;#################
-#### Actions ####
-#################
-&lt;/span&gt;
-
-&lt;span class=&quot;c&quot;&gt;###Fix text to utf8, disabled for now
-###action(type=&quot;mmutf8fix&quot;)
-&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;#action(type=&quot;omfile&quot; file=&quot;/tmp/logtesting&quot; template=&quot;RSYSLOG_DebugFormat&quot;)
-&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;if&lt;/span&gt; ($&lt;span class=&quot;n&quot;&gt;syslogtag&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;contains&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'geoip'&lt;/span&gt;) &lt;span class=&quot;n&quot;&gt;then&lt;/span&gt; {
-    
-    
-    &lt;span class=&quot;n&quot;&gt;action&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;type&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;mmjsonparse&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cookie&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;)
-    
-    &lt;span class=&quot;n&quot;&gt;if&lt;/span&gt; $&lt;span class=&quot;n&quot;&gt;parsesuccess&lt;/span&gt; == &lt;span class=&quot;s2&quot;&gt;&quot;OK&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;then&lt;/span&gt; {
-
-        &lt;span class=&quot;c&quot;&gt;# https://github.com/rsyslog/rsyslog/issues/1650
-&lt;/span&gt;
-        &lt;span class=&quot;c&quot;&gt;# Add MaxMind/GeoIP DB lookup information
-&lt;/span&gt;        &lt;span class=&quot;n&quot;&gt;action&lt;/span&gt;( &lt;span class=&quot;n&quot;&gt;type&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;mmdblookup&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;mmdbfile&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;/etc/rsyslog.d/GeoLite2-City.mmdb&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;key&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;!src_ip&quot;&lt;/span&gt; 
-                &lt;span class=&quot;n&quot;&gt;fields&lt;/span&gt;=[&lt;span class=&quot;s2&quot;&gt;&quot;:timezone:!location!time_zone&quot;&lt;/span&gt;,
-                        &lt;span class=&quot;s2&quot;&gt;&quot;:latitude:!location!latitude&quot;&lt;/span&gt;,
-                        &lt;span class=&quot;s2&quot;&gt;&quot;:longitude:!location!longitude&quot;&lt;/span&gt;,
-                        &lt;span class=&quot;s2&quot;&gt;&quot;:dma_code:!location!metro_code&quot;&lt;/span&gt;,
-                        &lt;span class=&quot;s2&quot;&gt;&quot;:city_name:!names!en&quot;&lt;/span&gt;,
-                        &lt;span class=&quot;s2&quot;&gt;&quot;:continent_code:!continent!code&quot;&lt;/span&gt;,
-                        &lt;span class=&quot;s2&quot;&gt;&quot;:country_code2:!country!iso_code&quot;&lt;/span&gt;,
-                        &lt;span class=&quot;s2&quot;&gt;&quot;:country_code3:!country!iso_code&quot;&lt;/span&gt;,
-                        &lt;span class=&quot;s2&quot;&gt;&quot;:country_name:!country!names!en&quot;&lt;/span&gt;,
-                        &lt;span class=&quot;s2&quot;&gt;&quot;:postal_code:!postal!code&quot;&lt;/span&gt;,
-                        &lt;span class=&quot;s2&quot;&gt;&quot;:region_code:!subdivisions!iso_code&quot;&lt;/span&gt;,
-                        &lt;span class=&quot;s2&quot;&gt;&quot;:region_name:!subdivisions!names!en&quot;&lt;/span&gt;
-                        ]
-        )
-
-        &lt;span class=&quot;c&quot;&gt;# Add MaxMind/GeoIP ISP DB lookup information
-&lt;/span&gt;        &lt;span class=&quot;n&quot;&gt;action&lt;/span&gt;( &lt;span class=&quot;n&quot;&gt;type&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;mmdblookup&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;mmdbfile&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;/etc/rsyslog.d/GeoIP2-ISP.mmdb&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;key&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;!src_ip&quot;&lt;/span&gt; 
-                &lt;span class=&quot;n&quot;&gt;fields&lt;/span&gt;=[&lt;span class=&quot;s2&quot;&gt;&quot;:asn:!autonomous_system_number&quot;&lt;/span&gt;,
-                        &lt;span class=&quot;s2&quot;&gt;&quot;:as_org:!autonomous_system_organization&quot;&lt;/span&gt;,
-                        &lt;span class=&quot;s2&quot;&gt;&quot;!isp&quot;&lt;/span&gt;,
-                        &lt;span class=&quot;s2&quot;&gt;&quot;!organization&quot;&lt;/span&gt;
-                        ]
-        )
-        
-        &lt;span class=&quot;c&quot;&gt;# Add IP to src_geo object
-&lt;/span&gt;        &lt;span class=&quot;n&quot;&gt;set&lt;/span&gt; $!&lt;span class=&quot;n&quot;&gt;src_geo&lt;/span&gt;!&lt;span class=&quot;n&quot;&gt;ip&lt;/span&gt; = $!&lt;span class=&quot;n&quot;&gt;src_ip&lt;/span&gt;;
-
-        &lt;span class=&quot;c&quot;&gt;# If geolocation was successful, add lat,lon in a special location object
-&lt;/span&gt;        &lt;span class=&quot;n&quot;&gt;if&lt;/span&gt; $! &lt;span class=&quot;n&quot;&gt;contains&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'latitude'&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;then&lt;/span&gt; {
-            &lt;span class=&quot;n&quot;&gt;set&lt;/span&gt; $!&lt;span class=&quot;n&quot;&gt;src_geo&lt;/span&gt;!&lt;span class=&quot;n&quot;&gt;location&lt;/span&gt;!&lt;span class=&quot;n&quot;&gt;lat&lt;/span&gt; = $!&lt;span class=&quot;n&quot;&gt;src_geo&lt;/span&gt;!&lt;span class=&quot;n&quot;&gt;latitude&lt;/span&gt;;
-            &lt;span class=&quot;n&quot;&gt;set&lt;/span&gt; $!&lt;span class=&quot;n&quot;&gt;src_geo&lt;/span&gt;!&lt;span class=&quot;n&quot;&gt;location&lt;/span&gt;!&lt;span class=&quot;n&quot;&gt;lon&lt;/span&gt; = $!&lt;span class=&quot;n&quot;&gt;src_geo&lt;/span&gt;!&lt;span class=&quot;n&quot;&gt;longitude&lt;/span&gt;;
-        }
-
-        &lt;span class=&quot;c&quot;&gt;# Output to a new file
-&lt;/span&gt;        &lt;span class=&quot;n&quot;&gt;action&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;type&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;omfile&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;File&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;/tmp/json-output&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;template&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;geoip&quot;&lt;/span&gt;)
-
-        &lt;span class=&quot;c&quot;&gt;# Output to Elasticsearch
-&lt;/span&gt;        &lt;span class=&quot;n&quot;&gt;action&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;type&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;omelasticsearch&quot;&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;server&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;192.168.1.10&quot;&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;serverport&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;9200&quot;&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;template&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;geoip&quot;&lt;/span&gt;  
-            &lt;span class=&quot;n&quot;&gt;searchIndex&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;geoindex&quot;&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;dynSearchIndex&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;on&quot;&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;searchType&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;syslog&quot;&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;bulkmode&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;on&quot;&lt;/span&gt;                   &lt;span class=&quot;c&quot;&gt;# use the Bulk API
-&lt;/span&gt;            &lt;span class=&quot;n&quot;&gt;queue&lt;/span&gt;.&lt;span class=&quot;n&quot;&gt;dequeuebatchsize&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;5000&quot;&lt;/span&gt;   &lt;span class=&quot;c&quot;&gt;# ES bulk size
-&lt;/span&gt;            &lt;span class=&quot;n&quot;&gt;queue&lt;/span&gt;.&lt;span class=&quot;n&quot;&gt;size&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;100000&quot;&lt;/span&gt;   &lt;span class=&quot;c&quot;&gt;# capacity of the action queue
-&lt;/span&gt;            &lt;span class=&quot;n&quot;&gt;queue&lt;/span&gt;.&lt;span class=&quot;n&quot;&gt;workerthreads&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;5&quot;&lt;/span&gt;   &lt;span class=&quot;c&quot;&gt;# 5 workers for the action
-&lt;/span&gt;            &lt;span class=&quot;n&quot;&gt;action&lt;/span&gt;.&lt;span class=&quot;n&quot;&gt;resumeretrycount&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;-1&quot;&lt;/span&gt;  &lt;span class=&quot;c&quot;&gt;# retry indefinitely if ES is unreachable
-&lt;/span&gt;            &lt;span class=&quot;n&quot;&gt;errorfile&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;/var/log/omelasticsearch.log&quot;&lt;/span&gt;
-        )
-
-    } &lt;span class=&quot;n&quot;&gt;else&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;if&lt;/span&gt; $&lt;span class=&quot;n&quot;&gt;parsesuccess&lt;/span&gt; == &lt;span class=&quot;s2&quot;&gt;&quot;FAIL&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;then&lt;/span&gt; {
-        &lt;span class=&quot;n&quot;&gt;action&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;type&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;omfile&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;File&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;/tmp/json-parse-failure&quot;&lt;/span&gt;)
-    }
-}
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;To run Logstash we chose the quickest way, hence run it in Docker , so we have put all required Logstash configuration, logs and Maxmind databases in a directory:&lt;/p&gt;
-
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;linux@linux-VM:~&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;ls&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-l&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;-rwxrwxr-x&lt;/span&gt; 1 linux linux 26331174 Aug   6 19:11 GeoIP2-ISP.mmdb
-&lt;span class=&quot;nt&quot;&gt;-rwxrwxr-x&lt;/span&gt; 1 linux linux 51469823 Aug   6 19:11 GeoLite2-City.mmdb
-&lt;span class=&quot;nt&quot;&gt;-rw-rw-r--&lt;/span&gt; 1 linux linux      107 Aug  18 19:13 input-geo.json
-&lt;span class=&quot;nt&quot;&gt;-rwxrwxr-x&lt;/span&gt; 1 linux linux     2244 Aug  18 19:32 rsyslog.conf
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Running Rsyslog on Docker is not so relatively easy as the Docker images are a work in progress in &lt;a href=&quot;https://github.com/rsyslog/rsyslog-docker/&quot;&gt;Github&lt;/a&gt; (last checked 2018-08-18). So we created a custom image in our personal account, called &lt;a href=&quot;https://hub.docker.com/r/manios/rsyslog/&quot;&gt;manios/rsyslog&lt;/a&gt;. Let’s run a Docker container with Rsyslog 8.37.0:&lt;/p&gt;
-
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;docker run &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
-    &lt;span class=&quot;nt&quot;&gt;-d&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
-    &lt;span class=&quot;nt&quot;&gt;--name&lt;/span&gt; myrsyslog &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
-    &lt;span class=&quot;nt&quot;&gt;-v&lt;/span&gt; &lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;pwd&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;)&lt;/span&gt;/GeoLite2-City.mmdb:/etc/rsyslog.d/GeoLite2-City.mmdb &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
-    &lt;span class=&quot;nt&quot;&gt;-v&lt;/span&gt; &lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;pwd&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;)&lt;/span&gt;/GeoIP2-ISP.mmdb:/etc/rsyslog.d/GeoIP2-ISP.mmdb &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
-    &lt;span class=&quot;nt&quot;&gt;-v&lt;/span&gt; &lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;pwd&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;)&lt;/span&gt;/input-geo.json:/opt/input-geo.json &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
-    &lt;span class=&quot;nt&quot;&gt;-v&lt;/span&gt; &lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;pwd&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;)&lt;/span&gt;/rsyslog.conf:/etc/rsyslog.conf &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
-    manios/rsyslog:8.37.0
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Now Rsyslog is running. Let’s run a Bash shell inside the container:&lt;/p&gt;
-
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;docker &lt;span class=&quot;nb&quot;&gt;exec&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-it&lt;/span&gt; myrsyslog /bin/bash
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;While Rsyslog is running, if you examine the contents of &lt;code class=&quot;highlighter-rouge&quot;&gt;/tmp/json-output&lt;/code&gt; file, you will notice that the messages contain a lot of geolocation information and they will resemble to the following:&lt;/p&gt;
-
-&lt;div class=&quot;language-json highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;@version&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;1&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;@timestamp&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;2018-08-18T06:59:14.640903+00:00&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;host&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;b576d0a6022b&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;type&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;syslog&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;syslog_timestamp&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Aug 18 06:59:14&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;syslog_hostname&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;b576d0a6022b&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;syslog_program&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;geoip&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;syslog_message&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;{&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;Christos&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;src_ip&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;63.145.248.101&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;age&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;:12}&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;received_at&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;2018-08-18T06:59:14.640903+00:00&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;received_from&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;path&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;/opt/input-geo.json&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;name&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Christos&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;src_ip&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;63.145.248.101&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;src_geoip&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;timezone&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;America&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\/&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;Los_Angeles&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;latitude&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;37.925500&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;longitude&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;-122.343700&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;dma_code&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;807&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;city_name&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;continent_code&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;NA&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;country_code2&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;US&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;country_code3&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;US&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;country_name&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;UnitedStates&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;postal_code&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;94804&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;region_code&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;region_name&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;asn&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;209&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;as_org&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;QwestCommunicationsCompany,LLC&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;isp&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;CenturyLink&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;organization&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;CenturyLink&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;ip&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;63.145.248.101&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;location&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-            &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;lat&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;37.9255&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-            &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;lon&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;-122.3437&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Unfortunately, current version of Rsyslog contains a known bug (&lt;a href=&quot;https://github.com/rsyslog/rsyslog/issues/1650&quot;&gt;#1650&lt;/a&gt;) which strips the space characters from strings. Notice that&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&quot;country_name&quot;: &quot;UnitedStates&quot;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;should be&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&quot;country_name&quot;: &quot;United States&quot;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;for example. Also, if you compare to our previous post (&lt;code class=&quot;highlighter-rouge&quot;&gt;TODO add link here&lt;/code&gt;), &lt;code class=&quot;highlighter-rouge&quot;&gt;region_code&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;region_name&lt;/code&gt; should have a value. You can easily spot the differences between Rsyslog and Logstash output in the following image:&lt;/p&gt;
-
-&lt;figure&gt;
-    &lt;a href=&quot;/images/2018-08-18-rsyslog-geo-maxmind/maxmind-output-logstash-rsyslog.png&quot;&gt;&lt;img src=&quot;/images/2018-08-18-rsyslog-geo-maxmind/maxmind-output-logstash-rsyslog.png&quot; alt=&quot;Rsyslog and Logstash output diff when using Maxmind GeoIP City and ISP lookup databases&quot; /&gt;&lt;/a&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;We hope this article helped you get up and running with Rsyslog and the use of &lt;a href=&quot;https://www.rsyslog.com/doc/v8-stable/configuration/modules/mmdblookup.html&quot;&gt;MaxMind/GeoIP DB lookup (mmdblookup)&lt;/a&gt; module!&lt;/p&gt;</content><author><name>cmanios</name></author><category term="Rsyslog" /><category term="Elasticsearch" /><category term="rsyslog" /><category term="mmdblookup" /><category term="omelasticsearch" /><category term="geolocation" /><category term="ip" /><category term="geoip" /><category term="maxmind" /><category term="geo" /><category term="geoip" /><category term="geolite" /><category term="geolite2" /><category term="database" /><category term="json" /><category term="parse" /><category term="message" /><category term="log" /><summary type="html">Today we wanted to parse some json logs which we had in a file using Rsyslog and enrich them with Geolocation information regarding the city and the ISP an IP belongs. We initially tried with Logstash (see relevant previous blog post) but it was too slow. Thus we decided to try with parsing with Rsyslog. The file, let’s call it /var/log/input-geo.json had the following structure and content. (It is the same as in Logstash post):</summary></entry><entry><title type="html">Logstash - Enrich IP with Geolocation using Maxmind GeoLite2 City and ISP</title><link href="https://manios.org/2018/08/14/logstash-geoip-json-logs-maxmint-geolite-docker" rel="alternate" type="text/html" title="Logstash - Enrich IP with Geolocation using Maxmind GeoLite2 City and ISP" /><published>2018-08-14T10:35:00-05:00</published><updated>2018-08-14T10:35:00-05:00</updated><id>https://manios.org/2018/08/14/logstash-geoip-json-logs-maxmint-geolite-docker</id><content type="html" xml:base="https://manios.org/2018/08/14/logstash-geoip-json-logs-maxmint-geolite-docker">&lt;p&gt;Today we wanted to parse some json logs which we had in a file using Logstash and enrich  them with Geolocation information regarding the city and the ISP an IP belongs. The file, (let’s call it &lt;code class=&quot;highlighter-rouge&quot;&gt;/var/log/input-geo.json&lt;/code&gt;) had the following structure:&lt;/p&gt;
-
-&lt;div class=&quot;language-json highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;name&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Christos&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;src_ip&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;63.145.248.101&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;age&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;12&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;name&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Nikos&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;src_ip&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;98.158.156.175&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;age&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Logstash has &lt;a href=&quot;https://www.elastic.co/guide/en/logstash/current/plugins-filters-geoip.html&quot;&gt;GeoIP filter&lt;/a&gt; which adds information about the geographical location of IP addresses, based on data from the Maxmind GeoLite2 databases. In our case we used:&lt;/p&gt;
-&lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;https://dev.maxmind.com/geoip/geoip2/geolite2/&quot;&gt;GeoLite2 City&lt;/a&gt; database (free)&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://www.maxmind.com/en/geoip2-isp-database&quot;&gt;GeoIP2 ISP &lt;/a&gt; Database (commercial licence)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;We wanted to parse the JSON file enrich the &lt;code class=&quot;highlighter-rouge&quot;&gt;src_ip&lt;/code&gt; and then forward it to &lt;a href=&quot;https://www.elastic.co/guide/en/logstash/current/plugins-outputs-elasticsearch.html&quot;&gt;Elasticsearch&lt;/a&gt;. For debugging purposes we also enabled &lt;a href=&quot;https://www.elastic.co/guide/en/logstash/current/plugins-outputs-file.html&quot;&gt;file output&lt;/a&gt;. Thus , the configuration (&lt;code class=&quot;highlighter-rouge&quot;&gt;logstash.conf&lt;/code&gt;) looked like the following:&lt;/p&gt;
-
-&lt;div class=&quot;language-ruby highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;input&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-  &lt;span class=&quot;n&quot;&gt;file&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; 
-    &lt;span class=&quot;n&quot;&gt;path&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;/var/log/input-geo.json&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;sincedb_path&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;/usr/share/logstash/geo-sincedb1&quot;&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;start_position&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;beginning&quot;&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;codec&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;json&quot;&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;type&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;mygeo&quot;&lt;/span&gt;
-  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-
-
-&lt;span class=&quot;n&quot;&gt;filter&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    
-    &lt;span class=&quot;c1&quot;&gt;# Enhance with City geolocation information using free GeoLite2 City database&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;src_ip&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;geoip&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;source&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;src_ip&quot;&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;target&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;src_geoip&quot;&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;database&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;/usr/share/logstash/GeoLite2-City.mmdb&quot;&lt;/span&gt;
-        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-
-    &lt;span class=&quot;c1&quot;&gt;# Enhance with ISP geolocation information using free GeoIP2 ISP Database&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;src_ip&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;geoip&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;source&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;src_ip&quot;&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;target&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;src_geoip&quot;&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;database&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;/usr/share/logstash/GeoIP2-ISP.mmdb&quot;&lt;/span&gt;
-        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;  
-
-&lt;span class=&quot;n&quot;&gt;output&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;c1&quot;&gt;# stdout  { codec =&amp;gt; rubydebug }&lt;/span&gt;
-     
-    &lt;span class=&quot;c1&quot;&gt;# Output successfull messages to a file&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;_grokparsefailure&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;not&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tags&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;file&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;path&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;  &lt;span class=&quot;s2&quot;&gt;&quot;/usr/share/logstash/success-debug.txt&quot;&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;codec&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;json_lines&lt;/span&gt;
-        &lt;span class=&quot;c1&quot;&gt;#  codec =&amp;gt; rubydebug&lt;/span&gt;
-        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-  
-    &lt;span class=&quot;c1&quot;&gt;# Output failed messages to a file &lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;_grokparsefailure&quot;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tags&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;file&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;path&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt;  &lt;span class=&quot;s2&quot;&gt;&quot;/usr/share/logstash/failed-debug.txt&quot;&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;codec&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rubydebug&lt;/span&gt;
-        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
- 
-    &lt;span class=&quot;c1&quot;&gt;# Output successfull messages to Elasticsearch&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;elasticsearch&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;hosts&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;192.168.1.3:9200&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;index&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;json_logs-%{+YYYY.MM.dd}&quot;&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;index&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;192.168.1.3_login_events-%{+YYYY.MM.dd}&quot;&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;manage_template&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;true&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;template_name&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;login_events&quot;&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;template_overwrite&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;true&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;protocol&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;http&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;flush_size&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;512&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;workers&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;8&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;To run Logstash we chose the quickest way, hence run it in Docker , so we have put all required Logstash configuration, logs and Maxmind databases in a directory:&lt;/p&gt;
-
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;linux@linux-VM:~&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;ls&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-l&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;-rwxrwxr-x&lt;/span&gt; 1 linux linux 26331174 Aug   6 19:11 GeoIP2-ISP.mmdb
-&lt;span class=&quot;nt&quot;&gt;-rwxrwxr-x&lt;/span&gt; 1 linux linux 51469823 Aug   6 19:11 GeoLite2-City.mmdb
-&lt;span class=&quot;nt&quot;&gt;-rw-rw-r--&lt;/span&gt; 1 linux linux      107 Aug  13 19:13 input-geo.json
-&lt;span class=&quot;nt&quot;&gt;-rwxrwxr-x&lt;/span&gt; 1 linux linux     2244 Aug  13 19:32 logstash.conf
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Running Logstash on Docker is relatively easy as Docker images for are available from the &lt;a href=&quot;https://www.docker.elastic.co/&quot;&gt;Elastic Docker registry&lt;/a&gt;. You can find more information &lt;a href=&quot;https://www.elastic.co/guide/en/logstash/current/docker.html&quot;&gt;here&lt;/a&gt;. Let’s run and interactive Docker container with Logstash 6.3.2:&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;docker run -it \
-    --rm \
-    --name logstash \
-    -v $(pwd)/GeoIP2-ISP.mmdb:/usr/share/logstash/GeoIP2-ISP.mmdb \
-    -v $(pwd)/GeoLite2-City.mmdb:/usr/share/logstash/GeoLite2-City.mmdb \
-    -v $(pwd)/input-geo.json:/var/log/input-geo.json \
-    -v $(pwd)/logstash.conf:/usr/share/logstash/pipeline/logstash.conf \
-    docker.elastic.co/logstash/logstash-oss:6.3.2
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;While Logstash is running, if you examine Elasticsearch or &lt;code class=&quot;highlighter-rouge&quot;&gt;/usr/share/logstash/success-debug.txt&lt;/code&gt;, you will notice that the messages contain a lot of geolocation information and they will resemble to the following:&lt;/p&gt;
-
-&lt;div class=&quot;language-json highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;src_ip&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;63.145.248.101&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;path&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;/var/log/input-geo.json&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;host&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;a14a2394ba12&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;@timestamp&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;2018-08-13T17:33:05.894Z&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;type&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;mygeo&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;src_geoip&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;postal_code&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;94804&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;country_code3&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;US&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;dma_code&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;807&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;continent_code&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;NA&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;region_name&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;California&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;longitude&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;-122.3437&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;ip&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;63.145.248.101&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;isp&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;CenturyLink&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;region_code&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;CA&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;latitude&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;37.9255&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;as_org&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Qwest Communications Company, LLC&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;country_code2&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;US&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;asn&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;209&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;location&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-            &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;lon&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;-122.3437&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-            &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;lat&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;37.9255&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;organization&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;CenturyLink&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;city_name&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Richmond&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;country_name&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;United States&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;timezone&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;America/Los_Angeles&quot;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;name&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Christos&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;age&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;12&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;@version&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;1&quot;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Thank God we have a geolocation result! We hope this article helped you get up and running!&lt;/p&gt;</content><author><name>cmanios</name></author><category term="Logstash" /><category term="Elasticsearch" /><category term="logstash" /><category term="geolocation" /><category term="ip" /><category term="geoip" /><category term="maxmind" /><category term="geo" /><category term="geolite" /><category term="geolite2" /><category term="database" /><category term="json" /><category term="parse" /><category term="message" /><category term="log" /><summary type="html">Today we wanted to parse some json logs which we had in a file using Logstash and enrich them with Geolocation information regarding the city and the ISP an IP belongs. The file, (let’s call it /var/log/input-geo.json) had the following structure:</summary></entry></feed>
+&lt;p&gt;P.S. TAKIS R.I.P. ! We will never forget! We had eaten the best gyros in Triandria, Thessaloniki!&lt;/p&gt;</content><author><name>cmanios</name></author><category term="Go" /><category term="Golang" /><category term="Elastic" /><category term="Beats" /><category term="elastic" /><category term="metricbeat" /><category term="beats" /><category term="elasticsearch" /><category term="debug" /><category term="frame" /><category term="go" /><category term="golang" /><category term="elk" /><category term="error" /><category term="delve" /><category term="kibana" /><category term="index" /><category term="monitor" /><summary type="html">Today we were trying to debug Metricbeat (on commit #cff3e40c) using Visual Studio Code v1.27.2 and Delve debugger but it failed with the error:</summary></entry></feed>

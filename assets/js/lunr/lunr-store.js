@@ -376,4 +376,16 @@ var store = [{
         "tags": ["go","golang","struct","json","field","decimal","number","floating","point","marshal","unmarshal"],
         "url": "https://manios.org/2021/07/24/golang-decimal-field-in-struct-json-convert",
         "teaser": null
+      },{
+        "title": "Go Mongodb Error Cannot create field X in element {Y: null}",
+        "excerpt":"Today we had a MongoDB 3.6 collection with the following documents: db.getCollection('person').insertMany([ {\"name\": \"Odyseas\", \"surname\": \"Androutsos\", \"profilePicture\": null}, {\"name\": \"Theodoros\", \"surname\": \"Kolokotronis\", \"profilePicture\": null}, {\"name\": \"Ioannis\", \"surname\": \"Makrygiannis\", \"profilePicture\": null}, {\"name\": \"Ioannis\", \"surname\": \"Kapodistrias\", \"profilePicture\": null}, {\"name\": \"Emanouil\", \"surname\": \"Pappas\", \"profilePicture\": null} ]) and we wanted to update them with...","categories": ["Go","Golang","MongoDB"],
+        "tags": ["go","golang","mongodb","driver","database","error","dot","field","nested"],
+        "url": "https://manios.org/2021/08/04/golang-decimal-field-in-struct-json-convert",
+        "teaser": null
+      },{
+        "title": "Go Mongodb Error Cannot create field X in element {Y: null}",
+        "excerpt":"Today we had a MongoDB 3.6 collection with the following documents: db.getCollection('person').insertMany([ {\"name\": \"Odyseas\", \"surname\": \"Androutsos\", \"profilePicture\": null}, {\"name\": \"Theodoros\", \"surname\": \"Kolokotronis\", \"profilePicture\": null}, {\"name\": \"Ioannis\", \"surname\": \"Makrygiannis\", \"profilePicture\": null}, {\"name\": \"Ioannis\", \"surname\": \"Kapodistrias\", \"profilePicture\": null}, {\"name\": \"Emanouil\", \"surname\": \"Pappas\", \"profilePicture\": null} ]) and we wanted to update them with...","categories": ["Go","Golang","MongoDB"],
+        "tags": ["go","golang","mongodb","driver","database","error","dot","field","nested"],
+        "url": "https://manios.org/2021/08/04/go-mongodb-error-cannot-create-field-in-element-null",
+        "teaser": null
       }]
