@@ -257,6 +257,10 @@
 <lastmod>2021-08-04T13:55:00-05:00</lastmod>
 </url>
 <url>
+<loc>https://manios.org/2022/07/22/oracle-sql-select-date-range-between-range</loc>
+<lastmod>2022-07-22T13:55:00-05:00</lastmod>
+</url>
+<url>
 <loc>https://manios.org/</loc>
 </url>
 <url>
@@ -1286,6 +1290,12 @@
 <loc>https://manios.org/tag/nested/</loc>
 </url>
 <url>
+<loc>https://manios.org/tag/oracle/</loc>
+</url>
+<url>
+<loc>https://manios.org/tag/range/</loc>
+</url>
+<url>
 <loc>https://manios.org/category/databases/</loc>
 </url>
 <url>
@@ -1458,6 +1468,9 @@
 </url>
 <url>
 <loc>https://manios.org/category/json/</loc>
+</url>
+<url>
+<loc>https://manios.org/category/oracle/</loc>
 </url>
 <url>
 <loc>https://manios.org/page2/</loc>

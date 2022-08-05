@@ -1,4 +1,100 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.0">Jekyll</generator><link href="https://manios.org/feed.xml" rel="self" type="application/atom+xml" /><link href="https://manios.org/" rel="alternate" type="text/html" /><updated>2021-08-14T10:57:45-05:00</updated><id>https://manios.org/feed.xml</id><title type="html">cmanios</title><subtitle>Developer life is a NullPointerException</subtitle><author><name>Christos Manios</name></author><entry><title type="html">Go Mongodb Error Cannot create field X in element {Y: null}</title><link href="https://manios.org/2021/08/04/go-mongodb-error-cannot-create-field-in-element-null" rel="alternate" type="text/html" title="Go Mongodb Error Cannot create field X in element {Y: null}" /><published>2021-08-04T13:55:00-05:00</published><updated>2021-08-04T13:55:00-05:00</updated><id>https://manios.org/2021/08/04/go-mongodb-error-cannot-create-field-in-element-null</id><content type="html" xml:base="https://manios.org/2021/08/04/go-mongodb-error-cannot-create-field-in-element-null">&lt;p&gt;Today we had a MongoDB 3.6 collection with the following documents:&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.0">Jekyll</generator><link href="https://manios.org/feed.xml" rel="self" type="application/atom+xml" /><link href="https://manios.org/" rel="alternate" type="text/html" /><updated>2022-08-05T15:22:32-05:00</updated><id>https://manios.org/feed.xml</id><title type="html">cmanios</title><subtitle>Developer life is a NullPointerException</subtitle><author><name>Christos Manios</name></author><entry><title type="html">SQL query to check if a date range is between two dates in Oracle database</title><link href="https://manios.org/2022/07/22/oracle-sql-select-date-range-between-range" rel="alternate" type="text/html" title="SQL query to check if a date range is between two dates in Oracle database" /><published>2022-07-22T13:55:00-05:00</published><updated>2022-07-22T13:55:00-05:00</updated><id>https://manios.org/2022/07/22/oracle-sql-select-date-range-between-range</id><content type="html" xml:base="https://manios.org/2022/07/22/oracle-sql-select-date-range-between-range">&lt;p&gt;A few days ago, we had to select records from an &lt;a href=&quot;https://en.wikipedia.org/wiki/Oracle_Database&quot;&gt;Oracle database&lt;/a&gt; table which should be inside a given date range. The difficult thing with those records was that they had a date range defined in them too.&lt;/p&gt;
+
+&lt;p&gt;The table was described as:&lt;/p&gt;
+
+&lt;div class=&quot;language-sql highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;CREATE&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;TABLE&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;&quot;DATEBOB&quot;&lt;/span&gt; 
+&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;	
+    &lt;span class=&quot;nv&quot;&gt;&quot;ID&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;NUMBER&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;NOT&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;NULL&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ENABLE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; 
+    &lt;span class=&quot;nv&quot;&gt;&quot;FROMDATE&quot;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;DATE&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;NOT&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;NULL&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ENABLE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; 
+    &lt;span class=&quot;nv&quot;&gt;&quot;TODATE&quot;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;DATE&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;NOT&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;NULL&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ENABLE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; 
+    &lt;span class=&quot;k&quot;&gt;CONSTRAINT&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;&quot;DATEBOB_PK&quot;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;PRIMARY&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;KEY&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;&quot;ID&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;and the records like:&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;ID&lt;/th&gt;
+      &lt;th&gt;FROMDATE&lt;/th&gt;
+      &lt;th&gt;TODATE&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;10-JUL-2022&lt;/td&gt;
+      &lt;td&gt;10-JUL-2040&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;2&lt;/td&gt;
+      &lt;td&gt;10-JUL-2024&lt;/td&gt;
+      &lt;td&gt;10-JUL-2040&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;3&lt;/td&gt;
+      &lt;td&gt;22-JUL-2022&lt;/td&gt;
+      &lt;td&gt;23-JUL-2022&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;4&lt;/td&gt;
+      &lt;td&gt;24-JUL-2022&lt;/td&gt;
+      &lt;td&gt;25-JUL-2022&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;5&lt;/td&gt;
+      &lt;td&gt;22-JUL-2022&lt;/td&gt;
+      &lt;td&gt;22-JUL-2022&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;or in &lt;code class=&quot;highlighter-rouge&quot;&gt;SQL insert&lt;/code&gt; statements:&lt;/p&gt;
+
+&lt;div class=&quot;language-sql highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;INSERT&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;INTO&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;&quot;DATEBOB&quot;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ID&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;FROMDATE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;TODATE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;VALUES&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'1'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;TO_DATE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'2022-07-10'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'YYYY-MM-DD'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;TO_DATE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'2040-07-10'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'YYYY-MM-DD'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;INSERT&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;INTO&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;&quot;DATEBOB&quot;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ID&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;FROMDATE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;TODATE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;VALUES&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'2'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;TO_DATE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'2024-07-10'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'YYYY-MM-DD'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;TO_DATE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'2040-07-10'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'YYYY-MM-DD'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;INSERT&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;INTO&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;&quot;DATEBOB&quot;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ID&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;FROMDATE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;TODATE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;VALUES&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'3'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;TO_DATE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'2022-07-22'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'YYYY-MM-DD'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;TO_DATE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'2022-07-23'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'YYYY-MM-DD'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;INSERT&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;INTO&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;&quot;DATEBOB&quot;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ID&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;FROMDATE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;TODATE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;VALUES&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'4'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;TO_DATE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'2022-07-24'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'YYYY-MM-DD'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;TO_DATE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'2022-07-25'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'YYYY-MM-DD'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;INSERT&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;INTO&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;&quot;DATEBOB&quot;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ID&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;FROMDATE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;TODATE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;VALUES&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'5'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;TO_DATE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'2022-07-22'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'YYYY-MM-DD'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;TO_DATE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'2022-07-22'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'YYYY-MM-DD'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;In order to select the records which are valid from the current date up to 3 days in the future, you can do it with this query:&lt;/p&gt;
+
+&lt;div class=&quot;language-sql highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;select&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;datebob&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;where&lt;/span&gt; 
+&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;trunc&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sysdate&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;BETWEEN&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;fromdate&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;AND&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;todate&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;or&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;((&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;trunc&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sysdate&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;BETWEEN&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;fromdate&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;AND&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;todate&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;example output when current date is &lt;code class=&quot;highlighter-rouge&quot;&gt;2022-07-22&lt;/code&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;  ID FROMDATE  TODATE   
+---- --------- ---------
+   1 10-JUL-22 10-JUL-40
+   3 22-JUL-22 23-JUL-22
+   4 24-JUL-22 25-JUL-22
+   5 22-JUL-22 22-JUL-22
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;In order to select the records which are valid from a specific date current date (let us say &lt;code class=&quot;highlighter-rouge&quot;&gt;2022-07-24&lt;/code&gt;) up to 3 days in the future, you can do it with this query:&lt;/p&gt;
+
+&lt;div class=&quot;language-sql highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;select&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;datebob&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;where&lt;/span&gt; 
+&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;TO_DATE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'2022-07-24'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'YYYY-MM-DD'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;BETWEEN&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;fromdate&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;AND&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;todate&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;or&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;((&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;TO_DATE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'2022-07-24'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'YYYY-MM-DD'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;BETWEEN&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;fromdate&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;AND&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;todate&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;and the output looks like the following:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;   ID FROMDATE  TODATE   
+ ---- --------- ---------
+    1 10-JUL-22 10-JUL-40
+    4 24-JUL-22 25-JUL-22
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Note that in order to add days in a &lt;a href=&quot;https://docs.oracle.com/cd/B19306_01/server.102/b14225/ch4datetime.htm#sthref395&quot;&gt;DATE&lt;/a&gt; column, you just need to use the plus sign and the number of days to add. There is no specific function like &lt;a href=&quot;https://mariadb.com/kb/en/date_add/&quot;&gt;DATE_ADD&lt;/a&gt; of MariaDB which offers different intervals, like seconds, months, etc.&lt;/p&gt;</content><author><name>cmanios</name></author><category term="Oracle" /><category term="Databases" /><category term="SQL" /><category term="oracle" /><category term="sql" /><category term="query" /><category term="database" /><category term="date" /><category term="range" /><summary type="html">A few days ago, we had to select records from an Oracle database table which should be inside a given date range. The difficult thing with those records was that they had a date range defined in them too.</summary></entry><entry><title type="html">Go Mongodb Error Cannot create field X in element {Y: null}</title><link href="https://manios.org/2021/08/04/go-mongodb-error-cannot-create-field-in-element-null" rel="alternate" type="text/html" title="Go Mongodb Error Cannot create field X in element {Y: null}" /><published>2021-08-04T13:55:00-05:00</published><updated>2021-08-04T13:55:00-05:00</updated><id>https://manios.org/2021/08/04/go-mongodb-error-cannot-create-field-in-element-null</id><content type="html" xml:base="https://manios.org/2021/08/04/go-mongodb-error-cannot-create-field-in-element-null">&lt;p&gt;Today we had a MongoDB 3.6 collection with the following documents:&lt;/p&gt;
 
 &lt;div class=&quot;language-javascript highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nx&quot;&gt;db&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;getCollection&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;person&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;insertMany&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;
     &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;Odyseas&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;surname&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;Androutsos&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;profilePicture&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;
@@ -869,303 +965,4 @@ Build: &lt;span class=&quot;nv&quot;&gt;$Id&lt;/span&gt;: 1990ba12450cab9425a2ae
 
 &lt;p&gt;Have a nice night!&lt;/p&gt;
 
-&lt;p&gt;P.S. TAKIS R.I.P. ! We will never forget! We had eaten the best gyros in Triandria, Thessaloniki!&lt;/p&gt;</content><author><name>cmanios</name></author><category term="Go" /><category term="Golang" /><category term="Elastic" /><category term="Beats" /><category term="elastic" /><category term="metricbeat" /><category term="beats" /><category term="elasticsearch" /><category term="debug" /><category term="frame" /><category term="go" /><category term="golang" /><category term="elk" /><category term="error" /><category term="delve" /><category term="kibana" /><category term="index" /><category term="monitor" /><summary type="html">Today we were trying to debug Metricbeat (on commit #cff3e40c) using Visual Studio Code v1.27.2 and Delve debugger but it failed with the error:</summary></entry><entry><title type="html">Rsyslog - Parse Json and enrich IP with Geolocation using Maxmind GeoLite2 City and ISP</title><link href="https://manios.org/2018/08/18/logstash-geoip-json-logs-maxmint-geolite-docker" rel="alternate" type="text/html" title="Rsyslog - Parse Json and enrich IP with Geolocation using Maxmind GeoLite2 City and ISP" /><published>2018-08-18T02:13:44-05:00</published><updated>2018-08-18T02:13:44-05:00</updated><id>https://manios.org/2018/08/18/logstash-geoip-json-logs-maxmint-geolite-docker</id><content type="html" xml:base="https://manios.org/2018/08/18/logstash-geoip-json-logs-maxmint-geolite-docker">&lt;p&gt;Today we wanted to parse some json logs which we had in a file using &lt;a href=&quot;http://rsyslog.com/&quot;&gt;Rsyslog&lt;/a&gt; and enrich  them with Geolocation information regarding the city and the ISP an IP belongs. We initially tried with Logstash (see relevant &lt;a href=&quot;/2018/08/14/logstash-geoip-json-logs-maxmint-geolite-docker&quot;&gt;previous blog post&lt;/a&gt;) but it was too slow. Thus we decided to try with parsing with Rsyslog. The file, let’s call it &lt;code class=&quot;highlighter-rouge&quot;&gt;/var/log/input-geo.json&lt;/code&gt; had the following structure and content. (It is the same as in Logstash post):&lt;/p&gt;
-
-&lt;div class=&quot;language-json highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;name&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Christos&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;src_ip&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;63.145.248.101&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;age&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;12&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;name&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Nikos&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;src_ip&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;98.158.156.175&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;age&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Rsyslog has &lt;a href=&quot;https://www.rsyslog.com/doc/v8-stable/configuration/modules/mmdblookup.html&quot;&gt;MaxMind/GeoIP DB lookup (mmdblookup)&lt;/a&gt; module which adds information about the geographical location of IP addresses, based on data from the Maxmind GeoLite2 databases. In our case we used:&lt;/p&gt;
-&lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;https://dev.maxmind.com/geoip/geoip2/geolite2/&quot;&gt;GeoLite2 City&lt;/a&gt; database (free)&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://www.maxmind.com/en/geoip2-isp-database&quot;&gt;GeoIP2 ISP &lt;/a&gt; Database (commercial licence)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;We wanted to parse the JSON file enrich the &lt;code class=&quot;highlighter-rouge&quot;&gt;src_ip&lt;/code&gt; field and store the geolocation information to &lt;code class=&quot;highlighter-rouge&quot;&gt;src_geoip&lt;/code&gt;. Then we forward the message to Elasticsearch using &lt;a href=&quot;https://www.rsyslog.com/doc/v8-stable/configuration/modules/omelasticsearch.html&quot;&gt;omelasticsearch: Elasticsearch Output Module&lt;/a&gt;. For debugging purposes we also enabled &lt;a href=&quot;https://www.elastic.co/guide/en/logstash/current/plugins-outputs-file.html&quot;&gt;file output&lt;/a&gt;. Thus , the configuration (&lt;code class=&quot;highlighter-rouge&quot;&gt;rsyslog.conf&lt;/code&gt;) looked like the following:&lt;/p&gt;
-
-&lt;div class=&quot;language-conf highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;#  /etc/rsyslog.conf	Configuration file for rsyslog.
-#
-#			For more information see
-#			/usr/share/doc/rsyslog-doc/html/rsyslog_conf.html
-#
-#  Default logging rules can be found in /etc/rsyslog.d/50-default.conf
-&lt;/span&gt;
-
-&lt;span class=&quot;c&quot;&gt;#################
-#### MODULES ####
-#################
-&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;module&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;load&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;imuxsock&quot;&lt;/span&gt;) &lt;span class=&quot;c&quot;&gt;# provides support for local system logging
-# module(load=&quot;imklog&quot;)   # provides kernel logging support
-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;module&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;load&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;immark&quot;&lt;/span&gt;)  &lt;span class=&quot;c&quot;&gt;# provides --MARK-- message capability
-# $ModLoad imuxsock # provides support for local system logging
-# $ModLoad imklog   # provides kernel logging support (previously done by rklogd)
-#$ModLoad immark  # provides --MARK-- message capability
-&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# provides UDP syslog reception
-# $ModLoad imudp
-# $UDPServerRun 514
-&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# provides TCP syslog reception
-# $ModLoad imtcp
-# $InputTCPServerRun 514
-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;module&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;load&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;builtin:omfile&quot;&lt;/span&gt;)
-&lt;span class=&quot;n&quot;&gt;module&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;load&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;mmnormalize&quot;&lt;/span&gt;) &lt;span class=&quot;c&quot;&gt;# parser using liblognorm
-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;module&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;load&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;mmjsonparse&quot;&lt;/span&gt;) &lt;span class=&quot;c&quot;&gt;#for parsing CEE-enhanced syslog messages
-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;module&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;load&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;imfile&quot;&lt;/span&gt;)
-&lt;span class=&quot;n&quot;&gt;module&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;load&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;mmdblookup&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;container&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;!src_geo&quot;&lt;/span&gt;)
-
-&lt;span class=&quot;c&quot;&gt;###########################
-#### GLOBAL DIRECTIVES ####
-###########################
-&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;#
-# Use traditional timestamp format.
-# To enable high precision timestamps, comment out the following line.
-#
-&lt;/span&gt;$&lt;span class=&quot;n&quot;&gt;ActionFileDefaultTemplate&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;RSYSLOG_TraditionalFileFormat&lt;/span&gt;
-
-&lt;span class=&quot;c&quot;&gt;# Filter duplicated messages
-&lt;/span&gt;$&lt;span class=&quot;n&quot;&gt;RepeatedMsgReduction&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;on&lt;/span&gt;
-
-&lt;span class=&quot;c&quot;&gt;#
-# Set the default permissions for all log files.
-#
-&lt;/span&gt;$&lt;span class=&quot;n&quot;&gt;FileOwner&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;root&lt;/span&gt;
-$&lt;span class=&quot;n&quot;&gt;FileGroup&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;root&lt;/span&gt;
-$&lt;span class=&quot;n&quot;&gt;FileCreateMode&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;0640&lt;/span&gt;
-$&lt;span class=&quot;n&quot;&gt;DirCreateMode&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;0755&lt;/span&gt;
-$&lt;span class=&quot;n&quot;&gt;Umask&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;0022&lt;/span&gt;
-$&lt;span class=&quot;n&quot;&gt;PrivDropToUser&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;syslog&lt;/span&gt;
-$&lt;span class=&quot;n&quot;&gt;PrivDropToGroup&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;syslog&lt;/span&gt;
-
-&lt;span class=&quot;c&quot;&gt;# General globals
-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;global&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;net&lt;/span&gt;.&lt;span class=&quot;n&quot;&gt;enableDNS&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;off&quot;&lt;/span&gt;)
-
-&lt;span class=&quot;c&quot;&gt;# Remove Control Chars
-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;global&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;parser&lt;/span&gt;.&lt;span class=&quot;n&quot;&gt;escapeControlCharactersOnReceive&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;off&quot;&lt;/span&gt; )
-
-&lt;span class=&quot;c&quot;&gt;#
-# Where to place spool files
-#
-&lt;/span&gt;$&lt;span class=&quot;n&quot;&gt;WorkDirectory&lt;/span&gt; /&lt;span class=&quot;n&quot;&gt;var&lt;/span&gt;/&lt;span class=&quot;n&quot;&gt;spool&lt;/span&gt;/&lt;span class=&quot;n&quot;&gt;rsyslog&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;global&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;workDirectory&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;/var/spool/rsyslog&quot;&lt;/span&gt;)
-&lt;span class=&quot;c&quot;&gt;#
-# Include all config files in /etc/rsyslog.d/
-#
-# $IncludeConfig /etc/rsyslog.d/*.conf
-&lt;/span&gt;
-
-
-&lt;span class=&quot;c&quot;&gt;#################
-#### Inputs  ####
-#################
-&lt;/span&gt;
-
-&lt;span class=&quot;c&quot;&gt;# provides UDP syslog reception
-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;module&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;load&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;imudp&quot;&lt;/span&gt;)
-&lt;span class=&quot;n&quot;&gt;input&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;type&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;imudp&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;port&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;514&quot;&lt;/span&gt;)
-
-&lt;span class=&quot;c&quot;&gt;# provides TCP syslog reception
-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;module&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;load&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;imtcp&quot;&lt;/span&gt;)
-&lt;span class=&quot;n&quot;&gt;input&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;type&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;imtcp&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;port&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;514&quot;&lt;/span&gt; )
-
-&lt;span class=&quot;c&quot;&gt;# File 1
-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;input&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;type&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;imfile&quot;&lt;/span&gt;
-      &lt;span class=&quot;n&quot;&gt;File&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;/opt/input-geo.json&quot;&lt;/span&gt;
-      &lt;span class=&quot;n&quot;&gt;Tag&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;geoip&quot;&lt;/span&gt;
-      &lt;span class=&quot;n&quot;&gt;PersistStateInterval&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;1&quot;&lt;/span&gt;
-      &lt;span class=&quot;n&quot;&gt;freshStartTail&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;off&quot;&lt;/span&gt;)
-
-&lt;span class=&quot;c&quot;&gt;#################
-### Templates ###
-#################
-&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# this is for formatting our syslog in JSON with @timestamp for Json messages
-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;template&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;geoip&quot;&lt;/span&gt;
-  &lt;span class=&quot;n&quot;&gt;type&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;list&quot;&lt;/span&gt;) {
-    &lt;span class=&quot;n&quot;&gt;constant&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;{&quot;&lt;/span&gt;)
-      &lt;span class=&quot;n&quot;&gt;constant&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;\&quot;&lt;/span&gt;@&lt;span class=&quot;n&quot;&gt;version&lt;/span&gt;\&lt;span class=&quot;s2&quot;&gt;&quot;:\&quot;&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;&quot;&lt;/span&gt;)
-      &lt;span class=&quot;n&quot;&gt;constant&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;\&quot;&lt;/span&gt;,\&lt;span class=&quot;s2&quot;&gt;&quot;@timestamp\&quot;&lt;/span&gt;:\&lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;)		&lt;span class=&quot;n&quot;&gt;property&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;timegenerated&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dateFormat&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;rfc3339&quot;&lt;/span&gt;)
-      &lt;span class=&quot;n&quot;&gt;constant&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;\&quot;&lt;/span&gt;,\&lt;span class=&quot;s2&quot;&gt;&quot;host\&quot;&lt;/span&gt;:\&lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;)			    &lt;span class=&quot;n&quot;&gt;property&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;hostname&quot;&lt;/span&gt;) 
-      &lt;span class=&quot;n&quot;&gt;constant&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;\&quot;&lt;/span&gt;,\&lt;span class=&quot;s2&quot;&gt;&quot;type\&quot;&lt;/span&gt;:\&lt;span class=&quot;s2&quot;&gt;&quot;syslog&quot;&lt;/span&gt;)
-      &lt;span class=&quot;n&quot;&gt;constant&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;\&quot;&lt;/span&gt;,\&lt;span class=&quot;s2&quot;&gt;&quot;syslog_timestamp\&quot;&lt;/span&gt;:\&lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;)	&lt;span class=&quot;n&quot;&gt;property&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;timereported&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dateFormat&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;rfc3164&quot;&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;format&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;json&quot;&lt;/span&gt;)
-      &lt;span class=&quot;n&quot;&gt;constant&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;\&quot;&lt;/span&gt;,\&lt;span class=&quot;s2&quot;&gt;&quot;syslog_hostname\&quot;&lt;/span&gt;:\&lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;)	&lt;span class=&quot;n&quot;&gt;property&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;hostname&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;format&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;json&quot;&lt;/span&gt;)
-      &lt;span class=&quot;n&quot;&gt;constant&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;\&quot;&lt;/span&gt;,\&lt;span class=&quot;s2&quot;&gt;&quot;syslog_program\&quot;&lt;/span&gt;:\&lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;)	&lt;span class=&quot;n&quot;&gt;property&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;programname&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;format&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;json&quot;&lt;/span&gt;)
-      &lt;span class=&quot;n&quot;&gt;constant&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;\&quot;&lt;/span&gt;,\&lt;span class=&quot;s2&quot;&gt;&quot;syslog_message\&quot;&lt;/span&gt;:\&lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;)	&lt;span class=&quot;n&quot;&gt;property&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;msg&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;format&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;json&quot;&lt;/span&gt;)
-      &lt;span class=&quot;n&quot;&gt;constant&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;\&quot;&lt;/span&gt;,\&lt;span class=&quot;s2&quot;&gt;&quot;received_at\&quot;&lt;/span&gt;:\&lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;)		&lt;span class=&quot;n&quot;&gt;property&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;timegenerated&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dateFormat&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;rfc3339&quot;&lt;/span&gt;)
-      &lt;span class=&quot;n&quot;&gt;constant&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;\&quot;&lt;/span&gt;,\&lt;span class=&quot;s2&quot;&gt;&quot;received_from\&quot;&lt;/span&gt;:\&lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;)	    &lt;span class=&quot;n&quot;&gt;property&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;fromhost&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;format&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;json&quot;&lt;/span&gt;)
-      &lt;span class=&quot;n&quot;&gt;constant&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;\&quot;&lt;/span&gt;,\&lt;span class=&quot;s2&quot;&gt;&quot;path\&quot;&lt;/span&gt;:\&lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;)      	    &lt;span class=&quot;n&quot;&gt;property&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;$!metadata!filename&quot;&lt;/span&gt;)
-      &lt;span class=&quot;n&quot;&gt;constant&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;\&quot;&lt;/span&gt;,\&lt;span class=&quot;s2&quot;&gt;&quot;name\&quot;&lt;/span&gt;:\&lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;)              &lt;span class=&quot;n&quot;&gt;property&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;$!name&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;format&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;json&quot;&lt;/span&gt;)
-      &lt;span class=&quot;n&quot;&gt;constant&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;\&quot;&lt;/span&gt;,\&lt;span class=&quot;s2&quot;&gt;&quot;src_ip\&quot;&lt;/span&gt;:\&lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;)            &lt;span class=&quot;n&quot;&gt;property&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;$!src_ip&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;format&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;json&quot;&lt;/span&gt;)
-      &lt;span class=&quot;n&quot;&gt;constant&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;\&quot;&lt;/span&gt;,\&lt;span class=&quot;s2&quot;&gt;&quot;src_geoip\&quot;&lt;/span&gt;:{&lt;span class=&quot;s2&quot;&gt;&quot;)          property(name=&quot;&lt;/span&gt;$!&lt;span class=&quot;n&quot;&gt;src_geo&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot; position.from=&quot;&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;&quot;&lt;/span&gt;)
-      &lt;span class=&quot;n&quot;&gt;constant&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;}\n&quot;&lt;/span&gt;)
-}
-
-
-&lt;span class=&quot;c&quot;&gt;#################
-#### Actions ####
-#################
-&lt;/span&gt;
-
-&lt;span class=&quot;c&quot;&gt;###Fix text to utf8, disabled for now
-###action(type=&quot;mmutf8fix&quot;)
-&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;#action(type=&quot;omfile&quot; file=&quot;/tmp/logtesting&quot; template=&quot;RSYSLOG_DebugFormat&quot;)
-&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;if&lt;/span&gt; ($&lt;span class=&quot;n&quot;&gt;syslogtag&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;contains&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'geoip'&lt;/span&gt;) &lt;span class=&quot;n&quot;&gt;then&lt;/span&gt; {
-    
-    
-    &lt;span class=&quot;n&quot;&gt;action&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;type&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;mmjsonparse&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cookie&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;)
-    
-    &lt;span class=&quot;n&quot;&gt;if&lt;/span&gt; $&lt;span class=&quot;n&quot;&gt;parsesuccess&lt;/span&gt; == &lt;span class=&quot;s2&quot;&gt;&quot;OK&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;then&lt;/span&gt; {
-
-        &lt;span class=&quot;c&quot;&gt;# https://github.com/rsyslog/rsyslog/issues/1650
-&lt;/span&gt;
-        &lt;span class=&quot;c&quot;&gt;# Add MaxMind/GeoIP DB lookup information
-&lt;/span&gt;        &lt;span class=&quot;n&quot;&gt;action&lt;/span&gt;( &lt;span class=&quot;n&quot;&gt;type&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;mmdblookup&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;mmdbfile&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;/etc/rsyslog.d/GeoLite2-City.mmdb&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;key&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;!src_ip&quot;&lt;/span&gt; 
-                &lt;span class=&quot;n&quot;&gt;fields&lt;/span&gt;=[&lt;span class=&quot;s2&quot;&gt;&quot;:timezone:!location!time_zone&quot;&lt;/span&gt;,
-                        &lt;span class=&quot;s2&quot;&gt;&quot;:latitude:!location!latitude&quot;&lt;/span&gt;,
-                        &lt;span class=&quot;s2&quot;&gt;&quot;:longitude:!location!longitude&quot;&lt;/span&gt;,
-                        &lt;span class=&quot;s2&quot;&gt;&quot;:dma_code:!location!metro_code&quot;&lt;/span&gt;,
-                        &lt;span class=&quot;s2&quot;&gt;&quot;:city_name:!names!en&quot;&lt;/span&gt;,
-                        &lt;span class=&quot;s2&quot;&gt;&quot;:continent_code:!continent!code&quot;&lt;/span&gt;,
-                        &lt;span class=&quot;s2&quot;&gt;&quot;:country_code2:!country!iso_code&quot;&lt;/span&gt;,
-                        &lt;span class=&quot;s2&quot;&gt;&quot;:country_code3:!country!iso_code&quot;&lt;/span&gt;,
-                        &lt;span class=&quot;s2&quot;&gt;&quot;:country_name:!country!names!en&quot;&lt;/span&gt;,
-                        &lt;span class=&quot;s2&quot;&gt;&quot;:postal_code:!postal!code&quot;&lt;/span&gt;,
-                        &lt;span class=&quot;s2&quot;&gt;&quot;:region_code:!subdivisions!iso_code&quot;&lt;/span&gt;,
-                        &lt;span class=&quot;s2&quot;&gt;&quot;:region_name:!subdivisions!names!en&quot;&lt;/span&gt;
-                        ]
-        )
-
-        &lt;span class=&quot;c&quot;&gt;# Add MaxMind/GeoIP ISP DB lookup information
-&lt;/span&gt;        &lt;span class=&quot;n&quot;&gt;action&lt;/span&gt;( &lt;span class=&quot;n&quot;&gt;type&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;mmdblookup&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;mmdbfile&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;/etc/rsyslog.d/GeoIP2-ISP.mmdb&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;key&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;!src_ip&quot;&lt;/span&gt; 
-                &lt;span class=&quot;n&quot;&gt;fields&lt;/span&gt;=[&lt;span class=&quot;s2&quot;&gt;&quot;:asn:!autonomous_system_number&quot;&lt;/span&gt;,
-                        &lt;span class=&quot;s2&quot;&gt;&quot;:as_org:!autonomous_system_organization&quot;&lt;/span&gt;,
-                        &lt;span class=&quot;s2&quot;&gt;&quot;!isp&quot;&lt;/span&gt;,
-                        &lt;span class=&quot;s2&quot;&gt;&quot;!organization&quot;&lt;/span&gt;
-                        ]
-        )
-        
-        &lt;span class=&quot;c&quot;&gt;# Add IP to src_geo object
-&lt;/span&gt;        &lt;span class=&quot;n&quot;&gt;set&lt;/span&gt; $!&lt;span class=&quot;n&quot;&gt;src_geo&lt;/span&gt;!&lt;span class=&quot;n&quot;&gt;ip&lt;/span&gt; = $!&lt;span class=&quot;n&quot;&gt;src_ip&lt;/span&gt;;
-
-        &lt;span class=&quot;c&quot;&gt;# If geolocation was successful, add lat,lon in a special location object
-&lt;/span&gt;        &lt;span class=&quot;n&quot;&gt;if&lt;/span&gt; $! &lt;span class=&quot;n&quot;&gt;contains&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'latitude'&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;then&lt;/span&gt; {
-            &lt;span class=&quot;n&quot;&gt;set&lt;/span&gt; $!&lt;span class=&quot;n&quot;&gt;src_geo&lt;/span&gt;!&lt;span class=&quot;n&quot;&gt;location&lt;/span&gt;!&lt;span class=&quot;n&quot;&gt;lat&lt;/span&gt; = $!&lt;span class=&quot;n&quot;&gt;src_geo&lt;/span&gt;!&lt;span class=&quot;n&quot;&gt;latitude&lt;/span&gt;;
-            &lt;span class=&quot;n&quot;&gt;set&lt;/span&gt; $!&lt;span class=&quot;n&quot;&gt;src_geo&lt;/span&gt;!&lt;span class=&quot;n&quot;&gt;location&lt;/span&gt;!&lt;span class=&quot;n&quot;&gt;lon&lt;/span&gt; = $!&lt;span class=&quot;n&quot;&gt;src_geo&lt;/span&gt;!&lt;span class=&quot;n&quot;&gt;longitude&lt;/span&gt;;
-        }
-
-        &lt;span class=&quot;c&quot;&gt;# Output to a new file
-&lt;/span&gt;        &lt;span class=&quot;n&quot;&gt;action&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;type&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;omfile&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;File&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;/tmp/json-output&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;template&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;geoip&quot;&lt;/span&gt;)
-
-        &lt;span class=&quot;c&quot;&gt;# Output to Elasticsearch
-&lt;/span&gt;        &lt;span class=&quot;n&quot;&gt;action&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;type&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;omelasticsearch&quot;&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;server&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;192.168.1.10&quot;&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;serverport&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;9200&quot;&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;template&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;geoip&quot;&lt;/span&gt;  
-            &lt;span class=&quot;n&quot;&gt;searchIndex&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;geoindex&quot;&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;dynSearchIndex&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;on&quot;&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;searchType&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;syslog&quot;&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;bulkmode&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;on&quot;&lt;/span&gt;                   &lt;span class=&quot;c&quot;&gt;# use the Bulk API
-&lt;/span&gt;            &lt;span class=&quot;n&quot;&gt;queue&lt;/span&gt;.&lt;span class=&quot;n&quot;&gt;dequeuebatchsize&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;5000&quot;&lt;/span&gt;   &lt;span class=&quot;c&quot;&gt;# ES bulk size
-&lt;/span&gt;            &lt;span class=&quot;n&quot;&gt;queue&lt;/span&gt;.&lt;span class=&quot;n&quot;&gt;size&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;100000&quot;&lt;/span&gt;   &lt;span class=&quot;c&quot;&gt;# capacity of the action queue
-&lt;/span&gt;            &lt;span class=&quot;n&quot;&gt;queue&lt;/span&gt;.&lt;span class=&quot;n&quot;&gt;workerthreads&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;5&quot;&lt;/span&gt;   &lt;span class=&quot;c&quot;&gt;# 5 workers for the action
-&lt;/span&gt;            &lt;span class=&quot;n&quot;&gt;action&lt;/span&gt;.&lt;span class=&quot;n&quot;&gt;resumeretrycount&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;-1&quot;&lt;/span&gt;  &lt;span class=&quot;c&quot;&gt;# retry indefinitely if ES is unreachable
-&lt;/span&gt;            &lt;span class=&quot;n&quot;&gt;errorfile&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;/var/log/omelasticsearch.log&quot;&lt;/span&gt;
-        )
-
-    } &lt;span class=&quot;n&quot;&gt;else&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;if&lt;/span&gt; $&lt;span class=&quot;n&quot;&gt;parsesuccess&lt;/span&gt; == &lt;span class=&quot;s2&quot;&gt;&quot;FAIL&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;then&lt;/span&gt; {
-        &lt;span class=&quot;n&quot;&gt;action&lt;/span&gt;(&lt;span class=&quot;n&quot;&gt;type&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;omfile&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;File&lt;/span&gt;=&lt;span class=&quot;s2&quot;&gt;&quot;/tmp/json-parse-failure&quot;&lt;/span&gt;)
-    }
-}
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;To run Logstash we chose the quickest way, hence run it in Docker , so we have put all required Logstash configuration, logs and Maxmind databases in a directory:&lt;/p&gt;
-
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;linux@linux-VM:~&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;ls&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-l&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;-rwxrwxr-x&lt;/span&gt; 1 linux linux 26331174 Aug   6 19:11 GeoIP2-ISP.mmdb
-&lt;span class=&quot;nt&quot;&gt;-rwxrwxr-x&lt;/span&gt; 1 linux linux 51469823 Aug   6 19:11 GeoLite2-City.mmdb
-&lt;span class=&quot;nt&quot;&gt;-rw-rw-r--&lt;/span&gt; 1 linux linux      107 Aug  18 19:13 input-geo.json
-&lt;span class=&quot;nt&quot;&gt;-rwxrwxr-x&lt;/span&gt; 1 linux linux     2244 Aug  18 19:32 rsyslog.conf
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Running Rsyslog on Docker is not so relatively easy as the Docker images are a work in progress in &lt;a href=&quot;https://github.com/rsyslog/rsyslog-docker/&quot;&gt;Github&lt;/a&gt; (last checked 2018-08-18). So we created a custom image in our personal account, called &lt;a href=&quot;https://hub.docker.com/r/manios/rsyslog/&quot;&gt;manios/rsyslog&lt;/a&gt;. Let’s run a Docker container with Rsyslog 8.37.0:&lt;/p&gt;
-
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;docker run &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
-    &lt;span class=&quot;nt&quot;&gt;-d&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
-    &lt;span class=&quot;nt&quot;&gt;--name&lt;/span&gt; myrsyslog &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
-    &lt;span class=&quot;nt&quot;&gt;-v&lt;/span&gt; &lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;pwd&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;)&lt;/span&gt;/GeoLite2-City.mmdb:/etc/rsyslog.d/GeoLite2-City.mmdb &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
-    &lt;span class=&quot;nt&quot;&gt;-v&lt;/span&gt; &lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;pwd&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;)&lt;/span&gt;/GeoIP2-ISP.mmdb:/etc/rsyslog.d/GeoIP2-ISP.mmdb &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
-    &lt;span class=&quot;nt&quot;&gt;-v&lt;/span&gt; &lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;pwd&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;)&lt;/span&gt;/input-geo.json:/opt/input-geo.json &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
-    &lt;span class=&quot;nt&quot;&gt;-v&lt;/span&gt; &lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;pwd&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;)&lt;/span&gt;/rsyslog.conf:/etc/rsyslog.conf &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
-    manios/rsyslog:8.37.0
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Now Rsyslog is running. Let’s run a Bash shell inside the container:&lt;/p&gt;
-
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;docker &lt;span class=&quot;nb&quot;&gt;exec&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-it&lt;/span&gt; myrsyslog /bin/bash
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;While Rsyslog is running, if you examine the contents of &lt;code class=&quot;highlighter-rouge&quot;&gt;/tmp/json-output&lt;/code&gt; file, you will notice that the messages contain a lot of geolocation information and they will resemble to the following:&lt;/p&gt;
-
-&lt;div class=&quot;language-json highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;@version&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;1&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;@timestamp&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;2018-08-18T06:59:14.640903+00:00&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;host&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;b576d0a6022b&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;type&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;syslog&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;syslog_timestamp&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Aug 18 06:59:14&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;syslog_hostname&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;b576d0a6022b&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;syslog_program&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;geoip&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;syslog_message&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;{&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;Christos&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;src_ip&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;63.145.248.101&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;age&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;:12}&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;received_at&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;2018-08-18T06:59:14.640903+00:00&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;received_from&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;path&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;/opt/input-geo.json&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;name&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Christos&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;src_ip&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;63.145.248.101&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;src_geoip&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;timezone&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;America&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\/&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;Los_Angeles&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;latitude&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;37.925500&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;longitude&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;-122.343700&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;dma_code&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;807&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;city_name&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;continent_code&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;NA&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;country_code2&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;US&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;country_code3&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;US&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;country_name&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;UnitedStates&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;postal_code&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;94804&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;region_code&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;region_name&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;asn&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;209&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;as_org&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;QwestCommunicationsCompany,LLC&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;isp&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;CenturyLink&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;organization&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;CenturyLink&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;ip&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;63.145.248.101&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;location&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-            &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;lat&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;37.9255&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-            &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;lon&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;-122.3437&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Unfortunately, current version of Rsyslog contains a known bug (&lt;a href=&quot;https://github.com/rsyslog/rsyslog/issues/1650&quot;&gt;#1650&lt;/a&gt;) which strips the space characters from strings. Notice that&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&quot;country_name&quot;: &quot;UnitedStates&quot;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;should be&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&quot;country_name&quot;: &quot;United States&quot;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;for example. Also, if you compare to our previous post (&lt;code class=&quot;highlighter-rouge&quot;&gt;TODO add link here&lt;/code&gt;), &lt;code class=&quot;highlighter-rouge&quot;&gt;region_code&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;region_name&lt;/code&gt; should have a value. You can easily spot the differences between Rsyslog and Logstash output in the following image:&lt;/p&gt;
-
-&lt;figure&gt;
-    &lt;a href=&quot;/images/2018-08-18-rsyslog-geo-maxmind/maxmind-output-logstash-rsyslog.png&quot;&gt;&lt;img src=&quot;/images/2018-08-18-rsyslog-geo-maxmind/maxmind-output-logstash-rsyslog.png&quot; alt=&quot;Rsyslog and Logstash output diff when using Maxmind GeoIP City and ISP lookup databases&quot; /&gt;&lt;/a&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;We hope this article helped you get up and running with Rsyslog and the use of &lt;a href=&quot;https://www.rsyslog.com/doc/v8-stable/configuration/modules/mmdblookup.html&quot;&gt;MaxMind/GeoIP DB lookup (mmdblookup)&lt;/a&gt; module!&lt;/p&gt;</content><author><name>cmanios</name></author><category term="Rsyslog" /><category term="Elasticsearch" /><category term="rsyslog" /><category term="mmdblookup" /><category term="omelasticsearch" /><category term="geolocation" /><category term="ip" /><category term="geoip" /><category term="maxmind" /><category term="geo" /><category term="geoip" /><category term="geolite" /><category term="geolite2" /><category term="database" /><category term="json" /><category term="parse" /><category term="message" /><category term="log" /><summary type="html">Today we wanted to parse some json logs which we had in a file using Rsyslog and enrich them with Geolocation information regarding the city and the ISP an IP belongs. We initially tried with Logstash (see relevant previous blog post) but it was too slow. Thus we decided to try with parsing with Rsyslog. The file, let’s call it /var/log/input-geo.json had the following structure and content. (It is the same as in Logstash post):</summary></entry></feed>
+&lt;p&gt;P.S. TAKIS R.I.P. ! We will never forget! We had eaten the best gyros in Triandria, Thessaloniki!&lt;/p&gt;</content><author><name>cmanios</name></author><category term="Go" /><category term="Golang" /><category term="Elastic" /><category term="Beats" /><category term="elastic" /><category term="metricbeat" /><category term="beats" /><category term="elasticsearch" /><category term="debug" /><category term="frame" /><category term="go" /><category term="golang" /><category term="elk" /><category term="error" /><category term="delve" /><category term="kibana" /><category term="index" /><category term="monitor" /><summary type="html">Today we were trying to debug Metricbeat (on commit #cff3e40c) using Visual Studio Code v1.27.2 and Delve debugger but it failed with the error:</summary></entry></feed>

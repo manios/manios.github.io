@@ -382,4 +382,10 @@ var store = [{
         "tags": ["go","golang","mongodb","driver","database","error","dot","field","nested"],
         "url": "https://manios.org/2021/08/04/go-mongodb-error-cannot-create-field-in-element-null",
         "teaser": null
+      },{
+        "title": "SQL query to check if a date range is between two dates in Oracle database",
+        "excerpt":"A few days ago, we had to select records from an Oracle database table which should be inside a given date range. The difficult thing with those records was that they had a date range defined in them too. The table was described as: CREATE TABLE \"DATEBOB\" ( \"ID\" NUMBER(*,0)...","categories": ["Oracle","Databases","SQL"],
+        "tags": ["oracle","sql","query","database","date","range"],
+        "url": "https://manios.org/2022/07/22/oracle-sql-select-date-range-between-range",
+        "teaser": null
       }]
