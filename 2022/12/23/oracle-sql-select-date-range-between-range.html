@@ -1,0 +1,793 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.20.2 by Michael Rose
+  Copyright 2017 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE.txt
+-->
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>MS SQL Server Docker container restore database from .bak file created in Windows to a New Location - cmanios</title>
+<meta name="description" content="Yesterday, a client which uses Microsoft SQL Server 2008 R2 (SP2) wanted to test if his database backup can work in Microsoft SQL Server 2019 Developer version. He currently runs his SQL Server instance in Windows Server. He provided us with a .bak file, let us call it for this post WinCarFactorySQL.bak.">
+
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="cmanios">
+<meta property="og:title" content="MS SQL Server Docker container restore database from .bak file created in Windows to a New Location">
+<meta property="og:url" content="https://manios.org/2022/12/23/oracle-sql-select-date-range-between-range">
+
+
+  <meta property="og:description" content="Yesterday, a client which uses Microsoft SQL Server 2008 R2 (SP2) wanted to test if his database backup can work in Microsoft SQL Server 2019 Developer version. He currently runs his SQL Server instance in Windows Server. He provided us with a .bak file, let us call it for this post WinCarFactorySQL.bak.">
+
+
+
+
+
+
+
+  <meta property="article:published_time" content="2022-12-23T12:00:00-06:00">
+
+
+
+  <meta property="article:modified_time" content="2022-12-23T12:00:00-06:00">
+
+
+
+  
+
+  
+
+
+<link rel="canonical" href="https://manios.org/2022/12/23/oracle-sql-select-date-range-between-range">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": "Christos Manios",
+      "url": "https://manios.org/"
+    
+  }
+</script>
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="cmanios Feed">
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css">
+
+<!--[if IE]>
+  <style>
+    /* old IE unsupported flexbox fixes */
+    .greedy-nav .site-title {
+      padding-right: 3em;
+    }
+    .greedy-nav button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+    }
+  </style>
+<![endif]-->
+
+
+
+    <!-- start custom head snippets -->
+
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+  </head>
+
+  <body class="layout--single">
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+        <a class="site-title" href="/">
+          cmanios
+          
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/year-archive/">Posts archive</a>
+            </li><li class="masthead__menu-item">
+              <a href="/categories/">Categories</a>
+            </li><li class="masthead__menu-item">
+              <a href="/tags/">Tags</a>
+            </li><li class="masthead__menu-item">
+              <a href="/about/">About</a>
+            </li></ul>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+   
+
+    <!-- TODO add Google AdSense -->
+    <div class="initial-content">
+
+        
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope itemtype="https://schema.org/Person">
+
+  
+
+  <div class="author__content">
+    
+      <h3 class="author__name" itemprop="name"></h3>
+    
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+
+  <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
+    <meta itemprop="headline" content="MS SQL Server Docker container restore database from .bak file created in Windows to a New Location">
+    <meta itemprop="description" content="Yesterday, a client which uses Microsoft SQL Server 2008 R2 (SP2) wanted to test if his database backup can work in Microsoft SQL Server 2019 Developer version. He currently runs his SQL Server instance in Windows Server. He provided us with a .bak file, let us call it for this post WinCarFactorySQL.bak.">
+    <meta itemprop="datePublished" content="2022-12-23T12:00:00-06:00">
+    <meta itemprop="dateModified" content="2022-12-23T12:00:00-06:00">
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title" itemprop="headline">MS SQL Server Docker container restore database from .bak file created in Windows to a New Location
+</h1>
+          
+
+  <p class="page__meta">
+    
+
+    
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          4 minute read
+        
+      </span>
+    
+  </p>
+
+
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+        <p>Yesterday, a client which uses Microsoft SQL Server 2008 R2 (SP2) wanted to test if his database backup can work in Microsoft SQL Server 2019 Developer version. He currently runs his SQL Server instance in Windows Server. He provided us with a <code class="highlighter-rouge">.bak</code> file, let us call it for this post <code class="highlighter-rouge">WinCarFactorySQL.bak</code>.</p>
+
+<h2 id="run-a-microsoft-sql-server-docker-container">Run a Microsoft SQL Server Docker container</h2>
+
+<p>In order to test quickly, we are going to use the official, Ubuntu based, <a href="https://hub.docker.com/_/microsoft-mssql-server">Microsoft SQL Server 2019 docker container</a>. Therefore we download it:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker pull mcr.microsoft.com/mssql/server:2019-CU18-ubuntu-20.04
+</code></pre></div></div>
+
+<p>and run it in <code class="highlighter-rouge">Developer</code> mode:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker run <span class="nt">-d</span> <span class="se">\</span>
+    <span class="nt">--name</span> sqlserver2019 <span class="se">\</span>
+    <span class="nt">-e</span> <span class="s2">"ACCEPT_EULA=Y"</span> <span class="se">\</span>
+    <span class="nt">-e</span> <span class="s1">'MSSQL_SA_PASSWORD=mysuperduperpassworD1234!56'</span> <span class="se">\</span>
+    <span class="nt">-e</span> <span class="s2">"MSSQL_PID=Developer"</span> <span class="se">\</span>
+    <span class="nt">-p</span> 1433:1433 <span class="se">\</span>
+    <span class="nt">-v</span> <span class="s2">"/home/mylinux/wincarfactorybak:/opt/wincarfactorybak"</span> <span class="se">\</span>
+    mcr.microsoft.com/mssql/server:2019-CU18-ubuntu-20.04
+</code></pre></div></div>
+
+<p>As you can see we mount <code class="highlighter-rouge">/home/mylinux/wincarfactorybak</code> directory which contains the <code class="highlighter-rouge">WinCarFactorySQL.bak</code> in order to use it inside the container in <code class="highlighter-rouge">/opt/wincarfactorybak</code> directory.</p>
+
+<p>For more information you can read: <a href="https://learn.microsoft.com/en-us/sql/linux/quickstart-install-connect-docker?view=sql-server-ver16&amp;pivots=cs1-bash">Quickstart: Run SQL Server Linux container images with Docker</a></p>
+
+<h2 id="examine-bak-file-contents">Examine .bak file contents</h2>
+
+<p>In order to restore the database properly, we have to examine the <code class="highlighter-rouge">.bak</code> file contents. This can be achieved by executing this command on the running container:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker <span class="nb">exec</span> <span class="nt">-it</span> sqlserver2019 /opt/mssql-tools/bin/sqlcmd <span class="nt">-S</span> localhost <span class="se">\</span>
+   <span class="nt">-U</span> SA <span class="nt">-P</span> <span class="s1">'mysuperduperpassworD1234!56'</span> <span class="se">\</span>
+   <span class="nt">-Q</span> <span class="s1">'RESTORE FILELISTONLY FROM DISK = "/opt/wincarfactorybak/WinCarFactorySQL.bak"'</span> <span class="se">\</span>
+   | <span class="nb">tr</span> <span class="nt">-s</span> <span class="s1">' '</span> | <span class="nb">cut</span> <span class="nt">-d</span> <span class="s1">' '</span> <span class="nt">-f</span> 1-2
+</code></pre></div></div>
+
+<p>The output looks like this:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>LogicalName       PhysicalName
+-----------       ------------
+WinCarFactorySQL       c:\Program Files\Microsoft SQL Server\MSSQL10_50.SQLEXPRESS\MSSQL\DATA\WinCarFactorySQL.mdf
+WinCarFactorySQL_log   c:\Program Files\Microsoft SQL Server\MSSQL10_50.SQLEXPRESS\MSSQL\DATA\WinCarFactorySQL_log.ldf
+
+(2 rows)
+</code></pre></div></div>
+
+<p>For more information you can read: <a href="https://learn.microsoft.com/en-us/sql/linux/tutorial-restore-backup-in-sql-server-container?view=sql-server-ver16">Restore a SQL Server database in a Linux Docker container</a></p>
+
+<h2 id="restore-database">Restore database</h2>
+
+<p>Now we have to import and relocate these two files into the directory SQL Server uses to store these files in this container. The docker container uses a non-root user called <code class="highlighter-rouge">mssql</code>. Therefore in order to find the directory we searched for <code class="highlighter-rouge">*.mdf</code> files:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mintis@arotro:~/Documents/workspace-sts-3.8.4.RELEASE/manios-blog<span class="o">(</span>master<span class="o">)</span><span class="nv">$ </span>docker <span class="nb">exec</span> <span class="nt">-it</span>  sqlserver2019 /bin/bash
+mssql@7b208ca8f759:/<span class="nv">$ </span>f^C
+<span class="o">(</span>failed reverse-i-search<span class="o">)</span><span class="sb">`</span>fin<span class="s1">': ^C
+mssql@7b208ca8f759:/$ find -iname "*.mdf"
+./var/opt/mssql/data/tempdb.mdf
+./var/opt/mssql/data/msdbdata.mdf
+./var/opt/mssql/data/model_replicatedmaster.mdf
+./var/opt/mssql/data/model_msdbdata.mdf
+./var/opt/mssql/data/model.mdf
+./var/opt/mssql/data/master.mdf
+mssql@7b208ca8f759:/$ whoami
+mssql
+</span></code></pre></div></div>
+
+<p>Finally we restore the <code class="highlighter-rouge">WinCarFactorySQL.bak</code> file using the following command:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker <span class="nb">exec</span> <span class="nt">-it</span> sqlserver2019 /opt/mssql-tools/bin/sqlcmd <span class="nt">-S</span> localhost <span class="se">\</span>
+    <span class="nt">-U</span> SA <span class="nt">-P</span> <span class="s1">'mysuperduperpassworD1234!56'</span> <span class="se">\</span>
+    <span class="nt">-Q</span> <span class="s1">'RESTORE DATABASE WinCarFactorySQL FROM DISK = "/opt/wincarfactorybak/WinCarFactorySQL.bak" WITH MOVE "WinCarFactorySQL" TO "/var/opt/mssql/data/WinCarFactorySQL.mdf", MOVE "WinCarFactorySQL_log" TO "/var/opt/mssql/data/WinCarFactorySQL_log.ldf"'</span>
+</code></pre></div></div>
+
+<p>If you get an output similar to the following, then your database restoration was successful!</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Processed 130576 pages for database 'WinCarFactorySQL', file 'WinCarFactorySQL' on file 1.
+Processed 1 pages for database 'WinCarFactorySQL', file 'WinCarFactorySQL_log' on file 1.
+Converting database 'WinCarFactorySQL' from version 661 to the current version 904.
+Database 'WinCarFactorySQL' running the upgrade step from version 661 to version 668.
+Database 'WinCarFactorySQL' running the upgrade step from version 668 to version 669.
+-- some lines truncated --
+Database 'WinCarFactorySQL' running the upgrade step from version 901 to version 902.
+Database 'WinCarFactorySQL' running the upgrade step from version 902 to version 903.
+Database 'WinCarFactorySQL' running the upgrade step from version 903 to version 904.
+RESTORE DATABASE successfully processed 130577 pages in 10.623 seconds (96.030 MB/sec).
+</code></pre></div></div>
+
+<p>For more information about these commands, you can read:</p>
+
+<ul>
+  <li><a href="https://learn.microsoft.com/en-us/sql/relational-databases/backup-restore/restore-files-to-a-new-location-sql-server?view=sql-server-ver16">Restore Files to a New Location (SQL Server)</a></li>
+  <li><a href="https://www.sqlshack.com/change-default-database-file-and-backup-paths-in-sql-server-on-linux/">Change default database file and backup paths in SQL Server on Linux</a></li>
+</ul>
+
+<h3 id="note-regarding-directory-permissions">Note regarding directory permissions</h3>
+
+<p>If you decide to use another directory to <code class="highlighter-rouge">MOVE</code> your <code class="highlighter-rouge">.mdf</code> and <code class="highlighter-rouge">.ldf</code> files into any other random directory, you might stumble uppon permission issues. For instance if instead of using <code class="highlighter-rouge">/var/opt/mssql/data</code> you use <code class="highlighter-rouge">/opt/wincarfactorybak</code> which is not writable by <code class="highlighter-rouge">mssql</code> user you might get errors like this:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>The operating system returned the error '5(Access is denied.)' while attempting 'RestoreContainer::ValidateTargetForCreation' on '/opt/wincarfactorybak/WinCarFactorySQL.mdf'.
+Msg 3156, Level 16, State 5, Server 7b208ca8f759, Line 1
+File 'WinCarFactorySQL' cannot be restored to '/opt/wincarfactorybak/WinCarFactorySQL.mdf'. Use WITH MOVE to identify a valid location for the file.
+Msg 3634, Level 16, State 1, Server 7b208ca8f759, Line 1
+The operating system returned the error '5(Access is denied.)' while attempting 'RestoreContainer::ValidateTargetForCreation' on '/opt/wincarfactorybak/WinCarFactorySQL_log.ldf'.
+Msg 3156, Level 16, State 5, Server 7b208ca8f759, Line 1
+File 'WinCarFactorySQL' cannot be restored to '/opt/wincarfactorybak/WinCarFactorySQL_log.ldf'. Use WITH MOVE to identify a valid location for the file.
+Msg 3119, Level 16, State 1, Server 7b208ca8f759, Line 1
+Problems were identified while planning for the RESTORE statement. Previous messages provide details.
+Msg 3013, Level 16, State 1, Server 7b208ca8f759, Line 1
+RESTORE DATABASE is terminating abnormally.
+</code></pre></div></div>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+  
+
+
+  
+  
+  
+
+  <p class="page__taxonomy">
+    <strong><i class="fas fa-fw fa-tags" aria-hidden="true"></i> Tags: </strong>
+    <span itemprop="keywords">
+    
+      
+      
+      <a href="/tags/#bak" class="page__taxonomy-item" rel="tag">bak</a><span class="sep">, </span>
+    
+      
+      
+      <a href="/tags/#container" class="page__taxonomy-item" rel="tag">container</a><span class="sep">, </span>
+    
+      
+      
+      <a href="/tags/#database" class="page__taxonomy-item" rel="tag">database</a><span class="sep">, </span>
+    
+      
+      
+      <a href="/tags/#docker" class="page__taxonomy-item" rel="tag">docker</a><span class="sep">, </span>
+    
+      
+      
+      <a href="/tags/#mssql" class="page__taxonomy-item" rel="tag">mssql</a><span class="sep">, </span>
+    
+      
+      
+      <a href="/tags/#query" class="page__taxonomy-item" rel="tag">query</a><span class="sep">, </span>
+    
+      
+      
+      <a href="/tags/#restore" class="page__taxonomy-item" rel="tag">restore</a><span class="sep">, </span>
+    
+      
+      
+      <a href="/tags/#sqlserver" class="page__taxonomy-item" rel="tag">sqlserver</a><span class="sep">, </span>
+    
+      
+      
+      <a href="/tags/#sql" class="page__taxonomy-item" rel="tag">sql</a>
+    
+    </span>
+  </p>
+
+
+
+
+  
+
+
+  
+  
+  
+
+  <p class="page__taxonomy">
+    <strong><i class="fas fa-fw fa-folder-open" aria-hidden="true"></i> Categories: </strong>
+    <span itemprop="keywords">
+    
+      
+      
+      <a href="/categories/#databases" class="page__taxonomy-item" rel="tag">Databases</a><span class="sep">, </span>
+    
+      
+      
+      <a href="/categories/#ms-sql-server" class="page__taxonomy-item" rel="tag">MS SQL Server</a><span class="sep">, </span>
+    
+      
+      
+      <a href="/categories/#ms-sql" class="page__taxonomy-item" rel="tag">MS SQL</a><span class="sep">, </span>
+    
+      
+      
+      <a href="/categories/#sql" class="page__taxonomy-item" rel="tag">SQL</a>
+    
+    </span>
+  </p>
+
+
+        
+  <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="2022-12-23">December 23, 2022</time></p>
+
+
+      </footer>
+
+      <section class="page__share">
+  
+
+  <a href="https://twitter.com/intent/tweet?text=MS+SQL+Server+Docker+container+restore+database+from+.bak+file+created+in+Windows+to+a+New+Location%20https%3A%2F%2Fmanios.org%2F2022%2F12%2F23%2Foracle-sql-select-date-range-between-range" class="btn btn--twitter" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Twitter"><i class="fab fa-fw fa-twitter" aria-hidden="true"></i><span> Twitter</span></a>
+
+  <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fmanios.org%2F2022%2F12%2F23%2Foracle-sql-select-date-range-between-range" class="btn btn--facebook" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on Facebook"><i class="fab fa-fw fa-facebook" aria-hidden="true"></i><span> Facebook</span></a>
+
+  <a href="https://www.linkedin.com/shareArticle?mini=true&url=https%3A%2F%2Fmanios.org%2F2022%2F12%2F23%2Foracle-sql-select-date-range-between-range" class="btn btn--linkedin" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="Share on LinkedIn"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i><span> LinkedIn</span></a>
+</section>
+
+
+      
+  <nav class="pagination">
+    
+      <a href="/2022/07/22/oracle-sql-select-date-range-between-range" class="pagination--pager" title="SQL query to check if a date range is between two dates in Oracle database
+">Previous</a>
+    
+    
+      <a href="#" class="pagination--pager disabled">Next</a>
+    
+  </nav>
+
+    </div>
+
+    
+      <div class="page__comments">
+  
+  
+      <h4 class="page__comments-title">Comments</h4>
+      <section id="disqus_thread"></section>
+    
+</div>
+
+    
+  </article>
+
+  
+  
+    <div class="page__related">
+      <h4 class="page__related-title">You May Also Enjoy</h4>
+      <div class="grid__wrapper">
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/2022/07/22/oracle-sql-select-date-range-between-range" rel="permalink">SQL query to check if a date range is between two dates in Oracle database
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+
+    
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          2 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">A few days ago, we had to select records from an Oracle database table which should be inside a given date range. The difficult thing with those records was ...</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/2021/08/04/go-mongodb-error-cannot-create-field-in-element-null" rel="permalink">Go Mongodb Error Cannot create field X in element {Y: null}
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+
+    
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          3 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">Today we had a MongoDB 3.6 collection with the following documents:
+</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/2021/07/24/golang-decimal-field-in-struct-json-convert" rel="permalink">Convert from/to JSON decimal fields in Go (golang) structs
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+
+    
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          1 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">Yesterday we had to marshal and umarshal to/from JSON some HTTP requests and responses in a Go microservice we are building. We already use ericlagergren/dec...</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/2021/02/17/postgresql-case-accent-insentitive-sql-queries" rel="permalink">PostgreSQL case and accent insentitive SQL queries
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+
+    
+
+    
+      
+      
+
+      <span class="page__meta-readtime">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        
+          3 minute read
+        
+      </span>
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">A few days ago we were implementing a Spring Boot application which stored its data into a PostgreSQL database. As a requirement we needed to search into the...</p>
+  </article>
+</div>
+
+        
+      </div>
+    </div>
+  
+  
+</div>
+
+        
+        <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <div align="center" style="margin: 1em 0;">
+        <!-- manios-first -->
+        <!-- WARNING! Do not forget data-ad-test="on" attribute on localhost! -->
+        <ins class="adsbygoogle"
+             style="display:block; border-bottom: initial;"
+             data-ad-client="ca-pub-6651682831425197"
+             data-ad-slot="2514320571"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+        </div>     
+        <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+
+    </div>
+
+    <div class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+
+    
+      
+        
+          <li><a href="https://twitter.com/maniosolr" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-twitter-square" aria-hidden="true"></i> Twitter</a></li>
+        
+      
+        
+      
+        
+          <li><a href="https://github.com/manios" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i> GitHub</a></li>
+        
+      
+        
+          <li><a href="https://gitlab.com/manios" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-gitlab" aria-hidden="true"></i> GitLab</a></li>
+        
+      
+        
+      
+        
+      
+    
+
+    <li><a href="/feed.xml"><i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2022 Christos Manios. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+
+
+
+
+
+
+
+  <script>
+  window.ga=function(){ga.q.push(arguments)};ga.q=[];ga.l=+new Date;
+  ga('create','UA-96500199-2','auto');
+  ga('set', 'anonymizeIp', false);
+  ga('send','pageview')
+</script>
+<script src="https://www.google-analytics.com/analytics.js" async></script>
+
+
+
+
+
+
+    
+  <script>
+    var disqus_config = function () {
+      this.page.url = "https://manios.org/2022/12/23/oracle-sql-select-date-range-between-range";  /* Replace PAGE_URL with your page's canonical URL variable */
+      this.page.identifier = "/2022/12/23/oracle-sql-select-date-range-between-range"; /* Replace PAGE_IDENTIFIER with your page's unique identifier variable */
+    };
+    (function() { /* DON'T EDIT BELOW THIS LINE */
+      var d = document, s = d.createElement('script');
+      s.src = 'https://manios-org.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  </script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+  
+
+
+
+
+
+  </body>
+</html>

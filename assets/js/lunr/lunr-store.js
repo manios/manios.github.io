@@ -388,4 +388,10 @@ var store = [{
         "tags": ["oracle","sql","query","database","date","range"],
         "url": "https://manios.org/2022/07/22/oracle-sql-select-date-range-between-range",
         "teaser": null
+      },{
+        "title": "MS SQL Server Docker container restore database from .bak file created in Windows to a New Location",
+        "excerpt":"Yesterday, a client which uses Microsoft SQL Server 2008 R2 (SP2) wanted to test if his database backup can work in Microsoft SQL Server 2019 Developer version. He currently runs his SQL Server instance in Windows Server. He provided us with a .bak file, let us call it for this...","categories": ["MS SQL Server","MS SQL","Databases","SQL"],
+        "tags": ["mssql","sql","sqlserver","query","database","restore","bak","docker","container"],
+        "url": "https://manios.org/2022/12/23/oracle-sql-select-date-range-between-range",
+        "teaser": null
       }]

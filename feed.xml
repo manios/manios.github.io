@@ -1,4 +1,112 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.0">Jekyll</generator><link href="https://manios.org/feed.xml" rel="self" type="application/atom+xml" /><link href="https://manios.org/" rel="alternate" type="text/html" /><updated>2022-08-05T15:22:32-05:00</updated><id>https://manios.org/feed.xml</id><title type="html">cmanios</title><subtitle>Developer life is a NullPointerException</subtitle><author><name>Christos Manios</name></author><entry><title type="html">SQL query to check if a date range is between two dates in Oracle database</title><link href="https://manios.org/2022/07/22/oracle-sql-select-date-range-between-range" rel="alternate" type="text/html" title="SQL query to check if a date range is between two dates in Oracle database" /><published>2022-07-22T13:55:00-05:00</published><updated>2022-07-22T13:55:00-05:00</updated><id>https://manios.org/2022/07/22/oracle-sql-select-date-range-between-range</id><content type="html" xml:base="https://manios.org/2022/07/22/oracle-sql-select-date-range-between-range">&lt;p&gt;A few days ago, we had to select records from an &lt;a href=&quot;https://en.wikipedia.org/wiki/Oracle_Database&quot;&gt;Oracle database&lt;/a&gt; table which should be inside a given date range. The difficult thing with those records was that they had a date range defined in them too.&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.0">Jekyll</generator><link href="https://manios.org/feed.xml" rel="self" type="application/atom+xml" /><link href="https://manios.org/" rel="alternate" type="text/html" /><updated>2022-12-23T12:17:24-06:00</updated><id>https://manios.org/feed.xml</id><title type="html">cmanios</title><subtitle>Developer life is a NullPointerException</subtitle><author><name>Christos Manios</name></author><entry><title type="html">MS SQL Server Docker container restore database from .bak file created in Windows to a New Location</title><link href="https://manios.org/2022/12/23/oracle-sql-select-date-range-between-range" rel="alternate" type="text/html" title="MS SQL Server Docker container restore database from .bak file created in Windows to a New Location" /><published>2022-12-23T12:00:00-06:00</published><updated>2022-12-23T12:00:00-06:00</updated><id>https://manios.org/2022/12/23/oracle-sql-select-date-range-between-range</id><content type="html" xml:base="https://manios.org/2022/12/23/oracle-sql-select-date-range-between-range">&lt;p&gt;Yesterday, a client which uses Microsoft SQL Server 2008 R2 (SP2) wanted to test if his database backup can work in Microsoft SQL Server 2019 Developer version. He currently runs his SQL Server instance in Windows Server. He provided us with a &lt;code class=&quot;highlighter-rouge&quot;&gt;.bak&lt;/code&gt; file, let us call it for this post &lt;code class=&quot;highlighter-rouge&quot;&gt;WinCarFactorySQL.bak&lt;/code&gt;.&lt;/p&gt;
+
+&lt;h2 id=&quot;run-a-microsoft-sql-server-docker-container&quot;&gt;Run a Microsoft SQL Server Docker container&lt;/h2&gt;
+
+&lt;p&gt;In order to test quickly, we are going to use the official, Ubuntu based, &lt;a href=&quot;https://hub.docker.com/_/microsoft-mssql-server&quot;&gt;Microsoft SQL Server 2019 docker container&lt;/a&gt;. Therefore we download it:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;docker pull mcr.microsoft.com/mssql/server:2019-CU18-ubuntu-20.04
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;and run it in &lt;code class=&quot;highlighter-rouge&quot;&gt;Developer&lt;/code&gt; mode:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;docker run &lt;span class=&quot;nt&quot;&gt;-d&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;--name&lt;/span&gt; sqlserver2019 &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;-e&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;ACCEPT_EULA=Y&quot;&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;-e&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'MSSQL_SA_PASSWORD=mysuperduperpassworD1234!56'&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;-e&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;MSSQL_PID=Developer&quot;&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;-p&lt;/span&gt; 1433:1433 &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;-v&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;/home/mylinux/wincarfactorybak:/opt/wincarfactorybak&quot;&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+    mcr.microsoft.com/mssql/server:2019-CU18-ubuntu-20.04
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;As you can see we mount &lt;code class=&quot;highlighter-rouge&quot;&gt;/home/mylinux/wincarfactorybak&lt;/code&gt; directory which contains the &lt;code class=&quot;highlighter-rouge&quot;&gt;WinCarFactorySQL.bak&lt;/code&gt; in order to use it inside the container in &lt;code class=&quot;highlighter-rouge&quot;&gt;/opt/wincarfactorybak&lt;/code&gt; directory.&lt;/p&gt;
+
+&lt;p&gt;For more information you can read: &lt;a href=&quot;https://learn.microsoft.com/en-us/sql/linux/quickstart-install-connect-docker?view=sql-server-ver16&amp;amp;pivots=cs1-bash&quot;&gt;Quickstart: Run SQL Server Linux container images with Docker&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;examine-bak-file-contents&quot;&gt;Examine .bak file contents&lt;/h2&gt;
+
+&lt;p&gt;In order to restore the database properly, we have to examine the &lt;code class=&quot;highlighter-rouge&quot;&gt;.bak&lt;/code&gt; file contents. This can be achieved by executing this command on the running container:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;docker &lt;span class=&quot;nb&quot;&gt;exec&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-it&lt;/span&gt; sqlserver2019 /opt/mssql-tools/bin/sqlcmd &lt;span class=&quot;nt&quot;&gt;-S&lt;/span&gt; localhost &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+   &lt;span class=&quot;nt&quot;&gt;-U&lt;/span&gt; SA &lt;span class=&quot;nt&quot;&gt;-P&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'mysuperduperpassworD1234!56'&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+   &lt;span class=&quot;nt&quot;&gt;-Q&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'RESTORE FILELISTONLY FROM DISK = &quot;/opt/wincarfactorybak/WinCarFactorySQL.bak&quot;'&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+   | &lt;span class=&quot;nb&quot;&gt;tr&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-s&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;' '&lt;/span&gt; | &lt;span class=&quot;nb&quot;&gt;cut&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-d&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;' '&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; 1-2
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;The output looks like this:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;LogicalName       PhysicalName
+-----------       ------------
+WinCarFactorySQL       c:\Program Files\Microsoft SQL Server\MSSQL10_50.SQLEXPRESS\MSSQL\DATA\WinCarFactorySQL.mdf
+WinCarFactorySQL_log   c:\Program Files\Microsoft SQL Server\MSSQL10_50.SQLEXPRESS\MSSQL\DATA\WinCarFactorySQL_log.ldf
+
+(2 rows)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;For more information you can read: &lt;a href=&quot;https://learn.microsoft.com/en-us/sql/linux/tutorial-restore-backup-in-sql-server-container?view=sql-server-ver16&quot;&gt;Restore a SQL Server database in a Linux Docker container&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;restore-database&quot;&gt;Restore database&lt;/h2&gt;
+
+&lt;p&gt;Now we have to import and relocate these two files into the directory SQL Server uses to store these files in this container. The docker container uses a non-root user called &lt;code class=&quot;highlighter-rouge&quot;&gt;mssql&lt;/code&gt;. Therefore in order to find the directory we searched for &lt;code class=&quot;highlighter-rouge&quot;&gt;*.mdf&lt;/code&gt; files:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;mintis@arotro:~/Documents/workspace-sts-3.8.4.RELEASE/manios-blog&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;master&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;docker &lt;span class=&quot;nb&quot;&gt;exec&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-it&lt;/span&gt;  sqlserver2019 /bin/bash
+mssql@7b208ca8f759:/&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;f^C
+&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;failed reverse-i-search&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;sb&quot;&gt;`&lt;/span&gt;fin&lt;span class=&quot;s1&quot;&gt;': ^C
+mssql@7b208ca8f759:/$ find -iname &quot;*.mdf&quot;
+./var/opt/mssql/data/tempdb.mdf
+./var/opt/mssql/data/msdbdata.mdf
+./var/opt/mssql/data/model_replicatedmaster.mdf
+./var/opt/mssql/data/model_msdbdata.mdf
+./var/opt/mssql/data/model.mdf
+./var/opt/mssql/data/master.mdf
+mssql@7b208ca8f759:/$ whoami
+mssql
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Finally we restore the &lt;code class=&quot;highlighter-rouge&quot;&gt;WinCarFactorySQL.bak&lt;/code&gt; file using the following command:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;docker &lt;span class=&quot;nb&quot;&gt;exec&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-it&lt;/span&gt; sqlserver2019 /opt/mssql-tools/bin/sqlcmd &lt;span class=&quot;nt&quot;&gt;-S&lt;/span&gt; localhost &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;-U&lt;/span&gt; SA &lt;span class=&quot;nt&quot;&gt;-P&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'mysuperduperpassworD1234!56'&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;-Q&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'RESTORE DATABASE WinCarFactorySQL FROM DISK = &quot;/opt/wincarfactorybak/WinCarFactorySQL.bak&quot; WITH MOVE &quot;WinCarFactorySQL&quot; TO &quot;/var/opt/mssql/data/WinCarFactorySQL.mdf&quot;, MOVE &quot;WinCarFactorySQL_log&quot; TO &quot;/var/opt/mssql/data/WinCarFactorySQL_log.ldf&quot;'&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;If you get an output similar to the following, then your database restoration was successful!&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Processed 130576 pages for database 'WinCarFactorySQL', file 'WinCarFactorySQL' on file 1.
+Processed 1 pages for database 'WinCarFactorySQL', file 'WinCarFactorySQL_log' on file 1.
+Converting database 'WinCarFactorySQL' from version 661 to the current version 904.
+Database 'WinCarFactorySQL' running the upgrade step from version 661 to version 668.
+Database 'WinCarFactorySQL' running the upgrade step from version 668 to version 669.
+-- some lines truncated --
+Database 'WinCarFactorySQL' running the upgrade step from version 901 to version 902.
+Database 'WinCarFactorySQL' running the upgrade step from version 902 to version 903.
+Database 'WinCarFactorySQL' running the upgrade step from version 903 to version 904.
+RESTORE DATABASE successfully processed 130577 pages in 10.623 seconds (96.030 MB/sec).
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;For more information about these commands, you can read:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;https://learn.microsoft.com/en-us/sql/relational-databases/backup-restore/restore-files-to-a-new-location-sql-server?view=sql-server-ver16&quot;&gt;Restore Files to a New Location (SQL Server)&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://www.sqlshack.com/change-default-database-file-and-backup-paths-in-sql-server-on-linux/&quot;&gt;Change default database file and backup paths in SQL Server on Linux&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;note-regarding-directory-permissions&quot;&gt;Note regarding directory permissions&lt;/h3&gt;
+
+&lt;p&gt;If you decide to use another directory to &lt;code class=&quot;highlighter-rouge&quot;&gt;MOVE&lt;/code&gt; your &lt;code class=&quot;highlighter-rouge&quot;&gt;.mdf&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;.ldf&lt;/code&gt; files into any other random directory, you might stumble uppon permission issues. For instance if instead of using &lt;code class=&quot;highlighter-rouge&quot;&gt;/var/opt/mssql/data&lt;/code&gt; you use &lt;code class=&quot;highlighter-rouge&quot;&gt;/opt/wincarfactorybak&lt;/code&gt; which is not writable by &lt;code class=&quot;highlighter-rouge&quot;&gt;mssql&lt;/code&gt; user you might get errors like this:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;The operating system returned the error '5(Access is denied.)' while attempting 'RestoreContainer::ValidateTargetForCreation' on '/opt/wincarfactorybak/WinCarFactorySQL.mdf'.
+Msg 3156, Level 16, State 5, Server 7b208ca8f759, Line 1
+File 'WinCarFactorySQL' cannot be restored to '/opt/wincarfactorybak/WinCarFactorySQL.mdf'. Use WITH MOVE to identify a valid location for the file.
+Msg 3634, Level 16, State 1, Server 7b208ca8f759, Line 1
+The operating system returned the error '5(Access is denied.)' while attempting 'RestoreContainer::ValidateTargetForCreation' on '/opt/wincarfactorybak/WinCarFactorySQL_log.ldf'.
+Msg 3156, Level 16, State 5, Server 7b208ca8f759, Line 1
+File 'WinCarFactorySQL' cannot be restored to '/opt/wincarfactorybak/WinCarFactorySQL_log.ldf'. Use WITH MOVE to identify a valid location for the file.
+Msg 3119, Level 16, State 1, Server 7b208ca8f759, Line 1
+Problems were identified while planning for the RESTORE statement. Previous messages provide details.
+Msg 3013, Level 16, State 1, Server 7b208ca8f759, Line 1
+RESTORE DATABASE is terminating abnormally.
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name>cmanios</name></author><category term="MS SQL Server" /><category term="MS SQL" /><category term="Databases" /><category term="SQL" /><category term="mssql" /><category term="sql" /><category term="sqlserver" /><category term="query" /><category term="database" /><category term="restore" /><category term="bak" /><category term="docker" /><category term="container" /><summary type="html">Yesterday, a client which uses Microsoft SQL Server 2008 R2 (SP2) wanted to test if his database backup can work in Microsoft SQL Server 2019 Developer version. He currently runs his SQL Server instance in Windows Server. He provided us with a .bak file, let us call it for this post WinCarFactorySQL.bak.</summary></entry><entry><title type="html">SQL query to check if a date range is between two dates in Oracle database</title><link href="https://manios.org/2022/07/22/oracle-sql-select-date-range-between-range" rel="alternate" type="text/html" title="SQL query to check if a date range is between two dates in Oracle database" /><published>2022-07-22T13:55:00-05:00</published><updated>2022-07-22T13:55:00-05:00</updated><id>https://manios.org/2022/07/22/oracle-sql-select-date-range-between-range</id><content type="html" xml:base="https://manios.org/2022/07/22/oracle-sql-select-date-range-between-range">&lt;p&gt;A few days ago, we had to select records from an &lt;a href=&quot;https://en.wikipedia.org/wiki/Oracle_Database&quot;&gt;Oracle database&lt;/a&gt; table which should be inside a given date range. The difficult thing with those records was that they had a date range defined in them too.&lt;/p&gt;
 
 &lt;p&gt;The table was described as:&lt;/p&gt;
 
@@ -912,57 +1020,4 @@ find &lt;span class=&quot;nt&quot;&gt;-iname&lt;/span&gt; &lt;span class=&quot;s
 
 &lt;p&gt;Consequently we will monitor the temperature of our notebook and when it starts dangerously increasing, we will have to clean it again! We hope it does happen once in a year as the disassembly, cleaning and reassembly costs us two hours of work!&lt;/p&gt;
 
-&lt;p&gt;Cheers!&lt;/p&gt;</content><author><name>cmanios</name></author><category term="HP" /><category term="Notebook" /><category term="hp" /><category term="630" /><category term="hp630" /><category term="hp-630" /><category term="overheat" /><category term="overheating" /><category term="problem" /><category term="shutdown" /><category term="clean" /><category term="fan" /><summary type="html">First Incident</summary></entry><entry><title type="html">Resolve “Could not find __debug_frame section in binary” when trying to Debug Metricbeat with Delve and Go 1.10.4</title><link href="https://manios.org/2018/10/05/metricbeat-debug-frame-section-error" rel="alternate" type="text/html" title="Resolve “Could not find __debug_frame section in binary” when trying to Debug Metricbeat with Delve and Go 1.10.4" /><published>2018-10-05T14:35:00-05:00</published><updated>2018-10-05T14:35:00-05:00</updated><id>https://manios.org/2018/10/05/metricbeat-debug-frame-section-error</id><content type="html" xml:base="https://manios.org/2018/10/05/metricbeat-debug-frame-section-error">&lt;p&gt;Today we were trying to debug &lt;a href=&quot;https://www.elastic.co/products/beats/metricbeat&quot;&gt;Metricbeat&lt;/a&gt; (on commit &lt;a href=&quot;https://github.com/elastic/beats/commit/cff3e40cfedb9521d7249caaa569668de203dc59&quot;&gt;#cff3e40c&lt;/a&gt;) using &lt;a href=&quot;http://code.visualstudio.com/&quot;&gt;Visual Studio Code&lt;/a&gt; v1.27.2 and &lt;a href=&quot;https://github.com/derekparker/delve&quot;&gt;Delve&lt;/a&gt; debugger but it failed with the error:&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Could not find __debug_frame section in binary
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Our environment was:&lt;/p&gt;
-
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;go version
-go version go1.10.4 linux/amd64
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;dlv version
-Delve Debugger
-Version: 1.1.0
-Build: &lt;span class=&quot;nv&quot;&gt;$Id&lt;/span&gt;: 1990ba12450cab9425a2ae62e6ab988725023d5c
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Our Visual Studio Code debug configuration was the following:&lt;/p&gt;
-
-&lt;div class=&quot;language-json highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;version&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;0.2.0&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;configurations&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-            &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;name&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Launch&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-            &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;type&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;go&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-            &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;request&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;launch&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-            &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;remotePath&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-            &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;port&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2345&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-            &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;host&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;127.0.0.1&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-            &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;program&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;${fileDirname}&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-            &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;env&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{},&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-            &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;args&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;-e&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;-d&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;'*'&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;-c&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;metricbeat.yml&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-            &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;showLog&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-        &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;After 1 hour of searching in the internet we found that starting from &lt;code class=&quot;highlighter-rouge&quot;&gt;go 1.10.x&lt;/code&gt; the &lt;code class=&quot;highlighter-rouge&quot;&gt;.debug_frame&lt;/code&gt; is &lt;u&gt;missing entirely&lt;/u&gt;, so Delve could not be used.&lt;/p&gt;
-
-&lt;h2 id=&quot;solution&quot;&gt;Solution&lt;/h2&gt;
-
-&lt;p&gt;In order to make debugging with Delve work again we downgraded to &lt;code class=&quot;highlighter-rouge&quot;&gt;go 1.9.7&lt;/code&gt;.&lt;/p&gt;
-
-&lt;p&gt;You can find more information regarding the problem in the following links:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Elastic Discuss question &lt;a href=&quot;https://discuss.elastic.co/t/debug-filebeat/146817&quot;&gt;#146817&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://github.com/golang/go/issues/23733&quot;&gt;olang/go #23733&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://github.com/derekparker/delve/issues/860&quot;&gt;derekparker/delve #860&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://github.com/orbs-network/orbs-network-go/issues/245&quot;&gt;orbs-network/orbs-network-go #245&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;Have a nice night!&lt;/p&gt;
-
-&lt;p&gt;P.S. TAKIS R.I.P. ! We will never forget! We had eaten the best gyros in Triandria, Thessaloniki!&lt;/p&gt;</content><author><name>cmanios</name></author><category term="Go" /><category term="Golang" /><category term="Elastic" /><category term="Beats" /><category term="elastic" /><category term="metricbeat" /><category term="beats" /><category term="elasticsearch" /><category term="debug" /><category term="frame" /><category term="go" /><category term="golang" /><category term="elk" /><category term="error" /><category term="delve" /><category term="kibana" /><category term="index" /><category term="monitor" /><summary type="html">Today we were trying to debug Metricbeat (on commit #cff3e40c) using Visual Studio Code v1.27.2 and Delve debugger but it failed with the error:</summary></entry></feed>
+&lt;p&gt;Cheers!&lt;/p&gt;</content><author><name>cmanios</name></author><category term="HP" /><category term="Notebook" /><category term="hp" /><category term="630" /><category term="hp630" /><category term="hp-630" /><category term="overheat" /><category term="overheating" /><category term="problem" /><category term="shutdown" /><category term="clean" /><category term="fan" /><summary type="html">First Incident</summary></entry></feed>
