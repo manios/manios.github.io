@@ -327,7 +327,7 @@ WinCarFactorySQL_log   c:\Program Files\Microsoft SQL Server\MSSQL10_50.SQLEXPRE
 
 <p>Now we have to import and relocate these two files into the directory SQL Server uses to store these files in this container. The docker container uses a non-root user called <code class="highlighter-rouge">mssql</code>. Therefore in order to find the directory we searched for <code class="highlighter-rouge">*.mdf</code> files:</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mintis@arotro:~/Documents/workspace-sts-3.8.4.RELEASE/manios-blog<span class="o">(</span>master<span class="o">)</span><span class="nv">$ </span>docker <span class="nb">exec</span> <span class="nt">-it</span>  sqlserver2019 /bin/bash
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bob@bobis:/home/mylinux<span class="nv">$ </span>docker <span class="nb">exec</span> <span class="nt">-it</span>  sqlserver2019 /bin/bash
 mssql@7b208ca8f759:/<span class="nv">$ </span>f^C
 <span class="o">(</span>failed reverse-i-search<span class="o">)</span><span class="sb">`</span>fin<span class="s1">': ^C
 mssql@7b208ca8f759:/$ find -iname "*.mdf"
@@ -740,7 +740,7 @@ RESTORE DATABASE is terminating abnormally.
   </ul>
 </div>
 
-<div class="page__footer-copyright">&copy; 2022 Christos Manios. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+<div class="page__footer-copyright">&copy; 2023 Christos Manios. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
 
       </footer>
     </div>
