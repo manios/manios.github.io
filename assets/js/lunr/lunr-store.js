@@ -394,4 +394,10 @@ var store = [{
         "tags": ["mssql","sql","sqlserver","query","database","restore","bak","docker","container"],
         "url": "https://manios.org/2022/12/23/oracle-sql-select-date-range-between-range",
         "teaser": null
+      },{
+        "title": "Kubernetes tail Spring Boot json logs in plain text Log4j (Logback) format using Stern",
+        "excerpt":"A few days ago we were debugging a Java Spring Boot web application (called engine-export-service) in Kubernetes and we wanted to tail the Pod logs. Since we have a lot of replicas for the engine-export-service Deployment of this application, we decided to use Stern, The Multi pod and container log...","categories": ["Kubernetes","Spring","Spring Boot"],
+        "tags": ["kubernetes","spring","boot","pod","log","tail","stern"],
+        "url": "https://manios.org/2023/06/18/kubernetes-view-pod-json-log-in-plain-text-with-stern-template",
+        "teaser": null
       }]
