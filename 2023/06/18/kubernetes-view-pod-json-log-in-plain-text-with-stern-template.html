@@ -302,10 +302,7 @@ engine-export-service-7f6c797f5b-q7cm8 engine-export {"@timestamp":"2023-06-15T0
 
 <p>Fortunately, <a href="https://github.com/stern/stern">Stern</a> allows to format the logs using a <a href="https://pkg.go.dev/text/template">Golang text template</a>! We opened up an editor and created one! This is it (<code class="highlighter-rouge">stern-spring-template.tpl</code>):</p>
 
-<!--  -->
-<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{{ printf "%-35s " .PodName}}\{\{with $d := .Message | parseJSON}}{{ printf "%s %5.0f %6.6s --- [%15.15s] %-70s : %s" (index $d "@timestamp") $d.level_value $d.level $d.thread_name $d.logger_name $d.message }}{{end}}
-</code></pre></div></div>
-<!-- ) -->
+<script src="https://gist.github.com/manios/cbe52788142bfa19b345b9bddbde4cca.js"></script>
 
 <p>We saved the template into a file, called <code class="highlighter-rouge">stern-spring-template.tpl</code> and we run again the command with the addition of the <code class="highlighter-rouge">--template-file</code> parameter!</p>
 
