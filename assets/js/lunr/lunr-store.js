@@ -400,4 +400,10 @@ var store = [{
         "tags": ["kubernetes","spring","boot","pod","log","tail","stern"],
         "url": "https://manios.org/2023/06/18/kubernetes-view-pod-json-log-in-plain-text-with-stern-template",
         "teaser": null
+      },{
+        "title": "ORA-17026: Numeric overflow when calling Oracle SQL function using Hibernate 6",
+        "excerpt":"A few days ago we stumbled upon a very strange error while migrating a legacy application from Spring Boot 2.7.0 with Spring Data JPA (Hibernate Core 5.6.9-Final) to Spring Boot 3.1.0 (Hibernate Core 6.2.2-Final) The code was executing an Oracle database function, called pl_functions.persist_bonus_points which was persisting some loyalty customer...","categories": ["Java","Hibernate","Oracle","Database","Spring","Spring Boot"],
+        "tags": ["java","hibernate","oracle","database","function","overflow","error","spring","spring-boot"],
+        "url": "https://manios.org/2023/08/30/java-spring-hibernate-error-ora-17026-numeric-overflow-oracle-function-call",
+        "teaser": null
       }]
