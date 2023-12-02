@@ -264,7 +264,7 @@
       <span class="page__meta-readtime">
         <i class="far fa-clock" aria-hidden="true"></i>
         
-          4 minute read
+          5 minute read
         
       </span>
     
@@ -275,6 +275,23 @@
       
 
       <section class="page__content" itemprop="text">
+        
+          <aside class="sidebar__right ">
+            <nav class="toc">
+              <header><h4 class="nav__title"><i class="fas fa-file-alt"></i> Contents</h4></header>
+              <ul class="toc__menu">
+  <li><a href="#run-a-microsoft-sql-server-docker-container">Run a Microsoft SQL Server Docker container</a></li>
+  <li><a href="#examine-bak-file-contents">Examine .bak file contents</a></li>
+  <li><a href="#restore-database">Restore database</a>
+    <ul>
+      <li><a href="#note-1-regarding-directory-permissions">Note 1: Regarding directory permissions</a></li>
+    </ul>
+  </li>
+  <li><a href="#note-2-regarding-sql-server-version-where-backup-was-made">Note 2: Regarding SQL server version where backup was made</a></li>
+</ul>
+
+            </nav>
+          </aside>
         
         <p>Yesterday, a client which uses Microsoft SQL Server 2008 R2 (SP2) wanted to test if his database backup can work in Microsoft SQL Server 2019 Developer version. He currently runs his SQL Server instance in Windows Server. He provided us with a <code class="highlighter-rouge">.bak</code> file, let us call it for this post <code class="highlighter-rouge">WinCarFactorySQL.bak</code>.</p>
 
@@ -369,7 +386,7 @@ RESTORE DATABASE successfully processed 130577 pages in 10.623 seconds (96.030 M
   <li><a href="https://www.sqlshack.com/change-default-database-file-and-backup-paths-in-sql-server-on-linux/">Change default database file and backup paths in SQL Server on Linux</a></li>
 </ul>
 
-<h3 id="note-regarding-directory-permissions">Note regarding directory permissions</h3>
+<h3 id="note-1-regarding-directory-permissions">Note 1: Regarding directory permissions</h3>
 
 <p>If you decide to use another directory to <code class="highlighter-rouge">MOVE</code> your <code class="highlighter-rouge">.mdf</code> and <code class="highlighter-rouge">.ldf</code> files into any other random directory, you might stumble uppon permission issues. For instance if instead of using <code class="highlighter-rouge">/var/opt/mssql/data</code> you use <code class="highlighter-rouge">/opt/wincarfactorybak</code> which is not writable by <code class="highlighter-rouge">mssql</code> user you might get errors like this:</p>
 
@@ -385,6 +402,25 @@ Problems were identified while planning for the RESTORE statement. Previous mess
 Msg 3013, Level 16, State 1, Server 7b208ca8f759, Line 1
 RESTORE DATABASE is terminating abnormally.
 </code></pre></div></div>
+
+<h2 id="note-2-regarding-sql-server-version-where-backup-was-made">Note 2: Regarding SQL server version where backup was made</h2>
+
+<p>If you received a database backup which fails to be restored locally getting the following error:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Msg 3169, Level 16, State 1, Server 203c41e3a2e1, Line 1
+The database was backed up on a server running version 16.00.1000. That version is incompatible with this server, which is running version 15.00.4261. Either restore the database on a server that supports the backup, or use a backup that is compatible with this server.
+Msg 3013, Level 16, State 1, Server 203c41e3a2e1, Line 1
+RESTORE DATABASE is terminating abnormally.
+</code></pre></div></div>
+
+<p>then it seems that the backup has been created using a different Microsoft SQL Server version than the one that you are running in your container. In this example we took help from https://sqlserverbuilds.blogspot.com/ and we found out that:</p>
+
+<ol>
+  <li>The backup was created using Microsoft SQL Server <strong>2022</strong> with build 16.0.1000.</li>
+  <li>We tried to restore it in an older Microsoft SQL Server <strong>2019</strong> with build 15.0.4261.</li>
+</ol>
+
+<p>Therefore we need to run a container using an updated image according <a href="https://hub.docker.com/_/microsoft-mssql-server?tab=description">to this table</a> which will be in our case: <code class="highlighter-rouge">mcr.microsoft.com/mssql/server:2022-CU9-ubuntu-20.04</code></p>
 
         
       </section>

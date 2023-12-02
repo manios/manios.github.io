@@ -288,7 +288,7 @@
 <p>After the fix the code is the following:</p>
 
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="nc">String</span> <span class="nf">getTransactionIdForUpdatingBonusPoints</span><span class="o">(</span><span class="nc">Long</span> <span class="n">branchId</span><span class="o">,</span> <span class="nc">String</span> <span class="n">customerId</span><span class="o">,</span> <span class="nc">String</span> <span class="n">points</span><span class="o">)</span> <span class="o">{</span>
-    <span class="nc">Query</span> <span class="n">query</span> <span class="o">=</span> <span class="n">entityManager</span><span class="o">.</span><span class="na">createNativeQuery</span><span class="o">(</span><span class="s">"select pl_functions.persist_bonus_points (:branchId, :customerId, :points) from dual"</span><span class="o">);</span>
+    <span class="nc">Query</span> <span class="n">query</span> <span class="o">=</span> <span class="n">entityManager</span><span class="o">.</span><span class="na">createNativeQuery</span><span class="o">(</span><span class="s">"select pl_functions.persist_bonus_points (:branchId, :customerId, :points) as transactionId from dual"</span><span class="o">);</span>
     
     <span class="n">query</span><span class="o">.</span><span class="na">setParameter</span><span class="o">(</span><span class="s">"branchId"</span><span class="o">,</span> <span class="n">branchId</span><span class="o">);</span>
     <span class="n">query</span><span class="o">.</span><span class="na">setParameter</span><span class="o">(</span><span class="s">"customerId"</span><span class="o">,</span> <span class="n">customerId</span><span class="o">);</span>
@@ -518,7 +518,7 @@
       <span class="page__meta-readtime">
         <i class="far fa-clock" aria-hidden="true"></i>
         
-          4 minute read
+          5 minute read
         
       </span>
     
