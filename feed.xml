@@ -1,4 +1,151 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.0">Jekyll</generator><link href="https://manios.org/feed.xml" rel="self" type="application/atom+xml" /><link href="https://manios.org/" rel="alternate" type="text/html" /><updated>2023-12-02T15:10:35-06:00</updated><id>https://manios.org/feed.xml</id><title type="html">cmanios</title><subtitle>Developer life is a NullPointerException</subtitle><author><name>Christos Manios</name></author><entry><title type="html">ORA-17026: Numeric overflow when calling Oracle SQL function using Hibernate 6</title><link href="https://manios.org/2023/08/30/java-spring-hibernate-error-ora-17026-numeric-overflow-oracle-function-call" rel="alternate" type="text/html" title="ORA-17026: Numeric overflow when calling Oracle SQL function using Hibernate 6" /><published>2023-08-30T14:43:27-05:00</published><updated>2023-08-30T14:43:27-05:00</updated><id>https://manios.org/2023/08/30/java-spring-hibernate-error-ora-17026-numeric-overflow-oracle-function-call</id><content type="html" xml:base="https://manios.org/2023/08/30/java-spring-hibernate-error-ora-17026-numeric-overflow-oracle-function-call">&lt;p&gt;A few days ago we stumbled upon a very strange error while migrating a legacy application from Spring Boot 2.7.0 with Spring Data JPA (Hibernate Core 5.6.9-Final) to Spring Boot 3.1.0 (Hibernate Core 6.2.2-Final)&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.0">Jekyll</generator><link href="https://manios.org/feed.xml" rel="self" type="application/atom+xml" /><link href="https://manios.org/" rel="alternate" type="text/html" /><updated>2024-02-11T06:40:24-06:00</updated><id>https://manios.org/feed.xml</id><title type="html">cmanios</title><subtitle>Developer life is a NullPointerException</subtitle><author><name>Christos Manios</name></author><entry><title type="html">Linux Mint Mate configure screensaver and display sleep via command line</title><link href="https://manios.org/2024/02/11/linux-mint-mate-screensaver-command-line-configure-enable-disable" rel="alternate" type="text/html" title="Linux Mint Mate configure screensaver and display sleep via command line" /><published>2024-02-11T06:17:00-06:00</published><updated>2024-02-11T06:17:00-06:00</updated><id>https://manios.org/2024/02/11/linux-mint-mate-screensaver-command-line-configure-enable-disable</id><content type="html" xml:base="https://manios.org/2024/02/11/linux-mint-mate-screensaver-command-line-configure-enable-disable">&lt;h1 id=&quot;problem&quot;&gt;Problem&lt;/h1&gt;
+
+&lt;p&gt;A few days ago, while we were watching a film in VLC player in my laptop which runs Linux Mint 20.1 MATE, the screen went into screensaver mode. This happened multiple times and we had to press a button to make the screen come back. We have searched the web and we have seen that others had the same issue as seen here:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;https://forums.linuxmint.com/viewtopic.php?t=129745&quot;&gt;Screensaver activates when watching movies - Linux Mint Forums&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://forums.linuxmint.com/viewtopic.php?t=409457&quot;&gt;Firefox activates screensaver when watching videos - Linux Mint Forums&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;After spending some time reading the experiences of other users in forums, we ended up disabling the screensaver and display sleep until our film was finished.&lt;/p&gt;
+
+&lt;p&gt;However we wanted to be able to do that by command line in bash, in order to be able to quickly toggle the setting. When watching films disable the screensaver and when using the computer for work to enable it.&lt;/p&gt;
+
+&lt;p&gt;Our preferred settings would be when working with the PC:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Screensaver settings:
+    &lt;ul&gt;
+      &lt;li&gt;Activate screensaver when computer is idle: true&lt;/li&gt;
+      &lt;li&gt;Regard the computer as idle after (minutes)&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Powermanagement settings:
+    &lt;ul&gt;
+      &lt;li&gt;Put display to sleep when inactive for: 10 minutes&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;After some searching in the internet, we found out a related article for Ubuntu: &lt;a href=&quot;https://askubuntu.com/questions/1366143/how-to-configure-screensaver-by-command-line&quot;&gt;20.04 - How to configure ScreenSaver by Command Line? - Ask Ubuntu&lt;/a&gt;&lt;/p&gt;
+
+&lt;h1 id=&quot;gsettings-command&quot;&gt;gsettings command&lt;/h1&gt;
+
+&lt;p&gt;While playing with the &lt;code class=&quot;highlighter-rouge&quot;&gt;gsettings&lt;/code&gt; command, we found the following:&lt;/p&gt;
+
+&lt;p&gt;To list all settings and write them to a file you can execute this command:&lt;/p&gt;
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# List all settings and write them to allsettings.txt file&lt;/span&gt;
+gsettings list-recursively &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; allsettings.txt
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;To read a single setting you can use the &lt;code class=&quot;highlighter-rouge&quot;&gt;gsettings get&lt;/code&gt; command:&lt;/p&gt;
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;chris@laptop:~&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;gsettings get org.mate.power-manager sleep-display-ac
+600
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;To set  a single setting you can use the &lt;code class=&quot;highlighter-rouge&quot;&gt;gsettings set&lt;/code&gt; command:&lt;/p&gt;
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;chris@laptop:~&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;gsettings get org.mate.power-manager sleep-display-ac 300
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;After playing with the values of Mate desktop “Screensaver” settings window we found the following settings:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Screensaver settings:
+    &lt;ol&gt;
+      &lt;li&gt;Activate screensaver when computer is idle (true/false): &lt;code class=&quot;highlighter-rouge&quot;&gt;org.mate.screensaver idle-activation-enabled &amp;lt;true/false&amp;gt;&lt;/code&gt;&lt;/li&gt;
+      &lt;li&gt;Regard the computer as idle after 5 minutes: &lt;code class=&quot;highlighter-rouge&quot;&gt;org.mate.session idle-delay 5&lt;/code&gt;&lt;/li&gt;
+      &lt;li&gt;Regard the computer as idle after Never (disabled): &lt;code class=&quot;highlighter-rouge&quot;&gt;org.mate.session idle-delay 0&lt;/code&gt;&lt;/li&gt;
+    &lt;/ol&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Power management settings:
+    &lt;ol&gt;
+      &lt;li&gt;Put display to sleep when inactive for (seconds): &lt;code class=&quot;highlighter-rouge&quot;&gt;org.mate.power-manager sleep-display-ac 600&lt;/code&gt;&lt;/li&gt;
+      &lt;li&gt;Put display to sleep when inactive for Never (disabled): &lt;code class=&quot;highlighter-rouge&quot;&gt;org.mate.power-manager sleep-display-ac 0&lt;/code&gt;&lt;/li&gt;
+    &lt;/ol&gt;
+  &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;In configuration this is described as:&lt;/p&gt;
+&lt;div class=&quot;language-conf highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# Activate screensaver when computer is idle
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;org&lt;/span&gt;.&lt;span class=&quot;n&quot;&gt;mate&lt;/span&gt;.&lt;span class=&quot;n&quot;&gt;screensaver&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;idle&lt;/span&gt;-&lt;span class=&quot;n&quot;&gt;activation&lt;/span&gt;-&lt;span class=&quot;n&quot;&gt;enabled&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;true&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;# Regard the computer as idle after (minutes)
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;org&lt;/span&gt;.&lt;span class=&quot;n&quot;&gt;mate&lt;/span&gt;.&lt;span class=&quot;n&quot;&gt;session&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;idle&lt;/span&gt;-&lt;span class=&quot;n&quot;&gt;delay&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;5&lt;/span&gt;
+
+&lt;span class=&quot;c&quot;&gt;# Put display to sleep when inactive for: 10 minutes
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;org&lt;/span&gt;.&lt;span class=&quot;n&quot;&gt;mate&lt;/span&gt;.&lt;span class=&quot;n&quot;&gt;power&lt;/span&gt;-&lt;span class=&quot;n&quot;&gt;manager&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sleep&lt;/span&gt;-&lt;span class=&quot;n&quot;&gt;display&lt;/span&gt;-&lt;span class=&quot;n&quot;&gt;ac&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;600&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;# Put display to sleep when inactive for: Never
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;org&lt;/span&gt;.&lt;span class=&quot;n&quot;&gt;mate&lt;/span&gt;.&lt;span class=&quot;n&quot;&gt;power&lt;/span&gt;-&lt;span class=&quot;n&quot;&gt;manager&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sleep&lt;/span&gt;-&lt;span class=&quot;n&quot;&gt;display&lt;/span&gt;-&lt;span class=&quot;n&quot;&gt;ac&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;600&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h1 id=&quot;the-script&quot;&gt;The script&lt;/h1&gt;
+
+&lt;p&gt;We quickly drafted a bash script which toggles (enables or dsables) the screensaver and screen sleep you:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;#!/bin/bash&lt;/span&gt;
+
+&lt;span class=&quot;nv&quot;&gt;currentSetting&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;sb&quot;&gt;`&lt;/span&gt;gsettings get org.mate.screensaver idle-activation-enabled&lt;span class=&quot;sb&quot;&gt;`&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$currentSetting&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;true&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;then&lt;/span&gt;
+
+    &lt;span class=&quot;c&quot;&gt;# Activate screensaver when computer is idle&lt;/span&gt;
+    gsettings &lt;span class=&quot;nb&quot;&gt;set &lt;/span&gt;org.mate.screensaver idle-activation-enabled &lt;span class=&quot;nb&quot;&gt;false&lt;/span&gt;
+
+    &lt;span class=&quot;c&quot;&gt;# Regard the computer as idle after 0 minutes (Never)&lt;/span&gt;
+    gsettings &lt;span class=&quot;nb&quot;&gt;set &lt;/span&gt;org.mate.session idle-delay 0
+
+    &lt;span class=&quot;c&quot;&gt;# Put display to sleep when inactive for: 0 seconds (Never)&lt;/span&gt;
+    gsettings &lt;span class=&quot;nb&quot;&gt;set &lt;/span&gt;org.mate.power-manager sleep-display-ac 0
+
+    &lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Screensaver deactivated&quot;&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;else&lt;/span&gt;
+
+    &lt;span class=&quot;c&quot;&gt;# Activate screensaver when computer is idle&lt;/span&gt;
+    gsettings &lt;span class=&quot;nb&quot;&gt;set &lt;/span&gt;org.mate.screensaver idle-activation-enabled &lt;span class=&quot;nb&quot;&gt;true&lt;/span&gt;
+
+    &lt;span class=&quot;c&quot;&gt;# Regard the computer as idle after 5 minutes&lt;/span&gt;
+    gsettings &lt;span class=&quot;nb&quot;&gt;set &lt;/span&gt;org.mate.session idle-delay 5
+
+    &lt;span class=&quot;c&quot;&gt;# Put display to sleep when inactive for: 10 minutes&lt;/span&gt;
+    gsettings &lt;span class=&quot;nb&quot;&gt;set &lt;/span&gt;org.mate.power-manager sleep-display-ac 600
+
+    &lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Screensaver activated&quot;&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;fi&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;how-does-it-work&quot;&gt;How does it work?&lt;/h2&gt;
+
+&lt;p&gt;The script is pretty simple:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;It reads the &lt;code class=&quot;highlighter-rouge&quot;&gt;org.mate.screensaver idle-activation-enabled&lt;/code&gt; configuration to check if the screensaver is currently enabled.&lt;/li&gt;
+  &lt;li&gt;If the screensaver is enabled:
+    &lt;ol&gt;
+      &lt;li&gt;it disables it.&lt;/li&gt;
+      &lt;li&gt;It also disables display sleep.&lt;/li&gt;
+    &lt;/ol&gt;
+  &lt;/li&gt;
+  &lt;li&gt;If the screensaver is disabled:
+    &lt;ol&gt;
+      &lt;li&gt;it enables it with idle time of 5 minutes.&lt;/li&gt;
+      &lt;li&gt;It also enables the display sleep after 10 minutes.&lt;/li&gt;
+    &lt;/ol&gt;
+  &lt;/li&gt;
+  &lt;li&gt;It prints a message in &lt;code class=&quot;highlighter-rouge&quot;&gt;stdout&lt;/code&gt; to inform us about the action it took.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&quot;example-usage&quot;&gt;Example usage&lt;/h2&gt;
+
+&lt;p&gt;Put the script into a file, let us say &lt;code class=&quot;highlighter-rouge&quot;&gt;myscreensaver.sh&lt;/code&gt;, make it runnable with &lt;code class=&quot;highlighter-rouge&quot;&gt;chmod 744 myscreensaver.sh&lt;/code&gt; and test it:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;chris@laptop:~&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;c&quot;&gt;# Calling it for the first time&lt;/span&gt;
+chris@laptop:~&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;./myscreensaver.sh
+Screensaver activated
+chris@laptop:~&lt;span class=&quot;err&quot;&gt;$&lt;/span&gt;
+chris@laptop:~&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;c&quot;&gt;# Calling it for the second time&lt;/span&gt;
+chris@laptop:~&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;./myscreensaver.sh
+Screensaver deactivated
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;I hope this helps. Have a wonderful day!&lt;/p&gt;</content><author><name>cmanios</name></author><category term="Linux" /><category term="Mint" /><category term="Ubuntu" /><category term="Bash" /><category term="linux" /><category term="mint" /><category term="screensaver" /><category term="configure" /><category term="display" /><category term="sleep" /><category term="power" /><category term="management" /><summary type="html">Problem</summary></entry><entry><title type="html">ORA-17026: Numeric overflow when calling Oracle SQL function using Hibernate 6</title><link href="https://manios.org/2023/08/30/java-spring-hibernate-error-ora-17026-numeric-overflow-oracle-function-call" rel="alternate" type="text/html" title="ORA-17026: Numeric overflow when calling Oracle SQL function using Hibernate 6" /><published>2023-08-30T14:43:27-05:00</published><updated>2023-08-30T14:43:27-05:00</updated><id>https://manios.org/2023/08/30/java-spring-hibernate-error-ora-17026-numeric-overflow-oracle-function-call</id><content type="html" xml:base="https://manios.org/2023/08/30/java-spring-hibernate-error-ora-17026-numeric-overflow-oracle-function-call">&lt;p&gt;A few days ago we stumbled upon a very strange error while migrating a legacy application from Spring Boot 2.7.0 with Spring Data JPA (Hibernate Core 5.6.9-Final) to Spring Boot 3.1.0 (Hibernate Core 6.2.2-Final)&lt;/p&gt;
 
 &lt;p&gt;The code was executing an Oracle database function, called &lt;code class=&quot;highlighter-rouge&quot;&gt;pl_functions.persist_bonus_points&lt;/code&gt; which was persisting some loyalty customer points for a bank and returned a transaction ID. The function call used to work before the upgrade. After upgrading to Hibernate 6 it started failing with an error:&lt;/p&gt;
 
@@ -184,7 +331,7 @@ Msg 3013, Level 16, State 1, Server 7b208ca8f759, Line 1
 RESTORE DATABASE is terminating abnormally.
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;h2 id=&quot;note-2-regarding-sql-server-version-where-backup-was-made&quot;&gt;Note 2: Regarding SQL server version where backup was made&lt;/h2&gt;
+&lt;h3 id=&quot;note-2-regarding-sql-server-version-where-backup-was-made&quot;&gt;Note 2: Regarding SQL server version where backup was made&lt;/h3&gt;
 
 &lt;p&gt;If you received a database backup which fails to be restored locally getting the following error:&lt;/p&gt;
 
@@ -787,231 +934,4 @@ OUT_TMP_PDF_FILE=tmpOut.pdf
 &lt;span class=&quot;k&quot;&gt;mv&lt;/span&gt; &quot;&lt;span class=&quot;err&quot;&gt;${&lt;/span&gt;OUT_TMP_PDF_FILE&lt;span class=&quot;err&quot;&gt;}&lt;/span&gt;&quot;  &quot;&lt;span class=&quot;err&quot;&gt;${&lt;/span&gt;OUT_PDF_FILE&lt;span class=&quot;err&quot;&gt;}&lt;/span&gt;&quot;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;This is it! Very simple and straightforward! I hope this article helps you and you will not devote much time to do the same. Have a nice day from a stormy Greece!&lt;/p&gt;</content><author><name>cmanios</name></author><category term="Markdown" /><category term="PDF" /><category term="File" /><category term="Conversion" /><category term="markdown" /><category term="md" /><category term="pdf" /><category term="docker" /><category term="asciidoctor" /><category term="convert" /><category term="file" /><category term="container" /><summary type="html">Today we had to deliver a .pdf file to a customer containing documentation about a system. The documentation was written in Markdown and needed to be converted to PDF. After some thoughts we did not find some straightforward way to do it, so we needed to convert Markdown to Asciidoctor using Pandoc first and then from Asciidoctor to PDF. In addition to that, we love Docker, so we used Docker containers to achieve that. The containers used:</summary></entry><entry><title type="html">Force Maven to execute offline with local repository dependencies in a machine without Internet connection</title><link href="https://manios.org/2019/08/21/force-maven-offline-execute-goal-dependencies" rel="alternate" type="text/html" title="Force Maven to execute offline with local repository dependencies in a machine without Internet connection" /><published>2019-08-21T12:57:53-05:00</published><updated>2019-08-21T12:57:53-05:00</updated><id>https://manios.org/2019/08/21/force-maven-offline-execute-goal-dependencies</id><content type="html" xml:base="https://manios.org/2019/08/21/force-maven-offline-execute-goal-dependencies">&lt;p&gt;Debugging an application which runs on a remote Virtual Machine can prove to be very hard, especially if your client has “exceptional” conditions due to security, company or any other psycological measures/policies. For example, your VM can be a Windows machine (yes, Windows servers are an exception themselves and impose many issues and difficulties), it may have no internet connection or accept no traffic other than http and RDP. Typically we as developers are called to confront such installations and make them work. As a paralellism, we are asked to fix a vehicle engine through the exhaust pipe without having access to the hood!&lt;/p&gt;
-
-&lt;p&gt;If you are not bored to death yet, you may proceed!&lt;/p&gt;
-
-&lt;h2 id=&quot;the-problem&quot;&gt;The problem&lt;/h2&gt;
-
-&lt;p&gt;A few days ago we had to remotely debug a Java Enterprise application inside a VM. The interesting fact was that everything had to be offline. Thus IDE installation, Maven installation and compile a Java project using Maven with no internet connection. Everything had to go fully offline. Really. Trully. Nothing special! (for a non technical person) At first we thought that it would suffice if we just copy the local maven repository from a development machine to the VM. Unfortunately that was not the case and it was not as simple as it looked like.&lt;/p&gt;
-
-&lt;p&gt;After investing 3 hours in searching and numerous trial and error attempts we managed to compile the application using Maven. The steps described are performed in 2 phases:&lt;/p&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;Preparation steps performed in a development machine with internet connection.&lt;/li&gt;
-  &lt;li&gt;Steps performed inside the VM with no internet connection (trully offline).&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h2 id=&quot;inside-your-development-machine&quot;&gt;Inside your development machine&lt;/h2&gt;
-
-&lt;h3 id=&quot;step-1-create-a-new-local-repository&quot;&gt;Step 1: Create a new local repository&lt;/h3&gt;
-
-&lt;p&gt;This new local repository will be used only for the dependencies required by your application to be compiled in offline mode. It is unnecessary to copy your everyday repository with all other redundant dependencies which maybe numerous and great in size.&lt;/p&gt;
-
-&lt;p&gt;In order to create a new local repository, navigate to your Maven &lt;code class=&quot;highlighter-rouge&quot;&gt;settings.xml&lt;/code&gt; file. By default you can find it in:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;C:\Users\&amp;lt;your-username&amp;gt;\.m2\settings.xml&lt;/code&gt;: in Windows machines&lt;/li&gt;
-  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;/home/&amp;lt;your-username&amp;gt;/.m2/settings.xml&lt;/code&gt;: in Linux or *nix machines&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;Edit the line:&lt;/p&gt;
-
-&lt;div class=&quot;language-xml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;&amp;lt;!-- Point to a new empty directory --&amp;gt;&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;&amp;lt;localRepository&amp;gt;&lt;/span&gt;C:/apps/m2repo&lt;span class=&quot;nt&quot;&gt;&amp;lt;/localRepository&amp;gt;&lt;/span&gt;--&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;h3 id=&quot;step-2-run-maven-to-download-dependencies-for-offline-usage&quot;&gt;Step 2: Run Maven to download dependencies for offline usage&lt;/h3&gt;
-
-&lt;p&gt;In order to to download dependencies for offline usage, inside our project we execute the following:&lt;/p&gt;
-
-&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;mvn dependency:go-offline
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Helpful link: &lt;a href=&quot;https://stackoverflow.com/questions/8851424/is-there-a-maven-command-line-option-for-offline-mode&quot;&gt;StackOverflow #8851424&lt;/a&gt;.&lt;/p&gt;
-
-&lt;h3 id=&quot;step-3-run-your-usual-maven-goals&quot;&gt;Step 3: Run your usual Maven goals&lt;/h3&gt;
-
-&lt;p&gt;You also have to run your usual Maven goals which you eventually you are going to execute again in the offline VM, like &lt;code class=&quot;highlighter-rouge&quot;&gt;clean&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;test&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;package&lt;/code&gt;. The reason for that is that Maven did not download the .jars needed for these goals when you run &lt;code class=&quot;highlighter-rouge&quot;&gt;mvn dependency:go-offline&lt;/code&gt;. In our case we run:&lt;/p&gt;
-
-&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;mvn clean &lt;span class=&quot;nb&quot;&gt;test
-&lt;/span&gt;mvn clean &lt;span class=&quot;nb&quot;&gt;install
-&lt;/span&gt;mvn clean package
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;You will notice that Maven downloads some extra .jars needed to execute its goals:&lt;/p&gt;
-
-&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;mvn clean &lt;span class=&quot;nb&quot;&gt;install&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO] Scanning &lt;span class=&quot;k&quot;&gt;for &lt;/span&gt;projects...
-&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO]
-&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO] &lt;span class=&quot;nt&quot;&gt;------------------------------------------------------------------------&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO] Building jetsprinkler 2.5.0-SNAPSHOT
-&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO] &lt;span class=&quot;nt&quot;&gt;------------------------------------------------------------------------&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO]
-&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO] &lt;span class=&quot;nt&quot;&gt;---&lt;/span&gt; maven-clean-plugin:2.5:clean &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;default-clean&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; @ jetsprinkler &lt;span class=&quot;nt&quot;&gt;---&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO]
-&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO] &lt;span class=&quot;nt&quot;&gt;---&lt;/span&gt; maven-resources-plugin:2.6:resources &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;default-resources&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; @ jetsprinkler &lt;span class=&quot;nt&quot;&gt;---&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO] Using &lt;span class=&quot;s1&quot;&gt;'UTF-8'&lt;/span&gt; encoding to copy filtered resources.
-&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO] Copying 11 resources
-&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO]
-&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO] &lt;span class=&quot;nt&quot;&gt;---&lt;/span&gt; maven-compiler-plugin:2.3.2:compile &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;default-compile&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; @ jetsprinkler &lt;span class=&quot;nt&quot;&gt;---&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO] Compiling 64 &lt;span class=&quot;nb&quot;&gt;source &lt;/span&gt;files to C:&lt;span class=&quot;se&quot;&gt;\j&lt;/span&gt;avaprojects&lt;span class=&quot;se&quot;&gt;\j&lt;/span&gt;etsprinkler&lt;span class=&quot;se&quot;&gt;\t&lt;/span&gt;arget&lt;span class=&quot;se&quot;&gt;\c&lt;/span&gt;lasses
-&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO]
-&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO] &lt;span class=&quot;nt&quot;&gt;---&lt;/span&gt; maven-resources-plugin:2.6:testResources &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;default-testResources&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; @ jetsprinkler &lt;span class=&quot;nt&quot;&gt;---&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO] Using &lt;span class=&quot;s1&quot;&gt;'UTF-8'&lt;/span&gt; encoding to copy filtered resources.
-&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO] Copying 8 resources
-&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO]
-&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO] &lt;span class=&quot;nt&quot;&gt;---&lt;/span&gt; maven-compiler-plugin:2.3.2:testCompile &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;default-testCompile&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; @ jetsprinkler &lt;span class=&quot;nt&quot;&gt;---&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO] Compiling 15 &lt;span class=&quot;nb&quot;&gt;source &lt;/span&gt;files to C:&lt;span class=&quot;se&quot;&gt;\j&lt;/span&gt;avaprojects&lt;span class=&quot;se&quot;&gt;\j&lt;/span&gt;etsprinkler&lt;span class=&quot;se&quot;&gt;\t&lt;/span&gt;arget&lt;span class=&quot;se&quot;&gt;\t&lt;/span&gt;est-classes
-&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO]
-&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO] &lt;span class=&quot;nt&quot;&gt;---&lt;/span&gt; maven-surefire-plugin:2.12.4:test &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;default-test&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; @ jetsprinkler &lt;span class=&quot;nt&quot;&gt;---&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO] Surefire report directory: C:&lt;span class=&quot;se&quot;&gt;\j&lt;/span&gt;avaprojects&lt;span class=&quot;se&quot;&gt;\j&lt;/span&gt;etsprinkler&lt;span class=&quot;se&quot;&gt;\t&lt;/span&gt;arget&lt;span class=&quot;se&quot;&gt;\s&lt;/span&gt;urefire-reports
-Downloading from public: https://nexus.manios.org/nexus/repository/public/org/apache/maven/surefire/surefire-junit4/2.12.4/surefire-junit4-2.12.4.pom
-Downloaded from public: https://nexus.manios.org/nexus/repository/public/org/apache/maven/surefire/surefire-junit4/2.12.4/surefire-junit4-2.12.4.pom &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;2.4 kB at 4.2 kB/s&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-Downloading from public: https://nexus.manios.org/nexus/repository/public/org/apache/maven/surefire/surefire-providers/2.12.4/surefire-providers-2.12.4.pom
-Downloaded from public: https://nexus.manios.org/nexus/repository/public/org/apache/maven/surefire/surefire-providers/2.12.4/surefire-providers-2.12.4.pom &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;2.3 kB at 18 kB/s&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-Downloading from public: https://nexus.manios.org/nexus/repository/public/org/apache/maven/surefire/surefire-junit4/2.12.4/surefire-junit4-2.12.4.jar
-Downloaded from public: https://nexus.manios.org/nexus/repository/public/org/apache/maven/surefire/surefire-junit4/2.12.4/surefire-junit4-2.12.4.jar &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;37 kB at 187 kB/s&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-
-&lt;span class=&quot;nt&quot;&gt;-------------------------------------------------------&lt;/span&gt;
- T E S T S
-&lt;span class=&quot;nt&quot;&gt;-------------------------------------------------------&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;h3 id=&quot;step-4-copy-your-local-repository-to-the-remote-vm&quot;&gt;Step 4: Copy your local repository to the remote VM&lt;/h3&gt;
-
-&lt;p&gt;We have to copy the contents of our new local repository (in our case &lt;code class=&quot;highlighter-rouge&quot;&gt;C:/apps/m2repo&lt;/code&gt;) to the remote VM with no internet connection. Place the contents of the repository in the respective repository directory.&lt;/p&gt;
-
-&lt;h2 id=&quot;inside-the-offline-machine-with-no-internet-connection&quot;&gt;Inside the offline machine (with no internet connection)&lt;/h2&gt;
-
-&lt;p&gt;The following steps will be run inside the target machine with no internet connection. Verify that you have cloned your source code somewhere.&lt;/p&gt;
-
-&lt;h3 id=&quot;step-5-remove-dependency-files-that-cause-trouble-in-offline-mode&quot;&gt;Step 5: Remove dependency files that cause trouble in offline mode&lt;/h3&gt;
-
-&lt;p&gt;When Maven resolves and downloads a dependency from the internet, it stores 2-3 extra files other than the .jars that contain the library, javadoc or the sources. For example for &lt;a href=&quot;https://mvnrepository.com/artifact/org.springframework/spring-core&quot;&gt;spring-core&lt;/a&gt;, the files inside the local repository are:&lt;/p&gt;
-
-&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;ls&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-l&lt;/span&gt; ~/.m2/repository/org/springframework/spring-core/4.1.7.RELEASE/
-total 1004
-&lt;span class=&quot;nt&quot;&gt;-rw-r--r--&lt;/span&gt; 1 bobos bobos     212 Jun 17 13:16 _remote.repositories
-&lt;span class=&quot;nt&quot;&gt;-rw-r--r--&lt;/span&gt; 1 bobos bobos 1008584 Jun 17 13:16 spring-core-4.1.7.RELEASE.jar
-&lt;span class=&quot;nt&quot;&gt;-rw-r--r--&lt;/span&gt; 1 bobos bobos      40 Jun 17 13:16 spring-core-4.1.7.RELEASE.jar.sha1
-&lt;span class=&quot;nt&quot;&gt;-rw-r--r--&lt;/span&gt; 1 bobos bobos    2490 Jun 17 13:16 spring-core-4.1.7.RELEASE.pom
-&lt;span class=&quot;nt&quot;&gt;-rw-r--r--&lt;/span&gt; 1 bobos bobos      40 Jun 17 13:16 spring-core-4.1.7.RELEASE.pom.sha1
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;An here is the peculiar fact:&lt;/p&gt;
-
-&lt;p&gt;Although we configure Maven to work offline, when it detects files with the extension &lt;code class=&quot;highlighter-rouge&quot;&gt;*.repositories&lt;/code&gt; or &lt;code class=&quot;highlighter-rouge&quot;&gt;*.sha1&lt;/code&gt;, it tries to connect to the internet! Consequently the Maven goal we run tries to download the dependency from the internet and it eventually fails after timeout (StackOverflow &lt;a href=&quot;https://stackoverflow.com/questions/33548395/how-do-i-force-maven-to-use-my-local-repository-rather-than-going-out-to-remote&quot;&gt;#33548395&lt;/a&gt;). To resolve this issue we have to recursively delete all files with the aforementioned suffixes. Hence, execute:&lt;/p&gt;
-
-&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# cd to repository directory&lt;/span&gt;
-&lt;span class=&quot;nb&quot;&gt;cd&lt;/span&gt; ~/.m2/repository
-
-&lt;span class=&quot;c&quot;&gt;# Then delete recursively all files&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# with the extension `*.repositories` or `*.sha1`&lt;/span&gt;
-find &lt;span class=&quot;nt&quot;&gt;-iname&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;*.repositories&quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-exec&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;rm&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{}&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
-find &lt;span class=&quot;nt&quot;&gt;-iname&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;*.sha1&quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-exec&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;rm&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{}&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;This issue might also be resolved by tweaking the &lt;a href=&quot;https://maven.apache.org/ref/3.3.3/maven-settings/settings.html#class_snapshots&quot;&gt;updatePolicy&lt;/a&gt; in Maven as mentioned in StackOverflow &lt;a href=&quot;https://stackoverflow.com/questions/33548395/how-do-i-force-maven-to-use-my-local-repository-rather-than-going-out-to-remote&quot;&gt;#33548395&lt;/a&gt; but unfortunately we did not have the time to test it.&lt;/p&gt;
-
-&lt;h3 id=&quot;step-6-optional-fix-parent-pom-references&quot;&gt;Step 6 (optional): Fix parent pom references&lt;/h3&gt;
-
-&lt;p&gt;In our case, the project had a parent pom:&lt;/p&gt;
-
-&lt;div class=&quot;language-xml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;parent&amp;gt;&lt;/span&gt;
-    &lt;span class=&quot;nt&quot;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;com.airplaneman&lt;span class=&quot;nt&quot;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
-    &lt;span class=&quot;nt&quot;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;super-pom&lt;span class=&quot;nt&quot;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
-    &lt;span class=&quot;nt&quot;&gt;&amp;lt;version&amp;gt;&lt;/span&gt;1.1.4&lt;span class=&quot;nt&quot;&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;&amp;lt;/parent&amp;gt;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;which could not be downloaded from an external Maven repository. We had the files offline, however this configuration could not work. To make it work we had to add the &lt;code class=&quot;highlighter-rouge&quot;&gt;&amp;lt;relativePath&amp;gt;&lt;/code&gt; to the pom file. This is trully a relative path to the project.&lt;/p&gt;
-
-&lt;p&gt;Hence our project was placed in:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;C:/projects/jetsprinkler&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;and the parent pom was located in&lt;/p&gt;
-&lt;ul&gt;
-  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;C:/Users/cmanios/.m2/repository/com/airplanman/super-pom/1.1.4/super-pom-1.1.4.pom&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;To reference the parent pom in a relative way, we resulted in the following configuration:&lt;/p&gt;
-
-&lt;div class=&quot;language-xml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;parent&amp;gt;&lt;/span&gt;
-    &lt;span class=&quot;nt&quot;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;com.airplaneman&lt;span class=&quot;nt&quot;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
-    &lt;span class=&quot;nt&quot;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;super-pom&lt;span class=&quot;nt&quot;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
-    &lt;span class=&quot;nt&quot;&gt;&amp;lt;version&amp;gt;&lt;/span&gt;1.1.4&lt;span class=&quot;nt&quot;&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
-    &lt;span class=&quot;nt&quot;&gt;&amp;lt;relativePath&amp;gt;&lt;/span&gt;../../Users/cmanios/.m2/repository/com/airplanman/super-pom/1.1.4/super-pom-1.1.4.pom&lt;span class=&quot;nt&quot;&gt;&amp;lt;/relativePath&amp;gt;&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;&amp;lt;/parent&amp;gt;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;For more info regarding parent pom refer to:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;DZone: &lt;a href=&quot;https://dzone.com/articles/mavens-non-resolvable-parent&quot;&gt;Maven Non Resolvable parent pom&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;StackOverflow &lt;a href=&quot;https://stackoverflow.com/questions/7612309/maven-non-resolvable-parent-pom&quot;&gt;#7612309 Non Resolvable parent pom&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://www.google.com/search?client=firefox-b-d&amp;amp;q=offline+non+resolvable+parent+pom&quot;&gt;Google search: Offline Non Resolvable parent pom&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;step-7-configure-maven-to-work-offline&quot;&gt;Step 7: Configure Maven to work offline&lt;/h3&gt;
-
-&lt;p&gt;Edit your Maven &lt;code class=&quot;highlighter-rouge&quot;&gt;settings.xml&lt;/code&gt; file in the following lines:&lt;/p&gt;
-
-&lt;div class=&quot;language-xml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;&amp;lt;!-- (Optional) Set the path to your local repository --&amp;gt;&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;&amp;lt;localRepository&amp;gt;&lt;/span&gt;/path/to/local/repo&lt;span class=&quot;nt&quot;&gt;&amp;lt;/localRepository&amp;gt;&lt;/span&gt;
-
-&lt;span class=&quot;c&quot;&gt;&amp;lt;!-- Run Maven in Offline mode --&amp;gt;&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;&amp;lt;offline&amp;gt;&lt;/span&gt;true&lt;span class=&quot;nt&quot;&gt;&amp;lt;/offline&amp;gt;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;h3 id=&quot;step-8-execute-your-goals-with--o-and--nsu-flag&quot;&gt;Step 8: Execute your goals with -o and -nsu flag&lt;/h3&gt;
-
-&lt;p&gt;It is useful that you run your goals with &lt;code class=&quot;highlighter-rouge&quot;&gt;-o&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;-nsu&lt;/code&gt; flags. According to &lt;a href=&quot;https://maven.apache.org/ref/3.1.0/maven-embedder/cli.html&quot;&gt;documentation&lt;/a&gt;:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;-o&lt;/code&gt;: Work offline&lt;/li&gt;
-  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt; -nsu,--no-snapshot-updates&lt;/code&gt;: Suppress SNAPSHOT updates&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;Thus your goal will look like this:&lt;/p&gt;
-
-&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;mvn &lt;span class=&quot;nt&quot;&gt;-nsu&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-o&lt;/span&gt; clean &lt;span class=&quot;nb&quot;&gt;install&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;h2 id=&quot;troubleshooting&quot;&gt;Troubleshooting&lt;/h2&gt;
-
-&lt;h3 id=&quot;cannot-access-central-httpsrepomavenapacheorgmaven2-in-offline-mode-and-the-artifact-orgapachemavenplugins&quot;&gt;Cannot access central (https://repo.maven.apache.org/maven2) in offline mode and the artifact org.apache.maven.plugins…&lt;/h3&gt;
-
-&lt;p&gt;You may step on this error:&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;[WARNING] The POM for org.apache.maven.plugins:maven-resources-plugin:jar:2.6 is missing, no dependency information available
-[INFO] ---------------------------------------------
-[INFO] BUILD FAILURE
-[INFO] ------------------------------------------------------
-[ERROR] Plugin org.apache.maven.plugins:maven-resources-plugin:2.6 or one of its dependencies could not be resolved: Cannot access central (https://repo.maven.apache.org/maven2) in offline mode and the artifact org.apache.maven.plugins:maven-resources-plugin:jar:2.6 has not been downloaded from it before. -&amp;gt; [Help 1]
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;if you omit &lt;strong&gt;Step 3&lt;/strong&gt;. Maven tries to download it’s plugins to run the goals but they do not exist.&lt;/p&gt;
-
-&lt;h3 id=&quot;non-resolvable-parent-pom--and-parentrelativepath-points-at-no-local-pom&quot;&gt;Non-resolvable parent POM […] and ‘parent.relativePath’ points at no local POM&lt;/h3&gt;
-
-&lt;p&gt;If you see an error similar to the following:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&quot;language-log&quot;&gt;[INFO] Scanning for projects...
-[DEBUG] Verifying availability of C:\Users\admin_manios\.m2\repository\com\airplanman\super-pom\1.1.4\super-pom-1.1.4.pom from [central (https://repo.maven.apache.org/maven2, default, releases)]
-[ERROR] [ERROR] Some problems were encountered while processing the POMs:
-[FATAL] Non-resolvable parent POM for airplanman.airsprinkler:jetengine:2.5.0-SNAPSHOT: Cannot access central (https://repo.maven.apache.org/maven2) in offline mode and the artifact com.airplaneman:super-pom:pom:1.1.4 has not been downloaded from it before. and 'parent.relativePath' points at no local POM @ line 10, column 10
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;then it means that either you did not copy the parent pom in your local repository for offline usage, or you did not set correctly the &lt;code class=&quot;highlighter-rouge&quot;&gt;relativePath&lt;/code&gt;. Please refer to &lt;strong&gt;Step 6&lt;/strong&gt;.&lt;/p&gt;
-
-&lt;h3 id=&quot;maven-attempts-to-download-artifacts-although-we-have-configure-it-for-offline-mode&quot;&gt;Maven attempts to download artifacts although we have configure it for offline mode&lt;/h3&gt;
-
-&lt;p&gt;Either you have not downloaded all your dependencies as described in &lt;strong&gt;Step 2&lt;/strong&gt; or you have not deleted the files described in &lt;strong&gt;Step 5.&lt;/strong&gt;&lt;/p&gt;
-
-&lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h2&gt;
-
-&lt;p&gt;I hope this article helps you and you will not waste so much time to do the same. Have a nice day and a wonderful and fruitful life!&lt;/p&gt;</content><author><name>cmanios</name></author><category term="MongoDB" /><category term="Database" /><category term="NoSQL" /><category term="maven" /><category term="offline" /><category term="goal" /><category term="dependencies" /><category term="without" /><category term="internet" /><category term="connection" /><category term="parent" /><category term="pom" /><category term="non" /><category term="resolvable" /><summary type="html">Debugging an application which runs on a remote Virtual Machine can prove to be very hard, especially if your client has “exceptional” conditions due to security, company or any other psycological measures/policies. For example, your VM can be a Windows machine (yes, Windows servers are an exception themselves and impose many issues and difficulties), it may have no internet connection or accept no traffic other than http and RDP. Typically we as developers are called to confront such installations and make them work. As a paralellism, we are asked to fix a vehicle engine through the exhaust pipe without having access to the hood!</summary></entry></feed>
+&lt;p&gt;This is it! Very simple and straightforward! I hope this article helps you and you will not devote much time to do the same. Have a nice day from a stormy Greece!&lt;/p&gt;</content><author><name>cmanios</name></author><category term="Markdown" /><category term="PDF" /><category term="File" /><category term="Conversion" /><category term="markdown" /><category term="md" /><category term="pdf" /><category term="docker" /><category term="asciidoctor" /><category term="convert" /><category term="file" /><category term="container" /><summary type="html">Today we had to deliver a .pdf file to a customer containing documentation about a system. The documentation was written in Markdown and needed to be converted to PDF. After some thoughts we did not find some straightforward way to do it, so we needed to convert Markdown to Asciidoctor using Pandoc first and then from Asciidoctor to PDF. In addition to that, we love Docker, so we used Docker containers to achieve that. The containers used:</summary></entry></feed>

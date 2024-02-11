@@ -406,4 +406,10 @@ var store = [{
         "tags": ["java","hibernate","oracle","database","function","overflow","error","spring","spring-boot"],
         "url": "https://manios.org/2023/08/30/java-spring-hibernate-error-ora-17026-numeric-overflow-oracle-function-call",
         "teaser": null
+      },{
+        "title": "Linux Mint Mate configure screensaver and display sleep via command line",
+        "excerpt":"Problem A few days ago, while we were watching a film in VLC player in my laptop which runs Linux Mint 20.1 MATE, the screen went into screensaver mode. This happened multiple times and we had to press a button to make the screen come back. We have searched the...","categories": ["Linux","Mint","Ubuntu","Bash"],
+        "tags": ["linux","mint","screensaver","configure","display","sleep","power","management"],
+        "url": "https://manios.org/2024/02/11/linux-mint-mate-screensaver-command-line-configure-enable-disable",
+        "teaser": null
       }]
