@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Untracked on Christos Manios</title>
+        <link>https://manios.org/tags/untracked/</link>
+        <description>Recent content in Untracked on Christos Manios</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>en-us</language>
+        <lastBuildDate>Sat, 12 Apr 2014 16:35:56 +0300</lastBuildDate><atom:link href="https://manios.org/tags/untracked/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>Export Untracked, modified, moved and deleted files from a Git repository to archive</title>
+        <link>https://manios.org/2014/04/12/export-untracked-modified-moved-and-deleted-files-from-a-git-repository-to-archive/</link>
+        <pubDate>Sat, 12 Apr 2014 16:35:56 +0300</pubDate>
+        
+        <guid>https://manios.org/2014/04/12/export-untracked-modified-moved-and-deleted-files-from-a-git-repository-to-archive/</guid>
+        <description>&lt;p&gt;Today I wanted to export to a .tar.gz archive all unstracked (new) , modified and deleted files from a Git repository. After some searching, I found &lt;a class=&#34;link&#34; href=&#34;http://stackoverflow.com/questions/855767/can-i-use-git-diff-on-untracked-files&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;a StackOverflow post&lt;/a&gt; which helped a lot. So after you &lt;strong&gt;cd&lt;/strong&gt; inside your repository and you have two options:&lt;/p&gt;
+&lt;h2 id=&#34;export-modified-moved-and-deleted-files&#34;&gt;Export modified moved and deleted files
+&lt;/h2&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;tar zvcf ~/new-files-cache.tar.gz &lt;span class=&#34;sb&#34;&gt;`&lt;/span&gt;git diff --name-only --diff-filter&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;ACMRT&lt;span class=&#34;sb&#34;&gt;`&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id=&#34;export-untracked-new-modified-and-deleted-files&#34;&gt;Export &lt;strong&gt;Untracked (new)&lt;/strong&gt;, modified and deleted files
+&lt;/h2&gt;&lt;p&gt;To achieve that I followed another custom route. If you find something smarter, please inform me!&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;tar zvcf ~/new-files-cache.tar.gz &lt;span class=&#34;sb&#34;&gt;`&lt;/span&gt; git status --short &lt;span class=&#34;p&#34;&gt;|&lt;/span&gt; sed &lt;span class=&#34;s1&#34;&gt;&amp;#39;s/^ *[^ ]* \(.*\)/\1/g&amp;#39;&lt;/span&gt; &lt;span class=&#34;sb&#34;&gt;`&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;That&amp;rsquo;s it! Have fun with Git!&lt;/p&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>

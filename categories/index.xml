@@ -1,0 +1,531 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Categories on Christos Manios</title>
+        <link>https://manios.org/categories/</link>
+        <description>Recent content in Categories on Christos Manios</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>en-us</language>
+        <lastBuildDate>Sat, 22 Nov 2025 12:43:27 +0200</lastBuildDate><atom:link href="https://manios.org/categories/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>Database</title>
+        <link>https://manios.org/categories/database/</link>
+        <pubDate>Sat, 22 Nov 2025 12:43:27 +0200</pubDate>
+        
+        <guid>https://manios.org/categories/database/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Postgres</title>
+        <link>https://manios.org/categories/postgres/</link>
+        <pubDate>Sat, 22 Nov 2025 12:43:27 +0200</pubDate>
+        
+        <guid>https://manios.org/categories/postgres/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>SQL</title>
+        <link>https://manios.org/categories/sql/</link>
+        <pubDate>Sat, 22 Nov 2025 12:43:27 +0200</pubDate>
+        
+        <guid>https://manios.org/categories/sql/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Bash</title>
+        <link>https://manios.org/categories/bash/</link>
+        <pubDate>Sun, 11 Feb 2024 14:17:00 +0200</pubDate>
+        
+        <guid>https://manios.org/categories/bash/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Linux</title>
+        <link>https://manios.org/categories/linux/</link>
+        <pubDate>Sun, 11 Feb 2024 14:17:00 +0200</pubDate>
+        
+        <guid>https://manios.org/categories/linux/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Mint</title>
+        <link>https://manios.org/categories/mint/</link>
+        <pubDate>Sun, 11 Feb 2024 14:17:00 +0200</pubDate>
+        
+        <guid>https://manios.org/categories/mint/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Ubuntu</title>
+        <link>https://manios.org/categories/ubuntu/</link>
+        <pubDate>Sun, 11 Feb 2024 14:17:00 +0200</pubDate>
+        
+        <guid>https://manios.org/categories/ubuntu/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Hibernate</title>
+        <link>https://manios.org/categories/hibernate/</link>
+        <pubDate>Wed, 30 Aug 2023 22:43:27 +0300</pubDate>
+        
+        <guid>https://manios.org/categories/hibernate/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Java</title>
+        <link>https://manios.org/categories/java/</link>
+        <pubDate>Wed, 30 Aug 2023 22:43:27 +0300</pubDate>
+        
+        <guid>https://manios.org/categories/java/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Oracle</title>
+        <link>https://manios.org/categories/oracle/</link>
+        <pubDate>Wed, 30 Aug 2023 22:43:27 +0300</pubDate>
+        
+        <guid>https://manios.org/categories/oracle/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Spring</title>
+        <link>https://manios.org/categories/spring/</link>
+        <pubDate>Wed, 30 Aug 2023 22:43:27 +0300</pubDate>
+        
+        <guid>https://manios.org/categories/spring/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Spring Boot</title>
+        <link>https://manios.org/categories/spring-boot/</link>
+        <pubDate>Wed, 30 Aug 2023 22:43:27 +0300</pubDate>
+        
+        <guid>https://manios.org/categories/spring-boot/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Kubernetes</title>
+        <link>https://manios.org/categories/kubernetes/</link>
+        <pubDate>Sun, 18 Jun 2023 16:50:00 +0300</pubDate>
+        
+        <guid>https://manios.org/categories/kubernetes/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Databases</title>
+        <link>https://manios.org/categories/databases/</link>
+        <pubDate>Fri, 23 Dec 2022 20:00:00 +0200</pubDate>
+        
+        <guid>https://manios.org/categories/databases/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>MS SQL</title>
+        <link>https://manios.org/categories/ms-sql/</link>
+        <pubDate>Fri, 23 Dec 2022 20:00:00 +0200</pubDate>
+        
+        <guid>https://manios.org/categories/ms-sql/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>MS SQL Server</title>
+        <link>https://manios.org/categories/ms-sql-server/</link>
+        <pubDate>Fri, 23 Dec 2022 20:00:00 +0200</pubDate>
+        
+        <guid>https://manios.org/categories/ms-sql-server/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Go</title>
+        <link>https://manios.org/categories/go/</link>
+        <pubDate>Wed, 04 Aug 2021 21:55:00 +0300</pubDate>
+        
+        <guid>https://manios.org/categories/go/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Golang</title>
+        <link>https://manios.org/categories/golang/</link>
+        <pubDate>Wed, 04 Aug 2021 21:55:00 +0300</pubDate>
+        
+        <guid>https://manios.org/categories/golang/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>MongoDB</title>
+        <link>https://manios.org/categories/mongodb/</link>
+        <pubDate>Wed, 04 Aug 2021 21:55:00 +0300</pubDate>
+        
+        <guid>https://manios.org/categories/mongodb/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>JSON</title>
+        <link>https://manios.org/categories/json/</link>
+        <pubDate>Sat, 24 Jul 2021 19:27:00 +0300</pubDate>
+        
+        <guid>https://manios.org/categories/json/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Camera</title>
+        <link>https://manios.org/categories/camera/</link>
+        <pubDate>Sun, 12 Jan 2020 12:19:00 +0200</pubDate>
+        
+        <guid>https://manios.org/categories/camera/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Lenovo</title>
+        <link>https://manios.org/categories/lenovo/</link>
+        <pubDate>Sun, 12 Jan 2020 12:19:00 +0200</pubDate>
+        
+        <guid>https://manios.org/categories/lenovo/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Conversion</title>
+        <link>https://manios.org/categories/conversion/</link>
+        <pubDate>Wed, 08 Jan 2020 18:01:00 +0200</pubDate>
+        
+        <guid>https://manios.org/categories/conversion/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>File</title>
+        <link>https://manios.org/categories/file/</link>
+        <pubDate>Wed, 08 Jan 2020 18:01:00 +0200</pubDate>
+        
+        <guid>https://manios.org/categories/file/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Markdown</title>
+        <link>https://manios.org/categories/markdown/</link>
+        <pubDate>Wed, 08 Jan 2020 18:01:00 +0200</pubDate>
+        
+        <guid>https://manios.org/categories/markdown/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>PDF</title>
+        <link>https://manios.org/categories/pdf/</link>
+        <pubDate>Wed, 08 Jan 2020 18:01:00 +0200</pubDate>
+        
+        <guid>https://manios.org/categories/pdf/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>NoSQL</title>
+        <link>https://manios.org/categories/nosql/</link>
+        <pubDate>Wed, 21 Aug 2019 20:57:53 +0300</pubDate>
+        
+        <guid>https://manios.org/categories/nosql/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>HP</title>
+        <link>https://manios.org/categories/hp/</link>
+        <pubDate>Sun, 07 Oct 2018 21:54:00 +0300</pubDate>
+        
+        <guid>https://manios.org/categories/hp/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Notebook</title>
+        <link>https://manios.org/categories/notebook/</link>
+        <pubDate>Sun, 07 Oct 2018 21:54:00 +0300</pubDate>
+        
+        <guid>https://manios.org/categories/notebook/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Beats</title>
+        <link>https://manios.org/categories/beats/</link>
+        <pubDate>Fri, 05 Oct 2018 22:35:00 +0300</pubDate>
+        
+        <guid>https://manios.org/categories/beats/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Elastic</title>
+        <link>https://manios.org/categories/elastic/</link>
+        <pubDate>Fri, 05 Oct 2018 22:35:00 +0300</pubDate>
+        
+        <guid>https://manios.org/categories/elastic/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Elasticsearch</title>
+        <link>https://manios.org/categories/elasticsearch/</link>
+        <pubDate>Sat, 18 Aug 2018 10:13:44 +0300</pubDate>
+        
+        <guid>https://manios.org/categories/elasticsearch/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Rsyslog</title>
+        <link>https://manios.org/categories/rsyslog/</link>
+        <pubDate>Sat, 18 Aug 2018 10:13:44 +0300</pubDate>
+        
+        <guid>https://manios.org/categories/rsyslog/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Logstash</title>
+        <link>https://manios.org/categories/logstash/</link>
+        <pubDate>Tue, 14 Aug 2018 18:35:00 +0300</pubDate>
+        
+        <guid>https://manios.org/categories/logstash/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Git</title>
+        <link>https://manios.org/categories/git/</link>
+        <pubDate>Wed, 30 May 2018 20:42:00 +0300</pubDate>
+        
+        <guid>https://manios.org/categories/git/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Debian</title>
+        <link>https://manios.org/categories/debian/</link>
+        <pubDate>Thu, 14 Dec 2017 10:42:00 +0200</pubDate>
+        
+        <guid>https://manios.org/categories/debian/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>HAProxy</title>
+        <link>https://manios.org/categories/haproxy/</link>
+        <pubDate>Wed, 15 Nov 2017 12:14:00 +0200</pubDate>
+        
+        <guid>https://manios.org/categories/haproxy/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Solr</title>
+        <link>https://manios.org/categories/solr/</link>
+        <pubDate>Wed, 15 Nov 2017 12:14:00 +0200</pubDate>
+        
+        <guid>https://manios.org/categories/solr/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Text Editor</title>
+        <link>https://manios.org/categories/text-editor/</link>
+        <pubDate>Tue, 17 Oct 2017 21:27:48 +0300</pubDate>
+        
+        <guid>https://manios.org/categories/text-editor/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Eclipse</title>
+        <link>https://manios.org/categories/eclipse/</link>
+        <pubDate>Wed, 09 Aug 2017 13:14:00 +0300</pubDate>
+        
+        <guid>https://manios.org/categories/eclipse/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Apache</title>
+        <link>https://manios.org/categories/apache/</link>
+        <pubDate>Tue, 12 Jul 2016 22:32:53 +0300</pubDate>
+        
+        <guid>https://manios.org/categories/apache/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>HTTP</title>
+        <link>https://manios.org/categories/http/</link>
+        <pubDate>Tue, 12 Jul 2016 22:32:53 +0300</pubDate>
+        
+        <guid>https://manios.org/categories/http/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Docker</title>
+        <link>https://manios.org/categories/docker/</link>
+        <pubDate>Fri, 04 Dec 2015 22:47:06 +0200</pubDate>
+        
+        <guid>https://manios.org/categories/docker/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Gitlab</title>
+        <link>https://manios.org/categories/gitlab/</link>
+        <pubDate>Fri, 04 Dec 2015 22:47:06 +0200</pubDate>
+        
+        <guid>https://manios.org/categories/gitlab/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Source Control</title>
+        <link>https://manios.org/categories/source-control/</link>
+        <pubDate>Fri, 04 Dec 2015 22:47:06 +0200</pubDate>
+        
+        <guid>https://manios.org/categories/source-control/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Lucene</title>
+        <link>https://manios.org/categories/lucene/</link>
+        <pubDate>Sat, 01 Nov 2014 16:40:40 +0200</pubDate>
+        
+        <guid>https://manios.org/categories/lucene/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Windows</title>
+        <link>https://manios.org/categories/windows/</link>
+        <pubDate>Sat, 01 Nov 2014 16:40:40 +0200</pubDate>
+        
+        <guid>https://manios.org/categories/windows/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Nginx</title>
+        <link>https://manios.org/categories/nginx/</link>
+        <pubDate>Sat, 12 Apr 2014 17:32:52 +0300</pubDate>
+        
+        <guid>https://manios.org/categories/nginx/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Server</title>
+        <link>https://manios.org/categories/server/</link>
+        <pubDate>Sat, 12 Apr 2014 17:32:52 +0300</pubDate>
+        
+        <guid>https://manios.org/categories/server/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Python</title>
+        <link>https://manios.org/categories/python/</link>
+        <pubDate>Tue, 31 Dec 2013 08:12:33 +0200</pubDate>
+        
+        <guid>https://manios.org/categories/python/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Android</title>
+        <link>https://manios.org/categories/android/</link>
+        <pubDate>Mon, 28 Oct 2013 23:22:48 +0200</pubDate>
+        
+        <guid>https://manios.org/categories/android/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>SQLite</title>
+        <link>https://manios.org/categories/sqlite/</link>
+        <pubDate>Mon, 28 Oct 2013 23:22:48 +0200</pubDate>
+        
+        <guid>https://manios.org/categories/sqlite/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Virtualisation</title>
+        <link>https://manios.org/categories/virtualisation/</link>
+        <pubDate>Wed, 12 Jun 2013 08:57:35 +0300</pubDate>
+        
+        <guid>https://manios.org/categories/virtualisation/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Vmware</title>
+        <link>https://manios.org/categories/vmware/</link>
+        <pubDate>Wed, 12 Jun 2013 08:57:35 +0300</pubDate>
+        
+        <guid>https://manios.org/categories/vmware/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Raspbian</title>
+        <link>https://manios.org/categories/raspbian/</link>
+        <pubDate>Tue, 23 Apr 2013 16:34:21 +0300</pubDate>
+        
+        <guid>https://manios.org/categories/raspbian/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Mysql</title>
+        <link>https://manios.org/categories/mysql/</link>
+        <pubDate>Fri, 19 Apr 2013 10:24:58 +0300</pubDate>
+        
+        <guid>https://manios.org/categories/mysql/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Raspberry Pi</title>
+        <link>https://manios.org/categories/raspberry-pi/</link>
+        <pubDate>Sun, 10 Mar 2013 13:09:32 +0200</pubDate>
+        
+        <guid>https://manios.org/categories/raspberry-pi/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>PHP</title>
+        <link>https://manios.org/categories/php/</link>
+        <pubDate>Tue, 05 Mar 2013 14:36:24 +0200</pubDate>
+        
+        <guid>https://manios.org/categories/php/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Networking</title>
+        <link>https://manios.org/categories/networking/</link>
+        <pubDate>Wed, 27 Feb 2013 16:45:15 +0200</pubDate>
+        
+        <guid>https://manios.org/categories/networking/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Smtp</title>
+        <link>https://manios.org/categories/smtp/</link>
+        <pubDate>Wed, 27 Feb 2013 16:45:15 +0200</pubDate>
+        
+        <guid>https://manios.org/categories/smtp/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Sql Server</title>
+        <link>https://manios.org/categories/sql-server/</link>
+        <pubDate>Wed, 26 Sep 2012 14:52:39 +0300</pubDate>
+        
+        <guid>https://manios.org/categories/sql-server/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>PowerBuilder</title>
+        <link>https://manios.org/categories/powerbuilder/</link>
+        <pubDate>Fri, 24 Aug 2012 14:27:26 +0300</pubDate>
+        
+        <guid>https://manios.org/categories/powerbuilder/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Application Server</title>
+        <link>https://manios.org/categories/application-server/</link>
+        <pubDate>Tue, 08 May 2012 10:31:12 +0300</pubDate>
+        
+        <guid>https://manios.org/categories/application-server/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>JBoss</title>
+        <link>https://manios.org/categories/jboss/</link>
+        <pubDate>Tue, 08 May 2012 10:31:12 +0300</pubDate>
+        
+        <guid>https://manios.org/categories/jboss/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Example Category</title>
+        <link>https://manios.org/categories/example-category/</link>
+        <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+        
+        <guid>https://manios.org/categories/example-category/</guid>
+        <description></description>
+        </item>
+        
+    </channel>
+</rss>

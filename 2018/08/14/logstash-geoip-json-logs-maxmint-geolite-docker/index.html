@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="Today we wanted to parse some json logs which we had in a file using Logstash and enrich them with Geolocation information regarding the city and the ISP an IP belongs. The file, (let&rsquo;s call it /var/log/input-geo.json) had the following structure:\n1 2 {&#34;name&#34;:&#34;Christos&#34;,&#34;src_ip&#34;:&#34;63.145.248.101&#34;,&#34;age&#34;:12} {&#34;name&#34;:&#34;Nikos&#34;,&#34;src_ip&#34;:&#34;98.158.156.175&#34;,&#34;age&#34;:10} Logstash has GeoIP filter which adds information about the geographical location of IP addresses, based on data from the Maxmind GeoLite2 databases. In our case we used:\n">
+<title>Logstash - Enrich IP with Geolocation using Maxmind GeoLite2 City and ISP</title>
+
+<link rel='canonical' href='https://manios.org/2018/08/14/logstash-geoip-json-logs-maxmint-geolite-docker/'>
+
+<link rel="stylesheet" href="/scss/style.min.b0e76e98cdd4f7082d1fc36f7af7e0843a81201db2197c03ca426751dc923735.css"><meta property='og:title' content="Logstash - Enrich IP with Geolocation using Maxmind GeoLite2 City and ISP">
+<meta property='og:description' content="Today we wanted to parse some json logs which we had in a file using Logstash and enrich them with Geolocation information regarding the city and the ISP an IP belongs. The file, (let&rsquo;s call it /var/log/input-geo.json) had the following structure:\n1 2 {&#34;name&#34;:&#34;Christos&#34;,&#34;src_ip&#34;:&#34;63.145.248.101&#34;,&#34;age&#34;:12} {&#34;name&#34;:&#34;Nikos&#34;,&#34;src_ip&#34;:&#34;98.158.156.175&#34;,&#34;age&#34;:10} Logstash has GeoIP filter which adds information about the geographical location of IP addresses, based on data from the Maxmind GeoLite2 databases. In our case we used:\n">
+<meta property='og:url' content='https://manios.org/2018/08/14/logstash-geoip-json-logs-maxmint-geolite-docker/'>
+<meta property='og:site_name' content='Christos Manios'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='logstash' /><meta property='article:tag' content='geolocation' /><meta property='article:tag' content='ip' /><meta property='article:tag' content='geoip' /><meta property='article:tag' content='maxmind' /><meta property='article:tag' content='geo' /><meta property='article:tag' content='geolite' /><meta property='article:tag' content='geolite2' /><meta property='article:tag' content='database' /><meta property='article:tag' content='json' /><meta property='article:tag' content='parse' /><meta property='article:tag' content='message' /><meta property='article:tag' content='log' /><meta property='article:published_time' content='2018-08-14T18:35:00&#43;03:00'/><meta property='article:modified_time' content='2018-08-14T18:35:00&#43;03:00'/>
+<meta name="twitter:title" content="Logstash - Enrich IP with Geolocation using Maxmind GeoLite2 City and ISP">
+<meta name="twitter:description" content="Today we wanted to parse some json logs which we had in a file using Logstash and enrich them with Geolocation information regarding the city and the ISP an IP belongs. The file, (let&rsquo;s call it /var/log/input-geo.json) had the following structure:\n1 2 {&#34;name&#34;:&#34;Christos&#34;,&#34;src_ip&#34;:&#34;63.145.248.101&#34;,&#34;age&#34;:12} {&#34;name&#34;:&#34;Nikos&#34;,&#34;src_ip&#34;:&#34;98.158.156.175&#34;,&#34;age&#34;:10} Logstash has GeoIP filter which adds information about the geographical location of IP addresses, based on data from the Maxmind GeoLite2 databases. In our case we used:\n">
+    <link rel="shortcut icon" href="/favicon.png" />
+
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-7TD74CVVZ2"></script>
+      <script>
+        var doNotTrack = false;
+        if ( false ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-7TD74CVVZ2');
+        }
+      </script>
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avatar_hu_b3778195aee6cc3.png" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Christos Manios</a></h1>
+            <h2 class="site-description">Developer life is a NullPointerException</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/manios'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://www.linkedin.com/in/christos-manios-23b6953a/'
+                        target="_blank"
+                        title="Linkedin"
+                        rel="me"
+                    >
+                        
+                        
+                            <?xml version="1.0" encoding="iso-8859-1"?>
+<!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+<svg height="800px" width="800px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
+	 viewBox="0 0 382 382" xml:space="preserve">
+<path style="fill:#0077B7;" d="M347.445,0H34.555C15.471,0,0,15.471,0,34.555v312.889C0,366.529,15.471,382,34.555,382h312.889
+	C366.529,382,382,366.529,382,347.444V34.555C382,15.471,366.529,0,347.445,0z M118.207,329.844c0,5.554-4.502,10.056-10.056,10.056
+	H65.345c-5.554,0-10.056-4.502-10.056-10.056V150.403c0-5.554,4.502-10.056,10.056-10.056h42.806
+	c5.554,0,10.056,4.502,10.056,10.056V329.844z M86.748,123.432c-22.459,0-40.666-18.207-40.666-40.666S64.289,42.1,86.748,42.1
+	s40.666,18.207,40.666,40.666S109.208,123.432,86.748,123.432z M341.91,330.654c0,5.106-4.14,9.246-9.246,9.246H286.73
+	c-5.106,0-9.246-4.14-9.246-9.246v-84.168c0-12.556,3.683-55.021-32.813-55.021c-28.309,0-34.051,29.066-35.204,42.11v97.079
+	c0,5.106-4.139,9.246-9.246,9.246h-44.426c-5.106,0-9.246-4.14-9.246-9.246V149.593c0-5.106,4.14-9.246,9.246-9.246h44.426
+	c5.106,0,9.246,4.14,9.246,9.246v15.655c10.497-15.753,26.097-27.912,59.312-27.912c73.552,0,73.131,68.716,73.131,106.472
+	L341.91,330.654L341.91,330.654z"/>
+</svg>
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://x.com/maniosolr'
+                        target="_blank"
+                        title="Twitter"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>Home</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/about/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>About</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/logstash/" >
+                Logstash
+            </a>
+        
+            <a href="/categories/elasticsearch/" >
+                Elasticsearch
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/2018/08/14/logstash-geoip-json-logs-maxmint-geolite-docker/">Logstash - Enrich IP with Geolocation using Maxmind GeoLite2 City and ISP</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published" datetime='2018-08-14T18:35:00&#43;03:00'>Aug 14, 2018</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    3 minute read
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <p>Today we wanted to parse some json logs which we had in a file using Logstash and enrich  them with Geolocation information regarding the city and the ISP an IP belongs. The file, (let&rsquo;s call it <code>/var/log/input-geo.json</code>) had the following structure:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="p">{</span><span class="nt">&#34;name&#34;</span><span class="p">:</span><span class="s2">&#34;Christos&#34;</span><span class="p">,</span><span class="nt">&#34;src_ip&#34;</span><span class="p">:</span><span class="s2">&#34;63.145.248.101&#34;</span><span class="p">,</span><span class="nt">&#34;age&#34;</span><span class="p">:</span><span class="mi">12</span><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span><span class="nt">&#34;name&#34;</span><span class="p">:</span><span class="s2">&#34;Nikos&#34;</span><span class="p">,</span><span class="nt">&#34;src_ip&#34;</span><span class="p">:</span><span class="s2">&#34;98.158.156.175&#34;</span><span class="p">,</span><span class="nt">&#34;age&#34;</span><span class="p">:</span><span class="mi">10</span><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Logstash has <a class="link" href="https://www.elastic.co/guide/en/logstash/current/plugins-filters-geoip.html"  target="_blank" rel="noopener"
+    >GeoIP filter</a> which adds information about the geographical location of IP addresses, based on data from the Maxmind GeoLite2 databases. In our case we used:</p>
+<ul>
+<li><a class="link" href="https://dev.maxmind.com/geoip/geoip2/geolite2/"  target="_blank" rel="noopener"
+    >GeoLite2 City</a> database (free)</li>
+<li><a class="link" href="https://www.maxmind.com/en/geoip2-isp-database"  target="_blank" rel="noopener"
+    >GeoIP2 ISP </a> Database (commercial licence)</li>
+</ul>
+<p>We wanted to parse the JSON file enrich the <code>src_ip</code> and then forward it to <a class="link" href="https://www.elastic.co/guide/en/logstash/current/plugins-outputs-elasticsearch.html"  target="_blank" rel="noopener"
+    >Elasticsearch</a>. For debugging purposes we also enabled <a class="link" href="https://www.elastic.co/guide/en/logstash/current/plugins-outputs-file.html"  target="_blank" rel="noopener"
+    >file output</a>. Thus , the configuration (<code>logstash.conf</code>) looked like the following:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-ruby" data-lang="ruby"><span class="line"><span class="cl"><span class="n">input</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="n">file</span> <span class="p">{</span> 
+</span></span><span class="line"><span class="cl">    <span class="n">path</span> <span class="o">=&gt;</span> <span class="o">[</span><span class="s2">&#34;/var/log/input-geo.json&#34;</span><span class="o">]</span>
+</span></span><span class="line"><span class="cl">    <span class="n">sincedb_path</span> <span class="o">=&gt;</span> <span class="s2">&#34;/usr/share/logstash/geo-sincedb1&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">start_position</span> <span class="o">=&gt;</span> <span class="s2">&#34;beginning&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">codec</span> <span class="o">=&gt;</span> <span class="s2">&#34;json&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">type</span> <span class="o">=&gt;</span> <span class="s2">&#34;mygeo&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">filter</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1"># Enhance with City geolocation information using free GeoLite2 City database</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="o">[</span><span class="n">src_ip</span><span class="o">]</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">geoip</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">source</span> <span class="o">=&gt;</span> <span class="s2">&#34;src_ip&#34;</span>
+</span></span><span class="line"><span class="cl">            <span class="n">target</span> <span class="o">=&gt;</span> <span class="s2">&#34;src_geoip&#34;</span>
+</span></span><span class="line"><span class="cl">            <span class="n">database</span> <span class="o">=&gt;</span> <span class="s2">&#34;/usr/share/logstash/GeoLite2-City.mmdb&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1"># Enhance with ISP geolocation information using free GeoIP2 ISP Database</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="o">[</span><span class="n">src_ip</span><span class="o">]</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">geoip</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">source</span> <span class="o">=&gt;</span> <span class="s2">&#34;src_ip&#34;</span>
+</span></span><span class="line"><span class="cl">            <span class="n">target</span> <span class="o">=&gt;</span> <span class="s2">&#34;src_geoip&#34;</span>
+</span></span><span class="line"><span class="cl">            <span class="n">database</span> <span class="o">=&gt;</span> <span class="s2">&#34;/usr/share/logstash/GeoIP2-ISP.mmdb&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>  
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">output</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># stdout  { codec =&gt; rubydebug }</span>
+</span></span><span class="line"><span class="cl">     
+</span></span><span class="line"><span class="cl">    <span class="c1"># Output successfull messages to a file</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="s2">&#34;_grokparsefailure&#34;</span> <span class="ow">not</span> <span class="k">in</span> <span class="o">[</span><span class="n">tags</span><span class="o">]</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">file</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">path</span> <span class="o">=&gt;</span>  <span class="s2">&#34;/usr/share/logstash/success-debug.txt&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">codec</span> <span class="o">=&gt;</span> <span class="n">json_lines</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">#  codec =&gt; rubydebug</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  
+</span></span><span class="line"><span class="cl">    <span class="c1"># Output failed messages to a file </span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="s2">&#34;_grokparsefailure&#34;</span> <span class="k">in</span> <span class="o">[</span><span class="n">tags</span><span class="o">]</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">file</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">path</span> <span class="o">=&gt;</span>  <span class="s2">&#34;/usr/share/logstash/failed-debug.txt&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">codec</span> <span class="o">=&gt;</span> <span class="n">rubydebug</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"> 
+</span></span><span class="line"><span class="cl">    <span class="c1"># Output successfull messages to Elasticsearch</span>
+</span></span><span class="line"><span class="cl">    <span class="n">elasticsearch</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">hosts</span> <span class="o">=&gt;</span> <span class="o">[</span><span class="s2">&#34;192.168.1.3:9200&#34;</span><span class="o">]</span>
+</span></span><span class="line"><span class="cl">        <span class="n">index</span> <span class="o">=&gt;</span> <span class="s2">&#34;json_logs-%{+YYYY.MM.dd}&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">index</span> <span class="o">=&gt;</span> <span class="s2">&#34;192.168.1.3_login_events-%{+YYYY.MM.dd}&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">manage_template</span> <span class="o">=&gt;</span> <span class="kp">true</span>
+</span></span><span class="line"><span class="cl">        <span class="n">template_name</span> <span class="o">=&gt;</span> <span class="s2">&#34;login_events&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">template_overwrite</span> <span class="o">=&gt;</span> <span class="kp">true</span>
+</span></span><span class="line"><span class="cl">        <span class="n">protocol</span> <span class="o">=&gt;</span> <span class="n">http</span>
+</span></span><span class="line"><span class="cl">            <span class="n">flush_size</span> <span class="o">=&gt;</span> <span class="mi">512</span>
+</span></span><span class="line"><span class="cl">            <span class="n">workers</span> <span class="o">=&gt;</span> <span class="mi">8</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>To run Logstash we chose the quickest way, hence run it in Docker , so we have put all required Logstash configuration, logs and Maxmind databases in a directory:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">linux@linux-VM:~$ ls -l
+</span></span><span class="line"><span class="cl">-rwxrwxr-x <span class="m">1</span> linux linux <span class="m">26331174</span> Aug   <span class="m">6</span> 19:11 GeoIP2-ISP.mmdb
+</span></span><span class="line"><span class="cl">-rwxrwxr-x <span class="m">1</span> linux linux <span class="m">51469823</span> Aug   <span class="m">6</span> 19:11 GeoLite2-City.mmdb
+</span></span><span class="line"><span class="cl">-rw-rw-r-- <span class="m">1</span> linux linux      <span class="m">107</span> Aug  <span class="m">13</span> 19:13 input-geo.json
+</span></span><span class="line"><span class="cl">-rwxrwxr-x <span class="m">1</span> linux linux     <span class="m">2244</span> Aug  <span class="m">13</span> 19:32 logstash.conf
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Running Logstash on Docker is relatively easy as Docker images for are available from the <a class="link" href="https://www.docker.elastic.co/"  target="_blank" rel="noopener"
+    >Elastic Docker registry</a>. You can find more information <a class="link" href="https://www.elastic.co/guide/en/logstash/current/docker.html"  target="_blank" rel="noopener"
+    >here</a>. Let&rsquo;s run and interactive Docker container with Logstash 6.3.2:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-gdscript3" data-lang="gdscript3"><span class="line"><span class="cl"><span class="n">docker</span> <span class="n">run</span> <span class="o">-</span><span class="n">it</span> \
+</span></span><span class="line"><span class="cl">    <span class="o">--</span><span class="n">rm</span> \
+</span></span><span class="line"><span class="cl">    <span class="o">--</span><span class="n">name</span> <span class="n">logstash</span> \
+</span></span><span class="line"><span class="cl">    <span class="o">-</span><span class="n">v</span> <span class="o">$</span><span class="p">(</span><span class="n">pwd</span><span class="p">)</span><span class="o">/</span><span class="n">GeoIP2</span><span class="o">-</span><span class="n">ISP</span><span class="o">.</span><span class="n">mmdb</span><span class="p">:</span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">share</span><span class="o">/</span><span class="n">logstash</span><span class="o">/</span><span class="n">GeoIP2</span><span class="o">-</span><span class="n">ISP</span><span class="o">.</span><span class="n">mmdb</span> \
+</span></span><span class="line"><span class="cl">    <span class="o">-</span><span class="n">v</span> <span class="o">$</span><span class="p">(</span><span class="n">pwd</span><span class="p">)</span><span class="o">/</span><span class="n">GeoLite2</span><span class="o">-</span><span class="n">City</span><span class="o">.</span><span class="n">mmdb</span><span class="p">:</span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">share</span><span class="o">/</span><span class="n">logstash</span><span class="o">/</span><span class="n">GeoLite2</span><span class="o">-</span><span class="n">City</span><span class="o">.</span><span class="n">mmdb</span> \
+</span></span><span class="line"><span class="cl">    <span class="o">-</span><span class="n">v</span> <span class="o">$</span><span class="p">(</span><span class="n">pwd</span><span class="p">)</span><span class="o">/</span><span class="n">input</span><span class="o">-</span><span class="n">geo</span><span class="o">.</span><span class="n">json</span><span class="p">:</span><span class="o">/</span><span class="k">var</span><span class="o">/</span><span class="nb">log</span><span class="o">/</span><span class="n">input</span><span class="o">-</span><span class="n">geo</span><span class="o">.</span><span class="n">json</span> \
+</span></span><span class="line"><span class="cl">    <span class="o">-</span><span class="n">v</span> <span class="o">$</span><span class="p">(</span><span class="n">pwd</span><span class="p">)</span><span class="o">/</span><span class="n">logstash</span><span class="o">.</span><span class="n">conf</span><span class="p">:</span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">share</span><span class="o">/</span><span class="n">logstash</span><span class="o">/</span><span class="n">pipeline</span><span class="o">/</span><span class="n">logstash</span><span class="o">.</span><span class="n">conf</span> \
+</span></span><span class="line"><span class="cl">    <span class="n">docker</span><span class="o">.</span><span class="n">elastic</span><span class="o">.</span><span class="n">co</span><span class="o">/</span><span class="n">logstash</span><span class="o">/</span><span class="n">logstash</span><span class="o">-</span><span class="n">oss</span><span class="p">:</span><span class="mf">6.3</span><span class="o">.</span><span class="mi">2</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>While Logstash is running, if you examine Elasticsearch or <code>/usr/share/logstash/success-debug.txt</code>, you will notice that the messages contain a lot of geolocation information and they will resemble to the following:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;src_ip&#34;</span><span class="p">:</span> <span class="s2">&#34;63.145.248.101&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;path&#34;</span><span class="p">:</span> <span class="s2">&#34;/var/log/input-geo.json&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;host&#34;</span><span class="p">:</span> <span class="s2">&#34;a14a2394ba12&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;@timestamp&#34;</span><span class="p">:</span> <span class="s2">&#34;2018-08-13T17:33:05.894Z&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;type&#34;</span><span class="p">:</span> <span class="s2">&#34;mygeo&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;src_geoip&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;postal_code&#34;</span><span class="p">:</span> <span class="s2">&#34;94804&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;country_code3&#34;</span><span class="p">:</span> <span class="s2">&#34;US&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;dma_code&#34;</span><span class="p">:</span> <span class="mi">807</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;continent_code&#34;</span><span class="p">:</span> <span class="s2">&#34;NA&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;region_name&#34;</span><span class="p">:</span> <span class="s2">&#34;California&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;longitude&#34;</span><span class="p">:</span> <span class="mf">-122.3437</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;ip&#34;</span><span class="p">:</span> <span class="s2">&#34;63.145.248.101&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;isp&#34;</span><span class="p">:</span> <span class="s2">&#34;CenturyLink&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;region_code&#34;</span><span class="p">:</span> <span class="s2">&#34;CA&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;latitude&#34;</span><span class="p">:</span> <span class="mf">37.9255</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;as_org&#34;</span><span class="p">:</span> <span class="s2">&#34;Qwest Communications Company, LLC&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;country_code2&#34;</span><span class="p">:</span> <span class="s2">&#34;US&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;asn&#34;</span><span class="p">:</span> <span class="mi">209</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;location&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&#34;lon&#34;</span><span class="p">:</span> <span class="mf">-122.3437</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&#34;lat&#34;</span><span class="p">:</span> <span class="mf">37.9255</span>
+</span></span><span class="line"><span class="cl">        <span class="p">},</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;organization&#34;</span><span class="p">:</span> <span class="s2">&#34;CenturyLink&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;city_name&#34;</span><span class="p">:</span> <span class="s2">&#34;Richmond&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;country_name&#34;</span><span class="p">:</span> <span class="s2">&#34;United States&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;timezone&#34;</span><span class="p">:</span> <span class="s2">&#34;America/Los_Angeles&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">},</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;Christos&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;age&#34;</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;@version&#34;</span><span class="p">:</span> <span class="s2">&#34;1&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Thank God we have a geolocation result! We hope this article helped you get up and running!</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/logstash/">Logstash</a>
+        
+            <a href="/tags/geolocation/">Geolocation</a>
+        
+            <a href="/tags/ip/">Ip</a>
+        
+            <a href="/tags/geoip/">Geoip</a>
+        
+            <a href="/tags/maxmind/">Maxmind</a>
+        
+            <a href="/tags/geo/">Geo</a>
+        
+            <a href="/tags/geolite/">Geolite</a>
+        
+            <a href="/tags/geolite2/">Geolite2</a>
+        
+            <a href="/tags/database/">Database</a>
+        
+            <a href="/tags/json/">Json</a>
+        
+            <a href="/tags/parse/">Parse</a>
+        
+            <a href="/tags/message/">Message</a>
+        
+            <a href="/tags/log/">Log</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/2018/08/18/logstash-geoip-json-logs-maxmint-geolite-docker/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Rsyslog - Parse Json and enrich IP with Geolocation using Maxmind GeoLite2 City and ISP</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/2025/11/22/postgre-sql-perform-queries-in-json-array-sub-documents/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">PostgreSQL perform queries in JSON array sub-documents</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/2018/07/23/create-a-beat-based-on-metricbeat-resolving-bugs/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Creating a Beat based on Metricbeat resolving Init and create metricset failures</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/2018/04/03/java-soap-service-client-debug-http-message/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Debug HTTP request of Java SOAP JAX-WS web service client</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/2014/12/30/json-remove-new-lines-via-linux-and-use-it-as-string-variable-and-as-param-in-curl-post-request/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">JSON remove new lines via Linux and use it as string variable and as param in cURL POST request</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    <div class="disqus-container">
+    <div id="disqus_thread"></div>
+<script>
+    window.disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "manios-org" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+
+<style>
+    .disqus-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+</style>
+
+<script>
+    window.addEventListener('onColorSchemeChange', (e) => {
+        if (typeof DISQUS == 'object') {
+            DISQUS.reset({
+                reload: true
+            });
+        }
+    })
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2011 - 
+        
+        2025 Christos Manios
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.32.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.c922af694cc257bf1ecc41c0dd7b0430f9114ec280ccf67cd2c6ad55f5316c4e.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

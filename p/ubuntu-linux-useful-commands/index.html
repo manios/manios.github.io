@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="Updated: 2015-09-08\nChange keyboard layout to support both English (US) and Greek (GR) 1 setxkbmap -option grp:alt_shift_toggle us,gr Audjust monitor brightness and gamma 1 2 3 4 5 # make it darker xrandr --output LVDS1 --brightness 0.4 --gamma 1.6:1.6:1.6 # restore to default brightness and gamma xrandr --output LVDS1 --brightness 1 --gamma 1:1:1 Find top 10 largest files in / 1 2 3 4 sudo du -a / | sort -n -r | head -n 10 # or in human readable format cd / ; sudo du -hsx * | sort -rh | head -10 Source: cybercity\n">
+<title>Ubuntu Debian Linux useful commands</title>
+
+<link rel='canonical' href='https://manios.org/p/ubuntu-linux-useful-commands/'>
+
+<link rel="stylesheet" href="/scss/style.min.b0e76e98cdd4f7082d1fc36f7af7e0843a81201db2197c03ca426751dc923735.css"><meta property='og:title' content="Ubuntu Debian Linux useful commands">
+<meta property='og:description' content="Updated: 2015-09-08\nChange keyboard layout to support both English (US) and Greek (GR) 1 setxkbmap -option grp:alt_shift_toggle us,gr Audjust monitor brightness and gamma 1 2 3 4 5 # make it darker xrandr --output LVDS1 --brightness 0.4 --gamma 1.6:1.6:1.6 # restore to default brightness and gamma xrandr --output LVDS1 --brightness 1 --gamma 1:1:1 Find top 10 largest files in / 1 2 3 4 sudo du -a / | sort -n -r | head -n 10 # or in human readable format cd / ; sudo du -hsx * | sort -rh | head -10 Source: cybercity\n">
+<meta property='og:url' content='https://manios.org/p/ubuntu-linux-useful-commands/'>
+<meta property='og:site_name' content='Christos Manios'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='bash' /><meta property='article:tag' content='command' /><meta property='article:tag' content='debian' /><meta property='article:tag' content='linux' /><meta property='article:tag' content='shell' /><meta property='article:published_time' content='2012-08-10T00:27:29&#43;03:00'/><meta property='article:modified_time' content='2012-08-10T00:27:29&#43;03:00'/>
+<meta name="twitter:title" content="Ubuntu Debian Linux useful commands">
+<meta name="twitter:description" content="Updated: 2015-09-08\nChange keyboard layout to support both English (US) and Greek (GR) 1 setxkbmap -option grp:alt_shift_toggle us,gr Audjust monitor brightness and gamma 1 2 3 4 5 # make it darker xrandr --output LVDS1 --brightness 0.4 --gamma 1.6:1.6:1.6 # restore to default brightness and gamma xrandr --output LVDS1 --brightness 1 --gamma 1:1:1 Find top 10 largest files in / 1 2 3 4 sudo du -a / | sort -n -r | head -n 10 # or in human readable format cd / ; sudo du -hsx * | sort -rh | head -10 Source: cybercity\n">
+    <link rel="shortcut icon" href="/favicon.png" />
+
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-7TD74CVVZ2"></script>
+      <script>
+        var doNotTrack = false;
+        if ( false ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-7TD74CVVZ2');
+        }
+      </script>
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avatar_hu_b3778195aee6cc3.png" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Christos Manios</a></h1>
+            <h2 class="site-description">Developer life is a NullPointerException</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/manios'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://www.linkedin.com/in/christos-manios-23b6953a/'
+                        target="_blank"
+                        title="Linkedin"
+                        rel="me"
+                    >
+                        
+                        
+                            <?xml version="1.0" encoding="iso-8859-1"?>
+<!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+<svg height="800px" width="800px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
+	 viewBox="0 0 382 382" xml:space="preserve">
+<path style="fill:#0077B7;" d="M347.445,0H34.555C15.471,0,0,15.471,0,34.555v312.889C0,366.529,15.471,382,34.555,382h312.889
+	C366.529,382,382,366.529,382,347.444V34.555C382,15.471,366.529,0,347.445,0z M118.207,329.844c0,5.554-4.502,10.056-10.056,10.056
+	H65.345c-5.554,0-10.056-4.502-10.056-10.056V150.403c0-5.554,4.502-10.056,10.056-10.056h42.806
+	c5.554,0,10.056,4.502,10.056,10.056V329.844z M86.748,123.432c-22.459,0-40.666-18.207-40.666-40.666S64.289,42.1,86.748,42.1
+	s40.666,18.207,40.666,40.666S109.208,123.432,86.748,123.432z M341.91,330.654c0,5.106-4.14,9.246-9.246,9.246H286.73
+	c-5.106,0-9.246-4.14-9.246-9.246v-84.168c0-12.556,3.683-55.021-32.813-55.021c-28.309,0-34.051,29.066-35.204,42.11v97.079
+	c0,5.106-4.139,9.246-9.246,9.246h-44.426c-5.106,0-9.246-4.14-9.246-9.246V149.593c0-5.106,4.14-9.246,9.246-9.246h44.426
+	c5.106,0,9.246,4.14,9.246,9.246v15.655c10.497-15.753,26.097-27.912,59.312-27.912c73.552,0,73.131,68.716,73.131,106.472
+	L341.91,330.654L341.91,330.654z"/>
+</svg>
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://x.com/maniosolr'
+                        target="_blank"
+                        title="Twitter"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>Home</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/about/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>About</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/linux/" >
+                Linux
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/ubuntu-linux-useful-commands/">Ubuntu Debian Linux useful commands</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published" datetime='2012-08-10T00:27:29&#43;03:00'>Aug 10, 2012</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    3 minute read
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <p>Updated: 2015-09-08</p>
+<ol>
+<li><strong>Change keyboard layout to support both English (US) and Greek (GR)</strong></li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">setxkbmap -option grp:alt_shift_toggle us,gr
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ol start="2">
+<li><strong>Audjust monitor brightness and gamma</strong></li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># make it darker</span>
+</span></span><span class="line"><span class="cl">xrandr --output LVDS1 --brightness 0.4 --gamma 1.6:1.6:1.6
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># restore to default brightness and gamma</span>
+</span></span><span class="line"><span class="cl">xrandr --output LVDS1 --brightness <span class="m">1</span> --gamma 1:1:1
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ol start="3">
+<li><strong>Find top 10 largest files in /</strong></li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo du -a / <span class="p">|</span> sort -n -r <span class="p">|</span> head -n <span class="m">10</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># or in human readable format</span>
+</span></span><span class="line"><span class="cl"><span class="nb">cd</span> / <span class="p">;</span> sudo du -hsx * <span class="p">|</span> sort -rh <span class="p">|</span> head -10
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Source: <a class="link" href="http://www.cyberciti.biz/faq/how-do-i-find-the-largest-filesdirectories-on-a-linuxunixbsd-filesystem/http://"  target="_blank" rel="noopener"
+    >cybercity</a></p>
+<ol start="4">
+<li><strong>Find IP without using ifconfig</strong></li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">netstat -n -t <span class="p">|</span> awk <span class="s1">&#39;{print $4}&#39;</span> <span class="p">|</span> grep -o <span class="p">&amp;</span>quot<span class="p">;</span><span class="o">[</span>0-9<span class="o">]</span>*<span class="se">\.</span><span class="o">[</span>0-9<span class="o">]</span>*<span class="se">\.</span><span class="o">[</span>0-9<span class="o">]</span>*<span class="se">\.</span><span class="o">[</span>0-9<span class="o">]</span>*<span class="p">&amp;</span>quot<span class="p">;</span> <span class="p">|</span>grep -v <span class="p">&amp;</span>quot<span class="p">;</span>127.0.0.1<span class="p">&amp;</span>quot<span class="p">;</span> <span class="p">|</span> sort -u
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ol start="5">
+<li><strong>Run logrotate</strong></li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">logrotate -f /etc/logrotate.conf
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ol start="6">
+<li><strong>Curl get http code and store it to Bash variable</strong></li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="nv">bob</span><span class="o">=</span><span class="sb">`</span>curl -L -s -f -w <span class="p">&amp;</span>quot<span class="p">;</span>%<span class="o">{</span>http_code<span class="o">}</span><span class="p">&amp;</span>quot<span class="p">;</span> --output /dev/null <span class="p">&amp;</span>quot<span class="p">;</span>http://www.google.gr<span class="p">&amp;</span>quot<span class="p">;</span><span class="sb">`</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ol start="7">
+<li><strong>Curl GET with url encode in BASH</strong></li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">curl -G <span class="p">&amp;</span>quot<span class="p">;</span><span class="nv">$urlGet</span><span class="p">&amp;</span>quot<span class="p">;</span> --data-urlencode <span class="p">&amp;</span>quot<span class="p">;</span><span class="nv">date</span><span class="o">=</span><span class="nv">$datos</span><span class="p">&amp;</span>quot<span class="p">;</span> --data-urlencode <span class="p">&amp;</span>quot<span class="p">;</span><span class="nv">diskdata</span><span class="o">=</span><span class="nv">$diskuse</span><span class="p">&amp;</span>quot<span class="p">;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ol start="8">
+<li><strong>Curl basic authentication</strong></li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">curl -u <span class="p">&amp;</span>quot<span class="p">;</span>myusername:mypass<span class="p">&amp;</span>quot<span class="p">;</span> <span class="p">&amp;</span>quot<span class="p">;</span>http://www.google.com<span class="p">&amp;</span>quot<span class="p">;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ol start="9">
+<li><strong>Url Encode String with Perl from Bash</strong></li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="nv">adaUrlEncoded</span><span class="o">=</span><span class="sb">`</span>perl -e <span class="s1">&#39; use URI::Escape; print uri_escape(&amp;quot;$row&amp;quot;);&#39;</span><span class="sb">`</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ol start="10">
+<li><strong>Cron Job every five minutes with sterr redirection</strong></li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">0,5,10,15,20,25,30,35,40,45,50,50,55 * * * * /home/bob/sendServerData.py <span class="p">&amp;</span>gt<span class="p">;</span>/dev/null 2<span class="p">&amp;</span>gt<span class="p">;&amp;</span>amp<span class="p">;</span><span class="m">1</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>More examples in <a class="link" href="http://www.cyberciti.biz/faq/how-do-i-add-jobs-to-cron-under-linux-or-unix-oses/"  target="_blank" rel="noopener"
+    >Cyberciti tutorial</a></p>
+<ol start="11">
+<li><strong>Add a GPG key to apt manually</strong></li>
+</ol>
+<p>Lets say we want to add MongoDB GPG key to apt in order to install MongoDB in Debian Linux. We download the key from <a class="link" href="http://docs.mongodb.org/10gen-gpg-key.asc"  target="_blank" rel="noopener"
+    >here</a> or copy it to a file, lets say 10gen-gpg-key.asc. Then run:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">cat 10gen-gpg-key.asc <span class="p">|</span> sudo apt-key add -
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ol start="12">
+<li>**Change your default locale **</li>
+</ol>
+<p>Edit your locale variable values using:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo vi /etc/default/locale
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ol start="13">
+<li><strong>Merge PDF files</strong></li>
+</ol>
+<p>Append multiple pdf files (source*.pdf) to one (alltogether.pdf) using the following command. <strong>NOTE:</strong> The last document is the generated destination pdf document where the rest will be appended.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">pdfunite source1.pdf source2.pdf source3.pdf alltogether.pdf
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ol start="14">
+<li><strong>Sort Nginx access log by Response Codes</strong></li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo awk <span class="s1">&#39;{print $9}&#39;</span> /var/log/nginx/ssl.access.log <span class="p">|</span> sort <span class="p">|</span> uniq -c <span class="p">|</span> sort -r
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Source: <a class="link" href="https://rtcamp.com/tutorials/nginx/log-parsing/"  target="_blank" rel="noopener"
+    >rtcamp</a></p>
+<ol start="15">
+<li><strong>Count IP requests from Nginx access log</strong></li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo awk <span class="s1">&#39;{print $1}&#39;</span> /var/log/nginx/ssl.access.log <span class="p">|</span> sort <span class="p">|</span> uniq -c <span class="p">|</span> sort -nr
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Source: <a class="link" href="http://www.mkyong.com/nginx/count-ip-address-in-nginx-access-logs/"  target="_blank" rel="noopener"
+    >Mkyong</a></p>
+<ol start="16">
+<li><strong>Fast Delete files modified before 10 minutes</strong></li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="nb">time</span> find <span class="nv">$i</span>/*.tmp -mmin +10 -type f -delete
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Source: <a class="link" href="http://www.slashroot.in/which-is-the-fastest-method-to-delete-files-in-linux"  target="_blank" rel="noopener"
+    >slashroot</a></p>
+<ol start="17">
+<li><strong>Remove newline character (&rsquo;\n&rsquo;) from a file</strong></li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">tr <span class="s1">&#39;\n&#39;</span> <span class="s1">&#39; &#39;</span> &lt; input_filename
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>or more hackish</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sed <span class="s1">&#39;:a;N;$!ba;s/\n/ /g&#39;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Source: <a class="link" href="http://stackoverflow.com/questions/1251999/sed-how-can-i-replace-a-newline-n"  target="_blank" rel="noopener"
+    >StackOverflow</a></p>
+<ol start="18">
+<li><strong>View Apache requests per minute (from logs)</strong></li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">grep <span class="s2">&#34;23/Jan/2013:06&#34;</span> example.com <span class="p">|</span> cut -d<span class="o">[</span> -f2 <span class="p">|</span> cut -d<span class="o">]</span> -f1 <span class="p">|</span> awk -F: <span class="s1">&#39;{print $2&#34;:&#34;$3}&#39;</span> <span class="p">|</span> sort -nk1 -nk2 <span class="p">|</span> uniq -c <span class="p">|</span> awk <span class="s1">&#39;{ if ($1 &gt; 10) print $0}&#39;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Source: <a class="link" href="http://www.inmotionhosting.com/support/website/server-usage/view-level-of-traffic-with-apache-access-log"  target="_blank" rel="noopener"
+    >inmotionhost</a></p>
+<ol>
+<li>
+<p><strong>Redirect script output to syslog (while it is in crontab)</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="m">0</span> 1,9,17 * * * myscript.sh <span class="p">&amp;</span>2&gt;1 <span class="p">|</span> /usr/bin/logger -t myscript
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p>Grep Solr logs for errors</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">egrep <span class="s2">&#34;^(ERROR|[[:blank:]])&#34;</span> solr.log.1 <span class="p">|</span> egrep -v <span class="s2">&#34;^[[:blank:]]commit&#34;</span> &gt; 20170515001700-errorlog.txt
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p>Create an SSH tunnel to a remote VM hosting MySQL server</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># This will create a tunnel which attaches to port 3306 of the remote server. To use it, we connect to port 3307 of our local machine.</span>
+</span></span><span class="line"><span class="cl">ssh -N -L 3307:localhost:3306 mysql.manios.org -p <span class="m">3022</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+</ol>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/bash/">Bash</a>
+        
+            <a href="/tags/command/">Command</a>
+        
+            <a href="/tags/debian/">Debian</a>
+        
+            <a href="/tags/linux/">Linux</a>
+        
+            <a href="/tags/shell/">Shell</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/p/install-and-configure-and-troubleshoot-ntp-servers-in-debian-linux/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Install, configure and troubleshoot NTP servers in Debian Linux</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/lets-encrypt-ssl-certificate-without-root-or-sudo-privileges/">
+        
+        
+            <div class="article-image">
+                
+                    <img src="/hubble_space.png" loading="lazy" data-key="lets-encrypt-ssl-certificate-without-root-or-sudo-privileges" data-hash="/hubble_space.png"/>
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Let&#39;s Encrypt SSL certificate without root or sudo privileges</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/p/json-remove-new-lines-via-linux-and-use-it-as-string-variable-and-as-param-in-curl-post-request/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">JSON remove new lines via Linux and use it as string variable and as param in cURL POST request</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/p/linux-extract-audio-and-video-using-ffmpeg/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Linux: Extract audio and video using ffmpeg </h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/p/read-sms-directly-from-sqlite-database-in-android/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Read SMS directly from Sqlite database in Android</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    <div class="disqus-container">
+    <div id="disqus_thread"></div>
+<script>
+    window.disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "manios-org" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+
+<style>
+    .disqus-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+</style>
+
+<script>
+    window.addEventListener('onColorSchemeChange', (e) => {
+        if (typeof DISQUS == 'object') {
+            DISQUS.reset({
+                reload: true
+            });
+        }
+    })
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2011 - 
+        
+        2025 Christos Manios
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.32.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.c922af694cc257bf1ecc41c0dd7b0430f9114ec280ccf67cd2c6ad55f5316c4e.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

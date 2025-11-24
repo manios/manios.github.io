@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="Today I had to hide a Wordpress 3.8.1 blog behind an Nginx reverse proxy configured to use only https. Nginx was behind an external firewall which forwarded https://bob.org:8080/blog to Nginx using https (port 4443). The difficulty was that whe Wordpress blog was installed in an Apache HTTP server in port 80 and it worked using http!. Lets say that my site was https://bob.org and I had to put the blog in https://bob.org:8080/blog. Thus my list of burdens was the following:\n">
+<title>Nginx https reverse proxy to Wordpress with Apache, http and different port</title>
+
+<link rel='canonical' href='https://manios.org/2014/04/12/nginx-https-reverse-proxy-to-wordpress-with-apache-http-and-different-port/'>
+
+<link rel="stylesheet" href="/scss/style.min.b0e76e98cdd4f7082d1fc36f7af7e0843a81201db2197c03ca426751dc923735.css"><meta property='og:title' content="Nginx https reverse proxy to Wordpress with Apache, http and different port">
+<meta property='og:description' content="Today I had to hide a Wordpress 3.8.1 blog behind an Nginx reverse proxy configured to use only https. Nginx was behind an external firewall which forwarded https://bob.org:8080/blog to Nginx using https (port 4443). The difficulty was that whe Wordpress blog was installed in an Apache HTTP server in port 80 and it worked using http!. Lets say that my site was https://bob.org and I had to put the blog in https://bob.org:8080/blog. Thus my list of burdens was the following:\n">
+<meta property='og:url' content='https://manios.org/2014/04/12/nginx-https-reverse-proxy-to-wordpress-with-apache-http-and-different-port/'>
+<meta property='og:site_name' content='Christos Manios'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='apache' /><meta property='article:tag' content='blog' /><meta property='article:tag' content='http' /><meta property='article:tag' content='https' /><meta property='article:tag' content='nginx' /><meta property='article:tag' content='port' /><meta property='article:tag' content='proxy' /><meta property='article:tag' content='reverse' /><meta property='article:tag' content='wordpress' /><meta property='article:published_time' content='2014-04-12T17:32:52&#43;03:00'/><meta property='article:modified_time' content='2014-04-12T17:32:52&#43;03:00'/>
+<meta name="twitter:title" content="Nginx https reverse proxy to Wordpress with Apache, http and different port">
+<meta name="twitter:description" content="Today I had to hide a Wordpress 3.8.1 blog behind an Nginx reverse proxy configured to use only https. Nginx was behind an external firewall which forwarded https://bob.org:8080/blog to Nginx using https (port 4443). The difficulty was that whe Wordpress blog was installed in an Apache HTTP server in port 80 and it worked using http!. Lets say that my site was https://bob.org and I had to put the blog in https://bob.org:8080/blog. Thus my list of burdens was the following:\n">
+    <link rel="shortcut icon" href="/favicon.png" />
+
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-7TD74CVVZ2"></script>
+      <script>
+        var doNotTrack = false;
+        if ( false ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-7TD74CVVZ2');
+        }
+      </script>
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avatar_hu_b3778195aee6cc3.png" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Christos Manios</a></h1>
+            <h2 class="site-description">Developer life is a NullPointerException</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/manios'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://www.linkedin.com/in/christos-manios-23b6953a/'
+                        target="_blank"
+                        title="Linkedin"
+                        rel="me"
+                    >
+                        
+                        
+                            <?xml version="1.0" encoding="iso-8859-1"?>
+<!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+<svg height="800px" width="800px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
+	 viewBox="0 0 382 382" xml:space="preserve">
+<path style="fill:#0077B7;" d="M347.445,0H34.555C15.471,0,0,15.471,0,34.555v312.889C0,366.529,15.471,382,34.555,382h312.889
+	C366.529,382,382,366.529,382,347.444V34.555C382,15.471,366.529,0,347.445,0z M118.207,329.844c0,5.554-4.502,10.056-10.056,10.056
+	H65.345c-5.554,0-10.056-4.502-10.056-10.056V150.403c0-5.554,4.502-10.056,10.056-10.056h42.806
+	c5.554,0,10.056,4.502,10.056,10.056V329.844z M86.748,123.432c-22.459,0-40.666-18.207-40.666-40.666S64.289,42.1,86.748,42.1
+	s40.666,18.207,40.666,40.666S109.208,123.432,86.748,123.432z M341.91,330.654c0,5.106-4.14,9.246-9.246,9.246H286.73
+	c-5.106,0-9.246-4.14-9.246-9.246v-84.168c0-12.556,3.683-55.021-32.813-55.021c-28.309,0-34.051,29.066-35.204,42.11v97.079
+	c0,5.106-4.139,9.246-9.246,9.246h-44.426c-5.106,0-9.246-4.14-9.246-9.246V149.593c0-5.106,4.14-9.246,9.246-9.246h44.426
+	c5.106,0,9.246,4.14,9.246,9.246v15.655c10.497-15.753,26.097-27.912,59.312-27.912c73.552,0,73.131,68.716,73.131,106.472
+	L341.91,330.654L341.91,330.654z"/>
+</svg>
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://x.com/maniosolr'
+                        target="_blank"
+                        title="Twitter"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>Home</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/about/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>About</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#configure-nginx-to-reverse-proxy-all-requests-to-blog">Configure Nginx to reverse proxy all requests to /blog</a></li>
+    <li><a href="#configure-wordpress-wp-configphp">Configure Wordpress wp-config.php</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/linux/" >
+                Linux
+            </a>
+        
+            <a href="/categories/nginx/" >
+                Nginx
+            </a>
+        
+            <a href="/categories/server/" >
+                Server
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/2014/04/12/nginx-https-reverse-proxy-to-wordpress-with-apache-http-and-different-port/">Nginx https reverse proxy to Wordpress with Apache, http and different port</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published" datetime='2014-04-12T17:32:52&#43;03:00'>Apr 12, 2014</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    3 minute read
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <p>Today I had to hide a <a class="link" href="http://wordpress.org/latest.zip"  target="_blank" rel="noopener"
+    >Wordpress 3.8.1</a> blog behind an Nginx reverse proxy configured to use only <strong>https</strong>. Nginx was behind an external firewall which forwarded <a class="link" href="https://bob.org:8080/blog"  target="_blank" rel="noopener"
+    >https://bob.org:8080/blog</a> to Nginx using https (port 4443). The difficulty was that whe Wordpress blog was installed in an Apache HTTP server in port 80 and it worked using <strong>http</strong>!. Lets say that my site was <a class="link" href="https://bob.org"  target="_blank" rel="noopener"
+    >https://bob.org</a> and I had to put the blog in <a class="link" href="https://bob.org:8080/blog"  target="_blank" rel="noopener"
+    >https://bob.org:8080/blog</a>. Thus my list of burdens was the following:</p>
+<ol>
+<li>Configure Nginx to use only https and redirect http to https.</li>
+<li>Reverse proxy in Nginx from <strong>bob.org:8080/blog</strong> to <strong>192.168.1.10/wordpress</strong> in Apache.</li>
+<li>Force Wordpress links to use port 8080</li>
+</ol>
+<p>The following is the diagram summarised my server configuration:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">      +--------------+
+</span></span><span class="line"><span class="cl">      |  Firewall    |
+</span></span><span class="line"><span class="cl">      | bob.org:8080 | 
+</span></span><span class="line"><span class="cl">      +------+-------+
+</span></span><span class="line"><span class="cl">            |
+</span></span><span class="line"><span class="cl">            |
+</span></span><span class="line"><span class="cl">            v
+</span></span><span class="line"><span class="cl">      +–––––––––+                  +––––––––––––––+
+</span></span><span class="line"><span class="cl">      |  Nginx  |      http        |  Wordpress   |
+</span></span><span class="line"><span class="cl">      | (https) |+----------------&gt;| Apache HTTP  |
+</span></span><span class="line"><span class="cl">      |         |                  | (port 80)    |
+</span></span><span class="line"><span class="cl">      +–––––––––+                  +––––––––––––––+ 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>So you will say: &ldquo;Are you completely insane ??!!&rdquo;
+I was asked to do it! That is my answer!</p>
+<p>Finally after one hour of searching I used a combination of two support articles (<a class="link" href="http://wordpress.org/support/topic/wordpress-behind-reverse-proxy-1"  target="_blank" rel="noopener"
+    >post1</a>, <a class="link" href="http://wordpress.org/support/topic/compatibility-with-wordpress-behind-a-reverse-proxy"  target="_blank" rel="noopener"
+    >post2</a>), some PHP knowledge and experience and a little of imagination, I created a solution:</p>
+<h2 id="configure-nginx-to-reverse-proxy-all-requests-to-blog">Configure Nginx to reverse proxy all requests to /blog
+</h2><p>This is a fragment of my <code>/etc/nginx/sites-available/default-ssl</code> Nginx configuration file:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-nginx" data-lang="nginx"><span class="line"><span class="cl"><span class="k">upstream</span> <span class="s">blog-webservers</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kn">server</span> <span class="n">192.168.1.10</span><span class="p">:</span><span class="mi">80</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># redirect http to https
+</span></span></span><span class="line"><span class="cl"><span class="c1"># http://serverfault.com/a/171238
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">server</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kn">listen</span> <span class="mi">80</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kn">rewrite</span> <span class="s">^(.*)</span> <span class="s">https://</span><span class="nv">$host$1</span> <span class="s">permanent</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">server</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kn">listen</span> <span class="s">*:443</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="kn">ssl</span> <span class="no">on</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kn">ssl_certificate</span>     <span class="s">/etc/nginx/crypto/server.crt</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kn">ssl_certificate_key</span> <span class="s">/etc/nginx/crypto/server.key</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="kn">ssl_client_certificate</span> <span class="s">/etc/nginx/crypto/ca.crt</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kn">ssl_verify_client</span> <span class="s">optional</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kn">ssl_verify_depth</span> <span class="mi">10</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1"># pem key asking for password problem
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1"># http://pandemoniumillusion.wordpress.com/2008/04/21/nginx-ssl-passphrase-at-startup/
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">    <span class="kn">server_name</span> <span class="s">bob.org</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kn">access_log</span>  <span class="s">/var/log/nginx/ssl.access.log</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kn">error_log</span>   <span class="s">/var/log/nginx/ssl.error.log</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kn">error_page</span>  <span class="mi">404</span> <span class="s">/404.html</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1"># reverse proxy to blog web servers
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kn">location</span> <span class="s">/blog</span> <span class="p">{</span> 
+</span></span><span class="line"><span class="cl">        <span class="kn">proxy_pass</span> <span class="s">http://blog-webservers/wordpress/</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="kn">proxy_redirect</span> <span class="s">https://server_name</span> <span class="s">http://blog-webservers/wordpress</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	
+</span></span><span class="line"><span class="cl">        <span class="kn">proxy_read_timeout</span>       <span class="mi">3500</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="kn">proxy_connect_timeout</span>    <span class="mi">3250</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="kn">proxy_set_header</span>   <span class="s">X-Real-IP</span>          <span class="nv">$remote_addr</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="kn">proxy_set_header</span>   <span class="s">Host</span>               <span class="nv">$host</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="kn">proxy_set_header</span>   <span class="s">X-Forwarded-For</span>    <span class="nv">$proxy_add_x_forwarded_for</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="kn">proxy_set_header</span>   <span class="s">X-Forwarded-Proto</span>  <span class="s">https</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">       
+</span></span><span class="line"><span class="cl"> 
+</span></span><span class="line"><span class="cl">        <span class="kn">proxy_set_header</span>   <span class="s">SSL_PROTOCOL</span> <span class="nv">$ssl_protocol</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="kn">proxy_set_header</span>   <span class="s">SSL_CLIENT_CERT</span> <span class="nv">$ssl_client_cert</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="kn">proxy_set_header</span>   <span class="s">SSL_CLIENT_VERIFY</span> <span class="nv">$ssl_client_verify</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="kn">proxy_set_header</span>   <span class="s">SSL_SERVER_S_DN</span> <span class="nv">$ssl_client_s_dn</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="configure-wordpress-wp-configphp">Configure Wordpress wp-config.php
+</h2><p>I added the following lines on top of <code>wp-config.php</code> file:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="cl"><span class="c1">// If Wordpress is behind reverse proxy 
+</span></span></span><span class="line"><span class="cl"><span class="c1">// which proxies https to http
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">if</span> <span class="p">(</span> <span class="p">(</span><span class="o">!</span><span class="k">empty</span><span class="p">(</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;HTTP_X_FORWARDED_HOST&#39;</span><span class="p">]))</span> <span class="o">||</span>
+</span></span><span class="line"><span class="cl">     <span class="p">(</span><span class="o">!</span><span class="k">empty</span><span class="p">(</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;HTTP_X_FORWARDED_FOR&#39;</span><span class="p">]))</span> <span class="p">)</span> <span class="p">{</span> 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// http://wordpress.org/support/topic/wordpress-behind-reverse-proxy-1
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;HTTP_HOST&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;HTTP_X_FORWARDED_HOST&#39;</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nx">define</span><span class="p">(</span><span class="s1">&#39;WP_HOME&#39;</span><span class="p">,</span> <span class="s1">&#39;https://bob.org:8080/blog&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">define</span><span class="p">(</span><span class="s1">&#39;WP_SITEURL&#39;</span><span class="p">,</span> <span class="s1">&#39;https://bob.org:8080/blog&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// rewrite blog word with wordpress
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;REQUEST_URI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nx">str_replace</span><span class="p">(</span><span class="s2">&#34;wordpress&#34;</span><span class="p">,</span> <span class="s2">&#34;blog&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;REQUEST_URI&#39;</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// http://wordpress.org/support/topic/compatibility-with-wordpress-behind-a-reverse-proxy
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;HTTPS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;on&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>If you want to debug the former PHP code fragment you can print <code>$_SERVER</code> variables before and after configuration changing command inside the if block:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-php" data-lang="php"><span class="line"><span class="cl"><span class="k">echo</span> <span class="s1">&#39;&lt;br&gt;Before:&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">echo</span> <span class="s1">&#39;&lt;br&gt;$_SERVER[\&#39;HTTP_HOST\&#39;] : &#39;</span> <span class="o">.</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;HTTP_HOST&#39;</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl"><span class="k">echo</span> <span class="s1">&#39;&lt;br&gt;$_SERVER[\&#39;HTTP_X_FORWARDED_HOST\&#39;]: &#39;</span> <span class="o">.</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;HTTP_X_FORWARDED_HOST&#39;</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl"><span class="k">echo</span> <span class="s1">&#39;&lt;br&gt;$_SERVER[\&#39;REQUEST_URI\&#39;]: &#39;</span> <span class="o">.</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;REQUEST_URI&#39;</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl"><span class="k">echo</span> <span class="s1">&#39;&lt;br&gt;$_SERVER[\&#39;HTTP_X_FORWARDED_SERVER\&#39;]: &#39;</span> <span class="o">.</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;HTTP_X_FORWARDED_SERVER&#39;</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl"><span class="k">echo</span> <span class="s1">&#39;&lt;br&gt;$_SERVER[\&#39;HTTP_X_FORWARDED_FOR\&#39;]: &#39;</span> <span class="o">.</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;HTTP_X_FORWARDED_FOR&#39;</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl"><span class="k">echo</span> <span class="s1">&#39;&lt;br&gt;$_SERVER[\&#39;HTTP_X_FORWARDED_FOR\&#39;]: &#39;</span> <span class="o">.</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;HTTP_X_FORWARDED_FOR&#39;</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl"><span class="k">echo</span> <span class="s1">&#39;&lt;br&gt;$_SERVER[\&#39;HTTPS\&#39;]: &#39;</span> <span class="o">.</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;HTTPS&#39;</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl"><span class="k">echo</span> <span class="s1">&#39;&lt;br&gt;$_SERVER[\&#39;REMOTE_ADDR\&#39;]: &#39;</span> <span class="o">.</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;REMOTE_ADDR&#39;</span><span class="p">];</span>    
+</span></span><span class="line"><span class="cl"><span class="k">echo</span> <span class="s1">&#39;&lt;br&gt;$_SERVER[\&#39;SERVER_NAME\&#39;]: &#39;</span> <span class="o">.</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;SERVER_NAME&#39;</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl"><span class="k">echo</span> <span class="s1">&#39;&lt;br&gt;$_SERVER[\&#39;SERVER_PROTOCOL\&#39;]: &#39;</span> <span class="o">.</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;SERVER_PROTOCOL&#39;</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl"><span class="k">echo</span> <span class="s1">&#39;&lt;br&gt;WP_HOME: &#39;</span> <span class="o">.</span> <span class="nx">WP_HOME</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">echo</span> <span class="s1">&#39;&lt;br&gt;WP_SITEURL : &#39;</span> <span class="o">.</span> <span class="nx">WP_SITEURL</span><span class="p">;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>I am exhausted, just writting it down! Be patient!</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/apache/">Apache</a>
+        
+            <a href="/tags/blog/">Blog</a>
+        
+            <a href="/tags/http/">Http</a>
+        
+            <a href="/tags/https/">Https</a>
+        
+            <a href="/tags/nginx/">Nginx</a>
+        
+            <a href="/tags/port/">Port</a>
+        
+            <a href="/tags/proxy/">Proxy</a>
+        
+            <a href="/tags/reverse/">Reverse</a>
+        
+            <a href="/tags/wordpress/">Wordpress</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/2014/11/01/solr-fix-corrupted-index-using-lucene/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Solr fix corrupted index using Lucene</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/2024/02/11/linux-mint-mate-screensaver-command-line-configure-enable-disable/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Linux Mint Mate configure screensaver and display sleep via command line</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/2018/05/30/git-merge-conflicts-using-tortoise-git-merge-windows/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Git merge conflicts using Tortoise Git merge in Windows</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/2017/12/14/install-and-configure-and-troubleshoot-ntp-servers-in-debian-linux/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Install, configure and troubleshoot NTP servers in Debian Linux</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/2017/11/23/mongodb-replica-stale-during-recovery/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">MongoDB replica error RS102 too stale to catch up during full recovery</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    <div class="disqus-container">
+    <div id="disqus_thread"></div>
+<script>
+    window.disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "manios-org" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+
+<style>
+    .disqus-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+</style>
+
+<script>
+    window.addEventListener('onColorSchemeChange', (e) => {
+        if (typeof DISQUS == 'object') {
+            DISQUS.reset({
+                reload: true
+            });
+        }
+    })
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2011 - 
+        
+        2025 Christos Manios
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.32.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.c922af694cc257bf1ecc41c0dd7b0430f9114ec280ccf67cd2c6ad55f5316c4e.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Sudo on Christos Manios</title>
+        <link>https://manios.org/tags/sudo/</link>
+        <description>Recent content in Sudo on Christos Manios</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>en-us</language>
+        <lastBuildDate>Tue, 12 Jul 2016 22:32:53 +0300</lastBuildDate><atom:link href="https://manios.org/tags/sudo/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>Let&#39;s Encrypt SSL certificate without root or sudo privileges</title>
+        <link>https://manios.org/2016/07/12/lets-encrypt-ssl-certificate-without-root-or-sudo-privileges/</link>
+        <pubDate>Tue, 12 Jul 2016 22:32:53 +0300</pubDate>
+        
+        <guid>https://manios.org/2016/07/12/lets-encrypt-ssl-certificate-without-root-or-sudo-privileges/</guid>
+        <description>&lt;img src="https://manios.org/hubble_space.png" alt="Featured image of post Let&#39;s Encrypt SSL certificate without root or sudo privileges" /&gt;&lt;p&gt;Five days ago we had to renew a number of SSL certificates using free &lt;a class=&#34;link&#34; href=&#34;http://letsencrypt.org/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Let&amp;rsquo;s Encrypt&lt;/a&gt; SSL authority to a few Apache servers which were installed in &lt;a class=&#34;link&#34; href=&#34;http://www.layershift.com/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Jelastic PaaS environment&lt;/a&gt;. The Apache servers were installed in an environment where:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;We did have SSH access.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;We &lt;strong&gt;did not have any root privileges or sudo command permission&lt;/strong&gt;.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;The SSH access was done using a limited &lt;code&gt;apache&lt;/code&gt; user.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;The underlying operating system was CentOS release 6.6 (Final) . (found out about it by running: &lt;code&gt;cat /etc/centos-release&lt;/code&gt;)&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Thus we could not use the official &lt;a class=&#34;link&#34; href=&#34;https://github.com/letsencrypt/letsencrypt&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Let&amp;rsquo;s Encrypt client&lt;/a&gt; as it requires root privileges. After 3 hours of searching and striving to use &lt;a class=&#34;link&#34; href=&#34;https://community.letsencrypt.org/t/list-of-client-implementations/2103&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;multiple client implementations&lt;/a&gt;, we stumbled upon &lt;a class=&#34;link&#34; href=&#34;https://github.com/lukas2511/letsencrypt.sh&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;letsencrypt.sh&lt;/a&gt;. With the guidance of a &lt;a class=&#34;link&#34; href=&#34;https://knallisworld.de/blog/2016/02/06/next-level-step-2-renewal-a-la-cron/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;tutorial written in German!!&lt;/a&gt; we finally managed to create our SSL certificates. So today, at last, we will show you how!!!&lt;/p&gt;
+&lt;p&gt;In this example, we assume that our domain name is &lt;code&gt;bobos.org&lt;/code&gt;. We want to create a certificate for &lt;a class=&#34;link&#34; href=&#34;http://bobos.org&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;bobos.org&lt;/a&gt; and &lt;a class=&#34;link&#34; href=&#34;http://www.bobos.org&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;www.bobos.org&lt;/a&gt;. Note that Let&amp;rsquo;s Encrypt &lt;strong&gt;does not generate wildcard certificates yet!!&lt;/strong&gt;.&lt;/p&gt;
+&lt;h3 id=&#34;prerequisites&#34;&gt;Prerequisites
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;No root access or sudo is required.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;We Obtain an A record for bobos.org and &lt;a class=&#34;link&#34; href=&#34;https://www.bobos.org&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;www.bobos.org&lt;/a&gt; which points to the IP of the server you are using.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Inside the aforementioned server we have to run a web server which listens to port 80. Listening to port 443 is optional.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Shell access to the server.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;If you want to have a thourough understanding of why we are going to perform the following steps, you can refer to &lt;a class=&#34;link&#34; href=&#34;https://letsencrypt.org/how-it-works/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;How it works&lt;/a&gt; official article. Few! It is high time we started. Shall we?&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Know thy environment.&lt;/li&gt;
+&lt;li&gt;Clone letsecrypt.sh script.&lt;/li&gt;
+&lt;li&gt;Configure the script.&lt;/li&gt;
+&lt;li&gt;Configure your web server.&lt;/li&gt;
+&lt;li&gt;Run the script.&lt;/li&gt;
+&lt;li&gt;Find the certificates.&lt;/li&gt;
+&lt;li&gt;Configure your web server to use the certificates&lt;/li&gt;
+&lt;li&gt;Upload SSL certificates to Jelastic Administration Panel&lt;/li&gt;
+&lt;li&gt;Reload or restart web server and test configuration&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;know-thy-environment&#34;&gt;Know thy environment
+&lt;/h3&gt;&lt;p&gt;After login via SSH we are in &lt;code&gt;/var/www/&lt;/code&gt; directory:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;apache@apache2 ~ $ &lt;span class=&#34;nb&#34;&gt;pwd&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;/var/www
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;Then we check CentOS version, because we can!&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;apache@apache2 ~ $ cat /etc/centos-release 
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;CentOS release 6.6 &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;Final&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id=&#34;clone-letsecryptsh-script&#34;&gt;Clone letsecrypt.sh script
+&lt;/h3&gt;&lt;p&gt;While being in that directory we clone &lt;a class=&#34;link&#34; href=&#34;https://github.com/lukas2511/letsencrypt.sh&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;letsencrypt.sh&lt;/a&gt;:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;apache@apache2 ~ $ git clone https://github.com/lukas2511/letsencrypt.sh.git
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Cloning into &lt;span class=&#34;s1&#34;&gt;&amp;#39;letsencrypt.sh&amp;#39;&lt;/span&gt;...
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;remote: Counting objects: 873, &lt;span class=&#34;k&#34;&gt;done&lt;/span&gt;.
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;remote: Total &lt;span class=&#34;m&#34;&gt;873&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;delta 0&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt;, reused &lt;span class=&#34;m&#34;&gt;0&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;delta 0&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt;, pack-reused &lt;span class=&#34;m&#34;&gt;873&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Receiving objects: 100% &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;873/873&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt;, 223.44 KiB &lt;span class=&#34;p&#34;&gt;|&lt;/span&gt; &lt;span class=&#34;m&#34;&gt;0&lt;/span&gt; bytes/s, &lt;span class=&#34;k&#34;&gt;done&lt;/span&gt;.
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Resolving deltas: 100% &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;530/530&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt;, &lt;span class=&#34;k&#34;&gt;done&lt;/span&gt;.
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Checking connectivity... &lt;span class=&#34;k&#34;&gt;done&lt;/span&gt;.
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;apache@apache2 ~ $ chown -R apache:apache letsencrypt.sh
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;apache@apache2 ~ $ &lt;span class=&#34;nb&#34;&gt;cd&lt;/span&gt; letsencrypt.sh
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;apache@apache2 ~ $ &lt;span class=&#34;nb&#34;&gt;pwd&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;/var/www/etsencrypt.sh
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id=&#34;configure-the-script&#34;&gt;Configure the script
+&lt;/h3&gt;&lt;p&gt;Then, we have perform a little configuration so the script is aware of our environment and the domains for which we want to generate free SSL certificates:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Prepare &lt;code&gt;base&lt;/code&gt; and &lt;code&gt;conf&lt;/code&gt; directories:
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;apache@apache2 ~/letsencrypt.sh $ mkdir conf 
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;apache@apache2 ~/letsencrypt.sh $ mkdir base
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;apache@apache2 ~/letsencrypt.sh $ cp config.sh.example conf/config.sh
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;apache@apache2 ~/letsencrypt.sh $ cp domains.txt.exampleconfig.sh.example conf/domains.txt
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;Edit configuration in &lt;code&gt;/var/www/letsencrypt.sh/conf/config.sh&lt;/code&gt;:
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-ini&#34; data-lang=&#34;ini&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;na&#34;&gt;CONFIG_D&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;/var/www/letsencrypt.sh&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;na&#34;&gt;BASEDIR&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;/var/www/letsencrypt.sh/base&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;na&#34;&gt;WELLKNOWN&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;${BASEDIR}/.acme-challenges&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;na&#34;&gt;CONTACT_EMAIL&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;aValidEmail@whateverServer.com&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;Add the domain names in /var/www/letsencrypt.sh/conf/domains.txt```:
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;bobos.org www.bobos.org
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;configure-your-web-server&#34;&gt;Configure your web server
+&lt;/h3&gt;&lt;p&gt;Now we have to put the following lines in your site&amp;rsquo;s special apache conf i.e. &lt;code&gt;/etc/httpd/sites-available/bobos.conf&lt;/code&gt; or in &lt;code&gt;/etc/httpd/conf/httpd.conf&lt;/code&gt;. This will help Let&amp;rsquo;s Encrypt to access your server, perform domain validation and perform some challenges in order to generate our SSL certificate.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;8
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Alias /.well-known/acme-challenge /var/www/letsencrypt.sh/base/.acme-challenges
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&amp;lt;Directory /var/www/letsencrypt.sh/base/.acme-challenges&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      Options None
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      AllowOverride None
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      Order allow,deny
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      Allow from all
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&amp;lt;/Directory&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id=&#34;run-the-script&#34;&gt;Run the script
+&lt;/h3&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;apache@apache2 ~/letsencrypt.sh $ ./letsencrypt.sh --config /var/www/letsencrypt.sh/conf/config.sh -c
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# INFO: Using main config file /var/www/letsencrypt.sh/conf/config.sh&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# INFO: Using additional config file /var/www/letsencrypt.sh/conf/config.sh&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Processing bobos.org with alternative names: www.bobos.org
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; + Signing domains...
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; + Creating new directory /var/www/letsencrypt.sh/base/certs/bobos.org ...
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; + Generating private key...
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; + Generating signing request...
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; + Requesting challenge &lt;span class=&#34;k&#34;&gt;for&lt;/span&gt; bobos.org...
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; + Requesting challenge &lt;span class=&#34;k&#34;&gt;for&lt;/span&gt; www.bobos.org...
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; + Responding to challenge &lt;span class=&#34;k&#34;&gt;for&lt;/span&gt; bobos.org...
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; + Challenge is valid!
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; + Responding to challenge &lt;span class=&#34;k&#34;&gt;for&lt;/span&gt; www.bobos.org...
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; + Challenge is valid!
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; + Requesting certificate...
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; + Checking certificate...
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; + Done!
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; + Creating fullchain.pem...
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; + Done!
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id=&#34;find-the-certificates&#34;&gt;Find the certificates
+&lt;/h3&gt;&lt;p&gt;The certificates are created in &lt;code&gt;$BASE/certs//&lt;/code&gt; directory:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;apache@apache2 ~/letsencrypt.sh $ ls -l base/certs/bobos.org/
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;total &lt;span class=&#34;m&#34;&gt;20&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;-rw------- &lt;span class=&#34;m&#34;&gt;1&lt;/span&gt; apache apache &lt;span class=&#34;m&#34;&gt;1655&lt;/span&gt; Jul  &lt;span class=&#34;m&#34;&gt;7&lt;/span&gt; 06:49 cert-1457333387.csr
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;-rw------- &lt;span class=&#34;m&#34;&gt;1&lt;/span&gt; apache apache &lt;span class=&#34;m&#34;&gt;2143&lt;/span&gt; Jul  &lt;span class=&#34;m&#34;&gt;7&lt;/span&gt; 06:49 cert-1457333387.pem
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;lrwxrwxrwx &lt;span class=&#34;m&#34;&gt;1&lt;/span&gt; apache apache   &lt;span class=&#34;m&#34;&gt;19&lt;/span&gt; Jul  &lt;span class=&#34;m&#34;&gt;7&lt;/span&gt; 06:50 cert.csr -&amp;gt; cert-1457333387.csr
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;lrwxrwxrwx &lt;span class=&#34;m&#34;&gt;1&lt;/span&gt; apache apache   &lt;span class=&#34;m&#34;&gt;19&lt;/span&gt; Jul  &lt;span class=&#34;m&#34;&gt;7&lt;/span&gt; 06:50 cert.pem -&amp;gt; cert-1457333387.pem
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;-rw------- &lt;span class=&#34;m&#34;&gt;1&lt;/span&gt; apache apache &lt;span class=&#34;m&#34;&gt;1675&lt;/span&gt; Jul  &lt;span class=&#34;m&#34;&gt;7&lt;/span&gt; 06:50 chain-1457333387.pem
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;lrwxrwxrwx &lt;span class=&#34;m&#34;&gt;1&lt;/span&gt; apache apache   &lt;span class=&#34;m&#34;&gt;20&lt;/span&gt; Jul  &lt;span class=&#34;m&#34;&gt;7&lt;/span&gt; 06:50 chain.pem -&amp;gt; chain-1457333387.pem
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;-rw------- &lt;span class=&#34;m&#34;&gt;1&lt;/span&gt; apache apache &lt;span class=&#34;m&#34;&gt;3818&lt;/span&gt; Jul  &lt;span class=&#34;m&#34;&gt;7&lt;/span&gt; 06:50 fullchain-1457333387.pem
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;lrwxrwxrwx &lt;span class=&#34;m&#34;&gt;1&lt;/span&gt; apache apache   &lt;span class=&#34;m&#34;&gt;24&lt;/span&gt; Jul  &lt;span class=&#34;m&#34;&gt;7&lt;/span&gt; 06:50 fullchain.pem -&amp;gt; fullchain-1457333387.pem
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;-rw------- &lt;span class=&#34;m&#34;&gt;1&lt;/span&gt; apache apache &lt;span class=&#34;m&#34;&gt;3243&lt;/span&gt; Jul  &lt;span class=&#34;m&#34;&gt;7&lt;/span&gt; 06:49 privkey-1457333387.pem
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;lrwxrwxrwx &lt;span class=&#34;m&#34;&gt;1&lt;/span&gt; apache apache   &lt;span class=&#34;m&#34;&gt;22&lt;/span&gt; Jul  &lt;span class=&#34;m&#34;&gt;7&lt;/span&gt; 06:50 privkey.pem -&amp;gt; privkey-1457333387.pem
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id=&#34;configure-your-web-server-to-use-the-certificates&#34;&gt;Configure your web server to use the certificates
+&lt;/h3&gt;&lt;p&gt;Configure Apache in order to use the created certificates. It might by your site&amp;rsquo;s special conf i.e. &lt;code&gt;/etc/httpd/sites-available/bobos.conf&lt;/code&gt; or global &lt;code&gt;/etc/httpd/conf/httpd.conf&lt;/code&gt;:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-apache&#34; data-lang=&#34;apache&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nb&#34;&gt;SSLEngine&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;On&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nb&#34;&gt;SSLCertificateFile&lt;/span&gt;      &lt;span class=&#34;sx&#34;&gt;/var/www/letsencrypt.sh/base/certs/bobos.org/cert.pem&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nb&#34;&gt;SSLCertificateKeyFile&lt;/span&gt;   &lt;span class=&#34;sx&#34;&gt;/var/www/letsencrypt.sh/base/certs/bobos.org/privkey.pem&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nb&#34;&gt;SSLCertificateChainFile&lt;/span&gt; &lt;span class=&#34;sx&#34;&gt;/var/www/letsencrypt.sh/base/certs/bobos.org/chain.pem&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nb&#34;&gt;SSLCACertificateFile&lt;/span&gt;    &lt;span class=&#34;sx&#34;&gt;/var/www/letsencrypt.sh/base/certs/bobos.org/fullchain.pem&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nb&#34;&gt;SSLHonorCipherOrder&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;On&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nb&#34;&gt;SSLCipherSuite&lt;/span&gt; ECDHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA256:ECDHE-RSA-AES256-SHA:ECDHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-RSA-AES128-SHA256:DHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA:ECDHE-RSA-DES-CBC3-SHA:EDH-RSA-DES-CBC3-SHA:AES256-GCM-SHA384:AES128-GCM-SHA256:AES256-SHA256:AES128-SHA256:AES256-SHA:AES128-SHA:DES-CBC3-SHA:HIGH:!aNULL:!eNULL:!EXPORT:!DES:!MD5:!PSK:!RC4
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;strong&gt;IMPORTANT NOTE!!&lt;/strong&gt; The previous configuration &lt;strong&gt;will not work&lt;/strong&gt; in Jelastic Paas environment, as it forces us to add the certificates via &lt;a class=&#34;link&#34; href=&#34;https://app.j.layershift.co.uk/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Jelastic Administration Panel&lt;/a&gt;. Jelastic puts the certificates to &lt;code&gt;/var/lib/jelastic/SSL&lt;/code&gt;.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;9
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-apache&#34; data-lang=&#34;apache&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nb&#34;&gt;SSLEngine&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;on&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nb&#34;&gt;SSLProtocol&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;ALL&lt;/span&gt; -SSLv2 -SSLv3
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nb&#34;&gt;SSLHonorCipherOrder&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;On&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nb&#34;&gt;SSLCipherSuite&lt;/span&gt; ECDH+AESGCM:DH+AESGCM:ECDH+AES256:DH+AES256:ECDH+AES128:DH+AES:ECDH+3DES:DH+3DES:RSA+AESGCM:RSA+AES:RSA+3DES:!aNULL:!MD5:!DSS
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nb&#34;&gt;SSLCertificateFile&lt;/span&gt; &lt;span class=&#34;sx&#34;&gt;/var/lib/jelastic/SSL/jelastic.crt&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nb&#34;&gt;SSLCertificateKeyFile&lt;/span&gt; &lt;span class=&#34;sx&#34;&gt;/var/lib/jelastic/SSL/jelastic.key&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nb&#34;&gt;SSLCACertificateFile&lt;/span&gt; &lt;span class=&#34;sx&#34;&gt;/var/lib/jelastic/SSL/jelastic-ca.crt&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id=&#34;upload-ssl-certificates-to-jelastic-administration-panel&#34;&gt;Upload SSL certificates to Jelastic Administration Panel
+&lt;/h3&gt;&lt;p&gt;Then we have to upload SSL certificates to Jelastic Administration Panel. To achieve that you can use &lt;a class=&#34;link&#34; href=&#34;https://docs.jelastic.com/custom-ssl#docs-internal-guid-ccfc9b2c-ad8f-bb9d-9503-26def475aa76&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;this guide&lt;/a&gt;. Otherwise (i.e. putting files via SSH) it will not work.&lt;/p&gt;
+&lt;h3 id=&#34;reload-or-restart-web-server-and-test-configuration&#34;&gt;Reload or restart web server and test configuration
+&lt;/h3&gt;&lt;p&gt;Finally we reload &lt;code&gt;sudo /etc/init.d/apache2 reload&lt;/code&gt; or restart (&lt;code&gt;sudo /etc/init.d/apache2 restart&lt;/code&gt;) Apache web server and verify that &lt;code&gt;https://bobos.org&lt;/code&gt; works.&lt;/p&gt;
+&lt;p&gt;That is all folks! Greetings from a hot and striving for the best Greece!&lt;/p&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>

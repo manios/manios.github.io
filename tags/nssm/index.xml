@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Nssm on Christos Manios</title>
+        <link>https://manios.org/tags/nssm/</link>
+        <description>Recent content in Nssm on Christos Manios</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>en-us</language>
+        <lastBuildDate>Sat, 15 Feb 2014 15:00:52 +0200</lastBuildDate><atom:link href="https://manios.org/tags/nssm/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>Install Apache Solr as Windows Service using NSSM</title>
+        <link>https://manios.org/2014/02/15/install-apache-solr-as-windows-service-using-nssm/</link>
+        <pubDate>Sat, 15 Feb 2014 15:00:52 +0200</pubDate>
+        
+        <guid>https://manios.org/2014/02/15/install-apache-solr-as-windows-service-using-nssm/</guid>
+        <description>&lt;p&gt;Today I wanted to install &lt;a class=&#34;link&#34; href=&#34;http://lucene.apache.org/solr/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Apache Solr&lt;/a&gt; index in Windows 7, Windows Server 2008R2 and Windows Server 2012 machines.
+So I achieved that , using the following steps:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Download Apache Solr&lt;/li&gt;
+&lt;li&gt;Download NSSM - the Non-Sucking Service Manager&lt;/li&gt;
+&lt;li&gt;Create a .bat init file for Solr&lt;/li&gt;
+&lt;li&gt;Create Windows service using NSSM&lt;/li&gt;
+&lt;li&gt;Test Solr service&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;In detail:&lt;/p&gt;
+&lt;h3 id=&#34;1-download-apache-solr&#34;&gt;1. Download Apache Solr
+&lt;/h3&gt;&lt;p&gt;Download Apache Solr .zip file from &lt;a class=&#34;link&#34; href=&#34;//www.apache.org/dyn/closer.cgi/lucene/solr/&#34; &gt;Apache Solr website&lt;/a&gt;. I am currently using version 4.6.0.&lt;/p&gt;
+&lt;h3 id=&#34;2-download-nssm---the-non-sucking-service-manager&#34;&gt;2. Download NSSM - the Non-Sucking Service Manager
+&lt;/h3&gt;&lt;p&gt;After a lot of searching for a stable solution in creating Windows services I stumbled upon &lt;a class=&#34;link&#34; href=&#34;http://nssm.cc/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;NSSM - the Non-Sucking Service Manager&lt;/a&gt;. Download it and place the nssm.exe executable in a directory that can be seen by &lt;strong&gt;$PATH&lt;/strong&gt;.&lt;/p&gt;
+&lt;h3 id=&#34;3-create-a-bat-init-file-for-solr&#34;&gt;3. Create a .bat init file for Solr
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;Unzip Apache Solr zip file to&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;C:\Program Files\apache-solr-4.6.0\
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Create &lt;code&gt;C:\Program Files\apache-solr-4.6.0\example\solrstart.bat&lt;/code&gt; file containing the following:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bat&#34; data-lang=&#34;bat&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;@&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;echo&lt;/span&gt; off
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;cd&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;C:\Program Files\apache-solr-4.6.0\example\&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;java -Xms64M -Xmx256M  -Djava.util.logging.config.file=etc/logging.properties -jar start.jar
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;4-create-windows-service-using-nssm&#34;&gt;4. Create Windows service using NSSM
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;Open a command line prompt (WinKey + R and type &amp;ldquo;cmd&amp;rdquo;) and type the following
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;nssm install Solr4.6.0 &lt;span class=&#34;s2&#34;&gt;&amp;#34;C:\Program Files\apache-solr-4.6.0\example\solrstart.bat&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;If the procedure succeeds you should see a message like this:&lt;strong&gt;Service &amp;ldquo;Solr4.6.0&amp;rdquo; installed successfully!&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;If you want to uninstall the service open again a command line prompt and type the following:
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;nssm remove Solr4.6.0 confirm
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;If the procedure succeeds you should see a message like this: &lt;strong&gt;Service &amp;ldquo;Solr4.6.0&amp;rdquo; removed successfully!&lt;/strong&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;5-test-solr-service&#34;&gt;5. Test Solr service
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;Open a command line prompt (WinKey + R and type &amp;ldquo;cmd&amp;rdquo;) and type the following
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;net start Solr4.6.0
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;If the service was started successfully, open a web browser and access admin page: &lt;a class=&#34;link&#34; href=&#34;http://localhost:8983/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;http://localhost:8983&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;That is all about it folks! May the Solr be with you!&lt;/p&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>

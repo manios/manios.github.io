@@ -1,0 +1,557 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Solr on Christos Manios</title>
+        <link>https://manios.org/categories/solr/</link>
+        <description>Recent content in Solr on Christos Manios</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>en-us</language>
+        <lastBuildDate>Wed, 15 Nov 2017 12:14:00 +0200</lastBuildDate><atom:link href="https://manios.org/categories/solr/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>Use HAProxy and Docker to load balance requests to Solr and SolrCloud</title>
+        <link>https://manios.org/2017/11/15/use-haproxy-and-docker-for-solr-load-balancing/</link>
+        <pubDate>Wed, 15 Nov 2017 12:14:00 +0200</pubDate>
+        
+        <guid>https://manios.org/2017/11/15/use-haproxy-and-docker-for-solr-load-balancing/</guid>
+        <description>&lt;p&gt;We use Solr 4.6 with SolrCloud configuration in a production system. You may say: &amp;ldquo;It is hight time you upgraded to the latest version, isn&amp;rsquo;t it?&amp;rdquo;. And you will be absolute right! But currently this is not the case because full reindexing costs! Our SolrCloud consists of one shard and five replicas as seen in the screenshot bellow:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://manios.org/2017/11/15/use-haproxy-and-docker-for-solr-load-balancing/2017-11-15-solrcloud.png&#34;
+	width=&#34;828&#34;
+	height=&#34;101&#34;
+	srcset=&#34;https://manios.org/2017/11/15/use-haproxy-and-docker-for-solr-load-balancing/2017-11-15-solrcloud_hu_7cc84fe46c807a6e.png 480w, https://manios.org/2017/11/15/use-haproxy-and-docker-for-solr-load-balancing/2017-11-15-solrcloud_hu_4d5234cf3feb6d9c.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;SolrCloud with one shard and five replicas&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;819&#34;
+		data-flex-basis=&#34;1967px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;The problem we were facing was that SolrJ library does balance the requests using round robin algorithm when using class &lt;a class=&#34;link&#34; href=&#34;https://lucene.apache.org/solr/4_6_0/solr-solrj/org/apache/solr/client/solrj/impl/LBHttpSolrServer.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;LBHttpSolrServer&lt;/a&gt;. Furthermore, when a request to a node fails for any reason (timeout, http 403, http 404, etc), it &lt;a class=&#34;link&#34; href=&#34;http://grepcode.com/file/repo1.maven.org/maven2/org.apache.solr/solr-solrj/4.6.0/org/apache/solr/client/solrj/impl/LBHttpSolrServer.java?av=f#265&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;puts the node to a zombie list&lt;/a&gt; for 60 seconds. This can become a burden when the SolrCloud has heavy loads and you will start to see in your application logs:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Exception in thread &amp;#34;main&amp;#34; org.apache.solr.client.solrj.SolrServerException: No live SolrServers available to handle this request
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;	at org.apache.solr.client.solrj.impl.LBHttpSolrServer.request(LBHttpSolrServer.java:289)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;	at org.apache.solr.client.solrj.impl.CloudSolrServer.request(CloudSolrServer.java:310)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;	at org.apache.solr.client.solrj.request.AbstractUpdateRequest.process(AbstractUpdateRequest.java:117)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;	at org.apache.solr.client.solrj.SolrServer.add(SolrServer.java:116)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;	at org.apache.solr.client.solrj.SolrServer.add(SolrServer.java:102)
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;So we decided to put a HAProxy instance to load balance the query requests to the SolrCloud using &lt;code&gt;leastconn&lt;/code&gt; (least connections) algorithm. After a lot of search and using a combination of &lt;a class=&#34;link&#34; href=&#34;http://cbonte.github.io/haproxy-dconv/1.7/configuration.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;official documentation&lt;/a&gt; and articles (&lt;a class=&#34;link&#34; href=&#34;http://davehall.com.au/blog/dave/2010/03/13/solr-replication-load-balancing-haproxy-and-drupal&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;link1&lt;/a&gt;, &lt;a class=&#34;link&#34; href=&#34;https://gist.github.com/feniix/1974460&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;link2&lt;/a&gt;) and the official HAProxy &lt;a class=&#34;link&#34; href=&#34;https://hub.docker.com/_/haproxy/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Docker image&lt;/a&gt; we created a container using the following configuration:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-nginx&#34; data-lang=&#34;nginx&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;global&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;s&#34;&gt;log&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;127.0.0.1&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;local0&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;notice&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;s&#34;&gt;maxconn&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;2000&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;c1&#34;&gt;#user haproxy
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;    &lt;span class=&#34;c1&#34;&gt;#group haproxy
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s&#34;&gt;defaults&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;s&#34;&gt;log&lt;/span&gt;     &lt;span class=&#34;s&#34;&gt;global&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;s&#34;&gt;mode&lt;/span&gt;    &lt;span class=&#34;s&#34;&gt;http&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;s&#34;&gt;option&lt;/span&gt;  &lt;span class=&#34;s&#34;&gt;httplog&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;s&#34;&gt;option&lt;/span&gt;  &lt;span class=&#34;s&#34;&gt;dontlognull&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;s&#34;&gt;retries&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;3&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;s&#34;&gt;timeout&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;connect&lt;/span&gt;  &lt;span class=&#34;mi&#34;&gt;5000&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;s&#34;&gt;timeout&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;client&lt;/span&gt;  &lt;span class=&#34;mi&#34;&gt;10000&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;s&#34;&gt;timeout&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;server&lt;/span&gt;  &lt;span class=&#34;mi&#34;&gt;10000&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s&#34;&gt;listen&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;solrcloud&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;s&#34;&gt;bind&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;0.0.0.0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;8983&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;s&#34;&gt;mode&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;http&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;s&#34;&gt;stats&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;enable&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;s&#34;&gt;stats&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;uri&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;/haproxy?stats&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;s&#34;&gt;stats&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;realm&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;Strictly\&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;Private&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;s&#34;&gt;stats&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;auth&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;haproxyuser:haproxypassword&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;s&#34;&gt;balance&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;leastconn&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;s&#34;&gt;option&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;httpclose&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;s&#34;&gt;option&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;forwardfor&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;s&#34;&gt;option&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;httpchk&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;GET&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;/solr/paradise-papers/admin/ping?wt=json&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;s&#34;&gt;server&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;search1&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;192.168.1.1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;8983&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;check&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;port&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;8983&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;inter&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;20s&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;fastinter&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;2s&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;s&#34;&gt;server&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;search2&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;192.168.1.2&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;8983&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;check&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;port&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;8983&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;inter&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;20s&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;fastinter&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;2s&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;s&#34;&gt;server&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;search3&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;192.168.1.3&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;8983&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;check&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;port&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;8983&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;inter&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;20s&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;fastinter&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;2s&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;s&#34;&gt;server&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;search4&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;192.168.1.4&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;8983&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;check&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;port&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;8983&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;inter&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;20s&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;fastinter&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;2s&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;s&#34;&gt;server&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;search5&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;192.168.1.5&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;8983&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;check&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;port&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;8983&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;inter&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;20s&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;fastinter&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;2s&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id=&#34;notes-on-configuration&#34;&gt;Notes on configuration:
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;Our HAProxy runs in &lt;code&gt;192.168.1.10&lt;/code&gt; and all the queries are handled by port &lt;code&gt;8983&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;We can see statistics about the distribution of requests using HAProxy statistics page which is accessible in &lt;a class=&#34;link&#34; href=&#34;http://192.168.1.10:8983/haproxy?stats&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;http://192.168.1.10:8983/haproxy?stats&lt;/a&gt;. See:
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-nginx&#34; data-lang=&#34;nginx&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;stats&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;uri&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;/haproxy?stats&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s&#34;&gt;stats&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;realm&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;Strictly\&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;Private&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s&#34;&gt;stats&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;auth&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;haproxyuser:haproxypassword&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;We check if every Solr node is alive by pinging it (see: &lt;code&gt;option httpchk GET /solr/paradise-papers/admin/ping?wt=json&lt;/code&gt;)&lt;/li&gt;
+&lt;li&gt;Check interval is 20 seconds (see: &lt;code&gt;inter 20s&lt;/code&gt;)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Now our search queries are handled better and we have already noticed an increase in query performance, faster response times and no downtime! This is a sample output from HAProxy statistics page:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://manios.org/2017/11/15/use-haproxy-and-docker-for-solr-load-balancing/2017-11-15-haproxy-stats.png&#34;
+	width=&#34;1705&#34;
+	height=&#34;182&#34;
+	srcset=&#34;https://manios.org/2017/11/15/use-haproxy-and-docker-for-solr-load-balancing/2017-11-15-haproxy-stats_hu_dcf5c5ec5a310c36.png 480w, https://manios.org/2017/11/15/use-haproxy-and-docker-for-solr-load-balancing/2017-11-15-haproxy-stats_hu_fb342a775ee21d2.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;HAProxy as a load balancer to Solr and SolrCloud with one shard and five replicas using leastconn algorithm&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;936&#34;
+		data-flex-basis=&#34;2248px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;We hope you find this article helpful!&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>Solr fix corrupted index using Lucene</title>
+        <link>https://manios.org/2014/11/01/solr-fix-corrupted-index-using-lucene/</link>
+        <pubDate>Sat, 01 Nov 2014 16:40:40 +0200</pubDate>
+        
+        <guid>https://manios.org/2014/11/01/solr-fix-corrupted-index-using-lucene/</guid>
+        <description>&lt;p&gt;A few days ago, a Solr server in our SolrCloud installation stopped unexpectedly. After examining solr.log file I spotted that it could not start again because &lt;strong&gt;index.20140510031827076&lt;/strong&gt; file was corrupted. After some searching I found this &lt;a class=&#34;link&#34; href=&#34;https://support.lucidworks.com/hc/en-us/articles/202091128-How-to-deal-with-Index-Corruption&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Lucidworks article&lt;/a&gt; which described how to deal with a corrupted index file. So I proceeded to the following steps:&lt;/p&gt;
+&lt;h3 id=&#34;warning&#34;&gt;WARNING!!
+&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;This procedure may result in unrecoverable data loss. &lt;em&gt;It is vital that you backup your index before performing index checking and repair&lt;/em&gt;.&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Find the guilty index file containing the corrupted segment. For me it was located in:
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;C:/Program Files/apache-solr-4.6.0/example/solr/hellaserver_shard1_replica4/data/index.20140510031827076
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;Find Lucene core .jar file. I work with Apache Solr 4.6.0 so it is a file named lucene-core-4.6.0.jar. It is usually in &lt;code&gt;$SOLR_HOME/example/solr-webapp/webapp/WEB-INF/lib/lucene-core-4.6.0.jar&lt;/code&gt;. So, switch to the directory where it exists:
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nb&#34;&gt;cd&lt;/span&gt; C:/Program Files/apache-solr-4.6.0/example/solr-webapp/webapp/WEB-INF/lib
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;Check the segments of the corrupted index file in order to identify the problematic segment. To accomplish that, run:
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;java -cp lucene-core-4.6.0.jar -ea:org.apache.lucene... org.apache.lucene.index.CheckIndex &lt;span class=&#34;s2&#34;&gt;&amp;#34;C:/Program Files/apache-solr-4.6.0/example/solr/hellaserver_shard1_replica4/data/index.20140510031827076&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;The check results for a &lt;strong&gt;healthy&lt;/strong&gt; segment look like the following:
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;1 of 37: name=_48r7 docCount=3021717
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   codec=Lucene46
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   compound=false
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   numFiles=11
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   size (MB)=5,020.87
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   diagnostics = {timestamp=1403095380034, os=Windows Server 2012, os.version=6
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;.2, mergeFactor=10, source=merge, lucene.version=4.6.0 1543363 - simon - 2013-11
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;-19 11:05:50, os.arch=amd64, mergeMaxNumSegments=-1, java.version=1.7.0_51, java
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;.vendor=Oracle Corporation}
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   has deletions [delGen=170]
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   test: open reader.........OK [196 deleted docs]
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   test: fields..............OK [135 fields]
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   test: field norms.........OK [52 fields]
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   test: terms, freq, prox...OK [16644025 terms; 441992389 terms/docs pairs; 39
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;0271915 tokens]
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   test (ignoring deletes): terms, freq, prox...OK [16646658 terms; 442060892 t
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;erms/docs pairs; 390381979 tokens]
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   test: stored fields.......OK [107214499 total field count; avg 35.484 fields
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;per doc]
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   test: term vectors........OK [0 total vector count; avg 0 term/freq vector f
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;ields per doc]
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   test: docvalues...........OK [0 docvalues fields; 0 BINARY; 0 NUMERIC; 0 SOR
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;TED; 0 SORTED_SET]
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;2 of 37: name=_3b16 docCount=2449309
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   codec=Lucene46
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   compound=false
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   numFiles=11
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   size (MB)=3,831.743
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   diagnostics = {timestamp=1402370404453, os=Windows Server 2012, os.version=6
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;.2, mergeFactor=10, source=merge, lucene.version=4.6.0 1543363 - simon - 2013-11
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;-19 11:05:50, os.arch=amd64, mergeMaxNumSegments=-1, java.version=1.7.0_51, java
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;.vendor=Oracle Corporation}
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   has deletions [delGen=426]
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   test: open reader.........OK [20262 deleted docs]
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   test: fields..............OK [92 fields]
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   test: field norms.........OK [35 fields]
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;When the index checker encounters a &lt;strong&gt;corrupted&lt;/strong&gt; segment, the output looks like the following:
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;37 of 37: name=_4gxr docCount=11
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   codec=Lucene46
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   compound=false
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   numFiles=10
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   size (MB)=75.71
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   diagnostics = {timestamp=1403212995547, os=Windows Server 2012, os.version=6
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;.2, source=flush, lucene.version=4.6.0 1543363 - simon - 2013-11-19 11:05:50, os
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;.arch=amd64, java.version=1.7.0_51, java.vendor=Oracle Corporation}
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   no deletions
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   test: open reader.........FAILED
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   WARNING: fixIndex() would remove reference to this segment; full exception:
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;org.apache.lucene.index.CorruptIndexException: invalid docCount: 48066 maxDoc: 1
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;1 (resource=MMapIndexInput(path=&amp;#34;C:\Program Files\apache-solr-4.6.0\example\solr
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;\hellasever_shard1_replica4\data\index.20140510031827076\_4gxr_Lucene41_0.ti
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;m&amp;#34;))
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      at org.apache.lucene.codecs.BlockTreeTermsReader.(BlockTreeTermsRe
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;ader.java:166)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      at org.apache.lucene.codecs.lucene41.Lucene41PostingsFormat.fieldsProduc
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;er(Lucene41PostingsFormat.java:437)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      at org.apache.lucene.codecs.perfield.PerFieldPostingsFormat$FieldsReader
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;.(PerFieldPostingsFormat.java:195)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      at org.apache.lucene.codecs.perfield.PerFieldPostingsFormat.fieldsProduc
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;er(PerFieldPostingsFormat.java:244)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      at org.apache.lucene.index.SegmentCoreReaders.(SegmentCoreReaders.
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;java:115)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      at org.apache.lucene.index.SegmentReader.(SegmentReader.java:95)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      at org.apache.lucene.index.CheckIndex.checkIndex(CheckIndex.java:554)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      at org.apache.lucene.index.CheckIndex.main(CheckIndex.java:1941)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;WARNING: 1 broken segments (containing 11 documents) detected
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;WARNING: would write new segments file, and 11 documents would be lost, if -fix
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;were specified
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;After the reconnaissance of the corrupted segment, rerun the command with &lt;strong&gt;-fix&lt;/strong&gt; parameter:
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;java -cp lucene-core-4.6.0.jar -ea:org.apache.lucene... org.apache.lucene.index.CheckIndex &lt;span class=&#34;s2&#34;&gt;&amp;#34;C:/Program Files/apache-solr-4.6.0/example/solr/hellaserver_shard1_replica4/data/index.20140510031827076&amp;#34;&lt;/span&gt; -fix
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;When the checker fixes the segment, the output will look like the following:
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;37 of 37: name=_4gxr docCount=11
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   codec=Lucene46
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   compound=false
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   numFiles=10
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   size (MB)=75.71
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   diagnostics = {timestamp=1403212995547, os=Windows Server 2012, os.version=6
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;.2, source=flush, lucene.version=4.6.0 1543363 - simon - 2013-11-19 11:05:50, os
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;.arch=amd64, java.version=1.7.0_51, java.vendor=Oracle Corporation}
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   no deletions
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   test: open reader.........FAILED
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   WARNING: fixIndex() would remove reference to this segment; full exception:
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;org.apache.lucene.index.CorruptIndexException: invalid docCount: 48066 maxDoc: 1
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;1 (resource=MMapIndexInput(path=&amp;#34;C:\Program Files\apache-solr-4.6.0\example\solr
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;\hellasever_shard1_replica4\data\index.20140510031827076\_4gxr_Lucene41_0.ti
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;m&amp;#34;))
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      at org.apache.lucene.codecs.BlockTreeTermsReader.&amp;lt;init&amp;gt;(BlockTreeTermsRe
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;ader.java:166)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      at org.apache.lucene.codecs.lucene41.Lucene41PostingsFormat.fieldsProduc
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;er(Lucene41PostingsFormat.java:437)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      at org.apache.lucene.codecs.perfield.PerFieldPostingsFormat$FieldsReader
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;.&amp;lt;init&amp;gt;(PerFieldPostingsFormat.java:195)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      at org.apache.lucene.codecs.perfield.PerFieldPostingsFormat.fieldsProduc
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;er(PerFieldPostingsFormat.java:244)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      at org.apache.lucene.index.SegmentCoreReaders.&amp;lt;init&amp;gt;(SegmentCoreReaders.
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;java:115)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      at org.apache.lucene.index.SegmentReader.&amp;lt;init&amp;gt;(SegmentReader.java:95)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      at org.apache.lucene.index.CheckIndex.checkIndex(CheckIndex.java:554)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      at org.apache.lucene.index.CheckIndex.main(CheckIndex.java:1941)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;WARNING: 1 broken segments (containing 11 documents) detected
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;WARNING: 11 documents will be lost
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;NOTE: will write new segments file in 5 seconds; this will remove 11 docs from t
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;he index. THIS IS YOUR LAST CHANCE TO CTRL+C!
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;5...
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;4...
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;3...
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;2...
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;1...
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Writing...
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;OK
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Wrote new segments file &amp;#34;segments_y5e&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;Finally, restart Solr server in order to resynchronise with the shard leader.&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+        </item>
+        <item>
+        <title>Install Apache Solr as Windows Service using NSSM</title>
+        <link>https://manios.org/2014/02/15/install-apache-solr-as-windows-service-using-nssm/</link>
+        <pubDate>Sat, 15 Feb 2014 15:00:52 +0200</pubDate>
+        
+        <guid>https://manios.org/2014/02/15/install-apache-solr-as-windows-service-using-nssm/</guid>
+        <description>&lt;p&gt;Today I wanted to install &lt;a class=&#34;link&#34; href=&#34;http://lucene.apache.org/solr/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Apache Solr&lt;/a&gt; index in Windows 7, Windows Server 2008R2 and Windows Server 2012 machines.
+So I achieved that , using the following steps:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Download Apache Solr&lt;/li&gt;
+&lt;li&gt;Download NSSM - the Non-Sucking Service Manager&lt;/li&gt;
+&lt;li&gt;Create a .bat init file for Solr&lt;/li&gt;
+&lt;li&gt;Create Windows service using NSSM&lt;/li&gt;
+&lt;li&gt;Test Solr service&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;In detail:&lt;/p&gt;
+&lt;h3 id=&#34;1-download-apache-solr&#34;&gt;1. Download Apache Solr
+&lt;/h3&gt;&lt;p&gt;Download Apache Solr .zip file from &lt;a class=&#34;link&#34; href=&#34;//www.apache.org/dyn/closer.cgi/lucene/solr/&#34; &gt;Apache Solr website&lt;/a&gt;. I am currently using version 4.6.0.&lt;/p&gt;
+&lt;h3 id=&#34;2-download-nssm---the-non-sucking-service-manager&#34;&gt;2. Download NSSM - the Non-Sucking Service Manager
+&lt;/h3&gt;&lt;p&gt;After a lot of searching for a stable solution in creating Windows services I stumbled upon &lt;a class=&#34;link&#34; href=&#34;http://nssm.cc/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;NSSM - the Non-Sucking Service Manager&lt;/a&gt;. Download it and place the nssm.exe executable in a directory that can be seen by &lt;strong&gt;$PATH&lt;/strong&gt;.&lt;/p&gt;
+&lt;h3 id=&#34;3-create-a-bat-init-file-for-solr&#34;&gt;3. Create a .bat init file for Solr
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;Unzip Apache Solr zip file to&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;C:\Program Files\apache-solr-4.6.0\
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Create &lt;code&gt;C:\Program Files\apache-solr-4.6.0\example\solrstart.bat&lt;/code&gt; file containing the following:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bat&#34; data-lang=&#34;bat&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;@&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;echo&lt;/span&gt; off
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;cd&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;C:\Program Files\apache-solr-4.6.0\example\&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;java -Xms64M -Xmx256M  -Djava.util.logging.config.file=etc/logging.properties -jar start.jar
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;4-create-windows-service-using-nssm&#34;&gt;4. Create Windows service using NSSM
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;Open a command line prompt (WinKey + R and type &amp;ldquo;cmd&amp;rdquo;) and type the following
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;nssm install Solr4.6.0 &lt;span class=&#34;s2&#34;&gt;&amp;#34;C:\Program Files\apache-solr-4.6.0\example\solrstart.bat&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;If the procedure succeeds you should see a message like this:&lt;strong&gt;Service &amp;ldquo;Solr4.6.0&amp;rdquo; installed successfully!&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;If you want to uninstall the service open again a command line prompt and type the following:
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;nssm remove Solr4.6.0 confirm
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;If the procedure succeeds you should see a message like this: &lt;strong&gt;Service &amp;ldquo;Solr4.6.0&amp;rdquo; removed successfully!&lt;/strong&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;5-test-solr-service&#34;&gt;5. Test Solr service
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;Open a command line prompt (WinKey + R and type &amp;ldquo;cmd&amp;rdquo;) and type the following
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;net start Solr4.6.0
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;If the service was started successfully, open a web browser and access admin page: &lt;a class=&#34;link&#34; href=&#34;http://localhost:8983/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;http://localhost:8983&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;That is all about it folks! May the Solr be with you!&lt;/p&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>

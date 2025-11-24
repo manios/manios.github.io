@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="Today we wanted to parse some json logs which we had in a file using Logstash and enrich them with Geolocation information regarding the city and the ISP an IP belongs. The file, (let&rsquo;s call it /var/log/input-geo.json) had the following structure:\n1 2 {&#34;name&#34;:&#34;Christos&#34;,&#34;src_ip&#34;:&#34;63.145.248.101&#34;,&#34;age&#34;:12} {&#34;name&#34;:&#34;Nikos&#34;,&#34;src_ip&#34;:&#34;98.158.156.175&#34;,&#34;age&#34;:10} Logstash has GeoIP filter which adds information about the geographical location of IP addresses, based on data from the Maxmind GeoLite2 databases. In our case we used:\n">
+<title>Rsyslog - Parse Json and enrich IP with Geolocation using Maxmind GeoLite2 City and ISP</title>
+
+<link rel='canonical' href='https://manios.org/p/logstash-geoip-json-logs-maxmint-geolite-docker/'>
+
+<link rel="stylesheet" href="/scss/style.min.b0e76e98cdd4f7082d1fc36f7af7e0843a81201db2197c03ca426751dc923735.css"><meta property='og:title' content="Logstash - Enrich IP with Geolocation using Maxmind GeoLite2 City and ISP">
+<meta property='og:description' content="Today we wanted to parse some json logs which we had in a file using Logstash and enrich them with Geolocation information regarding the city and the ISP an IP belongs. The file, (let&rsquo;s call it /var/log/input-geo.json) had the following structure:\n1 2 {&#34;name&#34;:&#34;Christos&#34;,&#34;src_ip&#34;:&#34;63.145.248.101&#34;,&#34;age&#34;:12} {&#34;name&#34;:&#34;Nikos&#34;,&#34;src_ip&#34;:&#34;98.158.156.175&#34;,&#34;age&#34;:10} Logstash has GeoIP filter which adds information about the geographical location of IP addresses, based on data from the Maxmind GeoLite2 databases. In our case we used:\n">
+<meta property='og:url' content='https://manios.org/p/logstash-geoip-json-logs-maxmint-geolite-docker/'>
+<meta property='og:site_name' content='Christos Manios'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='rsyslog' /><meta property='article:tag' content='mmdblookup' /><meta property='article:tag' content='omelasticsearch' /><meta property='article:tag' content='geolocation' /><meta property='article:tag' content='ip' /><meta property='article:tag' content='geoip' /><meta property='article:tag' content='maxmind' /><meta property='article:tag' content='geo' /><meta property='article:tag' content='geoip' /><meta property='article:tag' content='geolite' /><meta property='article:tag' content='geolite2' /><meta property='article:tag' content='database' /><meta property='article:tag' content='json' /><meta property='article:tag' content='parse' /><meta property='article:tag' content='message' /><meta property='article:tag' content='log' /><meta property='article:published_time' content='2018-08-18T10:13:44&#43;03:00'/><meta property='article:modified_time' content='2018-08-18T10:13:44&#43;03:00'/>
+<meta name="twitter:title" content="Logstash - Enrich IP with Geolocation using Maxmind GeoLite2 City and ISP">
+<meta name="twitter:description" content="Today we wanted to parse some json logs which we had in a file using Logstash and enrich them with Geolocation information regarding the city and the ISP an IP belongs. The file, (let&rsquo;s call it /var/log/input-geo.json) had the following structure:\n1 2 {&#34;name&#34;:&#34;Christos&#34;,&#34;src_ip&#34;:&#34;63.145.248.101&#34;,&#34;age&#34;:12} {&#34;name&#34;:&#34;Nikos&#34;,&#34;src_ip&#34;:&#34;98.158.156.175&#34;,&#34;age&#34;:10} Logstash has GeoIP filter which adds information about the geographical location of IP addresses, based on data from the Maxmind GeoLite2 databases. In our case we used:\n">
+    <link rel="shortcut icon" href="/favicon.png" />
+
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-7TD74CVVZ2"></script>
+      <script>
+        var doNotTrack = false;
+        if ( false ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-7TD74CVVZ2');
+        }
+      </script>
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avatar_hu_b3778195aee6cc3.png" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Christos Manios</a></h1>
+            <h2 class="site-description">Developer life is a NullPointerException</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/manios'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://www.linkedin.com/in/christos-manios-23b6953a/'
+                        target="_blank"
+                        title="Linkedin"
+                        rel="me"
+                    >
+                        
+                        
+                            <?xml version="1.0" encoding="iso-8859-1"?>
+<!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+<svg height="800px" width="800px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
+	 viewBox="0 0 382 382" xml:space="preserve">
+<path style="fill:#0077B7;" d="M347.445,0H34.555C15.471,0,0,15.471,0,34.555v312.889C0,366.529,15.471,382,34.555,382h312.889
+	C366.529,382,382,366.529,382,347.444V34.555C382,15.471,366.529,0,347.445,0z M118.207,329.844c0,5.554-4.502,10.056-10.056,10.056
+	H65.345c-5.554,0-10.056-4.502-10.056-10.056V150.403c0-5.554,4.502-10.056,10.056-10.056h42.806
+	c5.554,0,10.056,4.502,10.056,10.056V329.844z M86.748,123.432c-22.459,0-40.666-18.207-40.666-40.666S64.289,42.1,86.748,42.1
+	s40.666,18.207,40.666,40.666S109.208,123.432,86.748,123.432z M341.91,330.654c0,5.106-4.14,9.246-9.246,9.246H286.73
+	c-5.106,0-9.246-4.14-9.246-9.246v-84.168c0-12.556,3.683-55.021-32.813-55.021c-28.309,0-34.051,29.066-35.204,42.11v97.079
+	c0,5.106-4.139,9.246-9.246,9.246h-44.426c-5.106,0-9.246-4.14-9.246-9.246V149.593c0-5.106,4.14-9.246,9.246-9.246h44.426
+	c5.106,0,9.246,4.14,9.246,9.246v15.655c10.497-15.753,26.097-27.912,59.312-27.912c73.552,0,73.131,68.716,73.131,106.472
+	L341.91,330.654L341.91,330.654z"/>
+</svg>
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://x.com/maniosolr'
+                        target="_blank"
+                        title="Twitter"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>Home</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/about/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>About</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/logstash/" >
+                Logstash
+            </a>
+        
+            <a href="/categories/elasticsearch/" >
+                Elasticsearch
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/logstash-geoip-json-logs-maxmint-geolite-docker/">Logstash - Enrich IP with Geolocation using Maxmind GeoLite2 City and ISP</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published" datetime='2018-08-14T18:35:00&#43;03:00'>Aug 14, 2018</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    3 minute read
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <p>Today we wanted to parse some json logs which we had in a file using <a class="link" href="http://rsyslog.com/"  target="_blank" rel="noopener"
+    >Rsyslog</a> and enrich  them with Geolocation information regarding the city and the ISP an IP belongs. We initially tried with Logstash (see relevant [previous blog post]({% post_url 2018-08-14-logstash-geo-maxmind-docker %})) but it was too slow. Thus we decided to try with parsing with Rsyslog. The file, let&rsquo;s call it <code>/var/log/input-geo.json</code> had the following structure and content. (It is the same as in Logstash post):</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="p">{</span><span class="nt">&#34;name&#34;</span><span class="p">:</span><span class="s2">&#34;Christos&#34;</span><span class="p">,</span><span class="nt">&#34;src_ip&#34;</span><span class="p">:</span><span class="s2">&#34;63.145.248.101&#34;</span><span class="p">,</span><span class="nt">&#34;age&#34;</span><span class="p">:</span><span class="mi">12</span><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span><span class="nt">&#34;name&#34;</span><span class="p">:</span><span class="s2">&#34;Nikos&#34;</span><span class="p">,</span><span class="nt">&#34;src_ip&#34;</span><span class="p">:</span><span class="s2">&#34;98.158.156.175&#34;</span><span class="p">,</span><span class="nt">&#34;age&#34;</span><span class="p">:</span><span class="mi">10</span><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Rsyslog has <a class="link" href="https://www.rsyslog.com/doc/v8-stable/configuration/modules/mmdblookup.html"  target="_blank" rel="noopener"
+    >MaxMind/GeoIP DB lookup (mmdblookup)</a> module which adds information about the geographical location of IP addresses, based on data from the Maxmind GeoLite2 databases. In our case we used:</p>
+<ul>
+<li><a class="link" href="https://dev.maxmind.com/geoip/geoip2/geolite2/"  target="_blank" rel="noopener"
+    >GeoLite2 City</a> database (free)</li>
+<li><a class="link" href="https://www.maxmind.com/en/geoip2-isp-database"  target="_blank" rel="noopener"
+    >GeoIP2 ISP </a> Database (commercial licence)</li>
+</ul>
+<p>We wanted to parse the JSON file enrich the <code>src_ip</code> field and store the geolocation information to <code>src_geoip</code>. Then we forward the message to Elasticsearch using <a class="link" href="https://www.rsyslog.com/doc/v8-stable/configuration/modules/omelasticsearch.html"  target="_blank" rel="noopener"
+    >omelasticsearch: Elasticsearch Output Module</a>. For debugging purposes we also enabled <a class="link" href="https://www.elastic.co/guide/en/logstash/current/plugins-outputs-file.html"  target="_blank" rel="noopener"
+    >file output</a>. Thus , the configuration (<code>rsyslog.conf</code>) looked like the following:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">  1
+</span><span class="lnt">  2
+</span><span class="lnt">  3
+</span><span class="lnt">  4
+</span><span class="lnt">  5
+</span><span class="lnt">  6
+</span><span class="lnt">  7
+</span><span class="lnt">  8
+</span><span class="lnt">  9
+</span><span class="lnt"> 10
+</span><span class="lnt"> 11
+</span><span class="lnt"> 12
+</span><span class="lnt"> 13
+</span><span class="lnt"> 14
+</span><span class="lnt"> 15
+</span><span class="lnt"> 16
+</span><span class="lnt"> 17
+</span><span class="lnt"> 18
+</span><span class="lnt"> 19
+</span><span class="lnt"> 20
+</span><span class="lnt"> 21
+</span><span class="lnt"> 22
+</span><span class="lnt"> 23
+</span><span class="lnt"> 24
+</span><span class="lnt"> 25
+</span><span class="lnt"> 26
+</span><span class="lnt"> 27
+</span><span class="lnt"> 28
+</span><span class="lnt"> 29
+</span><span class="lnt"> 30
+</span><span class="lnt"> 31
+</span><span class="lnt"> 32
+</span><span class="lnt"> 33
+</span><span class="lnt"> 34
+</span><span class="lnt"> 35
+</span><span class="lnt"> 36
+</span><span class="lnt"> 37
+</span><span class="lnt"> 38
+</span><span class="lnt"> 39
+</span><span class="lnt"> 40
+</span><span class="lnt"> 41
+</span><span class="lnt"> 42
+</span><span class="lnt"> 43
+</span><span class="lnt"> 44
+</span><span class="lnt"> 45
+</span><span class="lnt"> 46
+</span><span class="lnt"> 47
+</span><span class="lnt"> 48
+</span><span class="lnt"> 49
+</span><span class="lnt"> 50
+</span><span class="lnt"> 51
+</span><span class="lnt"> 52
+</span><span class="lnt"> 53
+</span><span class="lnt"> 54
+</span><span class="lnt"> 55
+</span><span class="lnt"> 56
+</span><span class="lnt"> 57
+</span><span class="lnt"> 58
+</span><span class="lnt"> 59
+</span><span class="lnt"> 60
+</span><span class="lnt"> 61
+</span><span class="lnt"> 62
+</span><span class="lnt"> 63
+</span><span class="lnt"> 64
+</span><span class="lnt"> 65
+</span><span class="lnt"> 66
+</span><span class="lnt"> 67
+</span><span class="lnt"> 68
+</span><span class="lnt"> 69
+</span><span class="lnt"> 70
+</span><span class="lnt"> 71
+</span><span class="lnt"> 72
+</span><span class="lnt"> 73
+</span><span class="lnt"> 74
+</span><span class="lnt"> 75
+</span><span class="lnt"> 76
+</span><span class="lnt"> 77
+</span><span class="lnt"> 78
+</span><span class="lnt"> 79
+</span><span class="lnt"> 80
+</span><span class="lnt"> 81
+</span><span class="lnt"> 82
+</span><span class="lnt"> 83
+</span><span class="lnt"> 84
+</span><span class="lnt"> 85
+</span><span class="lnt"> 86
+</span><span class="lnt"> 87
+</span><span class="lnt"> 88
+</span><span class="lnt"> 89
+</span><span class="lnt"> 90
+</span><span class="lnt"> 91
+</span><span class="lnt"> 92
+</span><span class="lnt"> 93
+</span><span class="lnt"> 94
+</span><span class="lnt"> 95
+</span><span class="lnt"> 96
+</span><span class="lnt"> 97
+</span><span class="lnt"> 98
+</span><span class="lnt"> 99
+</span><span class="lnt">100
+</span><span class="lnt">101
+</span><span class="lnt">102
+</span><span class="lnt">103
+</span><span class="lnt">104
+</span><span class="lnt">105
+</span><span class="lnt">106
+</span><span class="lnt">107
+</span><span class="lnt">108
+</span><span class="lnt">109
+</span><span class="lnt">110
+</span><span class="lnt">111
+</span><span class="lnt">112
+</span><span class="lnt">113
+</span><span class="lnt">114
+</span><span class="lnt">115
+</span><span class="lnt">116
+</span><span class="lnt">117
+</span><span class="lnt">118
+</span><span class="lnt">119
+</span><span class="lnt">120
+</span><span class="lnt">121
+</span><span class="lnt">122
+</span><span class="lnt">123
+</span><span class="lnt">124
+</span><span class="lnt">125
+</span><span class="lnt">126
+</span><span class="lnt">127
+</span><span class="lnt">128
+</span><span class="lnt">129
+</span><span class="lnt">130
+</span><span class="lnt">131
+</span><span class="lnt">132
+</span><span class="lnt">133
+</span><span class="lnt">134
+</span><span class="lnt">135
+</span><span class="lnt">136
+</span><span class="lnt">137
+</span><span class="lnt">138
+</span><span class="lnt">139
+</span><span class="lnt">140
+</span><span class="lnt">141
+</span><span class="lnt">142
+</span><span class="lnt">143
+</span><span class="lnt">144
+</span><span class="lnt">145
+</span><span class="lnt">146
+</span><span class="lnt">147
+</span><span class="lnt">148
+</span><span class="lnt">149
+</span><span class="lnt">150
+</span><span class="lnt">151
+</span><span class="lnt">152
+</span><span class="lnt">153
+</span><span class="lnt">154
+</span><span class="lnt">155
+</span><span class="lnt">156
+</span><span class="lnt">157
+</span><span class="lnt">158
+</span><span class="lnt">159
+</span><span class="lnt">160
+</span><span class="lnt">161
+</span><span class="lnt">162
+</span><span class="lnt">163
+</span><span class="lnt">164
+</span><span class="lnt">165
+</span><span class="lnt">166
+</span><span class="lnt">167
+</span><span class="lnt">168
+</span><span class="lnt">169
+</span><span class="lnt">170
+</span><span class="lnt">171
+</span><span class="lnt">172
+</span><span class="lnt">173
+</span><span class="lnt">174
+</span><span class="lnt">175
+</span><span class="lnt">176
+</span><span class="lnt">177
+</span><span class="lnt">178
+</span><span class="lnt">179
+</span><span class="lnt">180
+</span><span class="lnt">181
+</span><span class="lnt">182
+</span><span class="lnt">183
+</span><span class="lnt">184
+</span><span class="lnt">185
+</span><span class="lnt">186
+</span><span class="lnt">187
+</span><span class="lnt">188
+</span><span class="lnt">189
+</span><span class="lnt">190
+</span><span class="lnt">191
+</span><span class="lnt">192
+</span><span class="lnt">193
+</span><span class="lnt">194
+</span><span class="lnt">195
+</span><span class="lnt">196
+</span><span class="lnt">197
+</span><span class="lnt">198
+</span><span class="lnt">199
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-gdscript3" data-lang="gdscript3"><span class="line"><span class="cl"><span class="c1">#  /etc/rsyslog.conf	Configuration file for rsyslog.</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#			For more information see</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#			/usr/share/doc/rsyslog-doc/html/rsyslog_conf.html</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#  Default logging rules can be found in /etc/rsyslog.d/50-default.conf</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">#################</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#### MODULES ####</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#################</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">module</span><span class="p">(</span><span class="nb">load</span><span class="o">=</span><span class="s2">&#34;imuxsock&#34;</span><span class="p">)</span> <span class="c1"># provides support for local system logging</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># module(load=&#34;imklog&#34;)   # provides kernel logging support</span>
+</span></span><span class="line"><span class="cl"><span class="n">module</span><span class="p">(</span><span class="nb">load</span><span class="o">=</span><span class="s2">&#34;immark&#34;</span><span class="p">)</span>  <span class="c1"># provides --MARK-- message capability</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># $ModLoad imuxsock # provides support for local system logging</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># $ModLoad imklog   # provides kernel logging support (previously done by rklogd)</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#$ModLoad immark  # provides --MARK-- message capability</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># provides UDP syslog reception</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># $ModLoad imudp</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># $UDPServerRun 514</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># provides TCP syslog reception</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># $ModLoad imtcp</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># $InputTCPServerRun 514</span>
+</span></span><span class="line"><span class="cl"><span class="n">module</span><span class="p">(</span><span class="nb">load</span><span class="o">=</span><span class="s2">&#34;builtin:omfile&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">module</span><span class="p">(</span><span class="nb">load</span><span class="o">=</span><span class="s2">&#34;mmnormalize&#34;</span><span class="p">)</span> <span class="c1"># parser using liblognorm</span>
+</span></span><span class="line"><span class="cl"><span class="n">module</span><span class="p">(</span><span class="nb">load</span><span class="o">=</span><span class="s2">&#34;mmjsonparse&#34;</span><span class="p">)</span> <span class="c1">#for parsing CEE-enhanced syslog messages</span>
+</span></span><span class="line"><span class="cl"><span class="n">module</span><span class="p">(</span><span class="nb">load</span><span class="o">=</span><span class="s2">&#34;imfile&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">module</span><span class="p">(</span><span class="nb">load</span><span class="o">=</span><span class="s2">&#34;mmdblookup&#34;</span> <span class="n">container</span><span class="o">=</span><span class="s2">&#34;!src_geo&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">###########################</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#### GLOBAL DIRECTIVES ####</span>
+</span></span><span class="line"><span class="cl"><span class="c1">###########################</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">#</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># Use traditional timestamp format.</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># To enable high precision timestamps, comment out the following line.</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#</span>
+</span></span><span class="line"><span class="cl"><span class="o">$</span><span class="n">ActionFileDefaultTemplate</span> <span class="n">RSYSLOG_TraditionalFileFormat</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Filter duplicated messages</span>
+</span></span><span class="line"><span class="cl"><span class="o">$</span><span class="n">RepeatedMsgReduction</span> <span class="n">on</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">#</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># Set the default permissions for all log files.</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#</span>
+</span></span><span class="line"><span class="cl"><span class="o">$</span><span class="n">FileOwner</span> <span class="n">root</span>
+</span></span><span class="line"><span class="cl"><span class="o">$</span><span class="n">FileGroup</span> <span class="n">root</span>
+</span></span><span class="line"><span class="cl"><span class="o">$</span><span class="n">FileCreateMode</span> <span class="mi">0640</span>
+</span></span><span class="line"><span class="cl"><span class="o">$</span><span class="n">DirCreateMode</span> <span class="mi">0755</span>
+</span></span><span class="line"><span class="cl"><span class="o">$</span><span class="n">Umask</span> <span class="mi">0022</span>
+</span></span><span class="line"><span class="cl"><span class="o">$</span><span class="n">PrivDropToUser</span> <span class="n">syslog</span>
+</span></span><span class="line"><span class="cl"><span class="o">$</span><span class="n">PrivDropToGroup</span> <span class="n">syslog</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># General globals</span>
+</span></span><span class="line"><span class="cl"><span class="n">global</span><span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">enableDNS</span><span class="o">=</span><span class="s2">&#34;off&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Remove Control Chars</span>
+</span></span><span class="line"><span class="cl"><span class="n">global</span><span class="p">(</span><span class="n">parser</span><span class="o">.</span><span class="n">escapeControlCharactersOnReceive</span><span class="o">=</span><span class="s2">&#34;off&#34;</span> <span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">#</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># Where to place spool files</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#</span>
+</span></span><span class="line"><span class="cl"><span class="o">$</span><span class="n">WorkDirectory</span> <span class="o">/</span><span class="k">var</span><span class="o">/</span><span class="n">spool</span><span class="o">/</span><span class="n">rsyslog</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">global</span><span class="p">(</span><span class="n">workDirectory</span><span class="o">=</span><span class="s2">&#34;/var/spool/rsyslog&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># Include all config files in /etc/rsyslog.d/</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># $IncludeConfig /etc/rsyslog.d/*.conf</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">#################</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#### Inputs  ####</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#################</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># provides UDP syslog reception</span>
+</span></span><span class="line"><span class="cl"><span class="n">module</span><span class="p">(</span><span class="nb">load</span><span class="o">=</span><span class="s2">&#34;imudp&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">input</span><span class="p">(</span><span class="n">type</span><span class="o">=</span><span class="s2">&#34;imudp&#34;</span> <span class="n">port</span><span class="o">=</span><span class="s2">&#34;514&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># provides TCP syslog reception</span>
+</span></span><span class="line"><span class="cl"><span class="n">module</span><span class="p">(</span><span class="nb">load</span><span class="o">=</span><span class="s2">&#34;imtcp&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">input</span><span class="p">(</span><span class="n">type</span><span class="o">=</span><span class="s2">&#34;imtcp&#34;</span> <span class="n">port</span><span class="o">=</span><span class="s2">&#34;514&#34;</span> <span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># File 1</span>
+</span></span><span class="line"><span class="cl"><span class="n">input</span><span class="p">(</span><span class="n">type</span><span class="o">=</span><span class="s2">&#34;imfile&#34;</span>
+</span></span><span class="line"><span class="cl">      <span class="ne">File</span><span class="o">=</span><span class="s2">&#34;/opt/input-geo.json&#34;</span>
+</span></span><span class="line"><span class="cl">      <span class="n">Tag</span><span class="o">=</span><span class="s2">&#34;geoip&#34;</span>
+</span></span><span class="line"><span class="cl">      <span class="n">PersistStateInterval</span><span class="o">=</span><span class="s2">&#34;1&#34;</span>
+</span></span><span class="line"><span class="cl">      <span class="n">freshStartTail</span><span class="o">=</span><span class="s2">&#34;off&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">#################</span>
+</span></span><span class="line"><span class="cl"><span class="c1">### Templates ###</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#################</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># this is for formatting our syslog in JSON with @timestamp for Json messages</span>
+</span></span><span class="line"><span class="cl"><span class="n">template</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&#34;geoip&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">type</span><span class="o">=</span><span class="s2">&#34;list&#34;</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">constant</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="s2">&#34;{&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">      <span class="n">constant</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="s2">&#34;</span><span class="se">\&#34;</span><span class="s2">@version</span><span class="se">\&#34;</span><span class="s2">:</span><span class="se">\&#34;</span><span class="s2">1&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">      <span class="n">constant</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="s2">&#34;</span><span class="se">\&#34;</span><span class="s2">,</span><span class="se">\&#34;</span><span class="s2">@timestamp</span><span class="se">\&#34;</span><span class="s2">:</span><span class="se">\&#34;</span><span class="s2">&#34;</span><span class="p">)</span>		<span class="n">property</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&#34;timegenerated&#34;</span> <span class="n">dateFormat</span><span class="o">=</span><span class="s2">&#34;rfc3339&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">      <span class="n">constant</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="s2">&#34;</span><span class="se">\&#34;</span><span class="s2">,</span><span class="se">\&#34;</span><span class="s2">host</span><span class="se">\&#34;</span><span class="s2">:</span><span class="se">\&#34;</span><span class="s2">&#34;</span><span class="p">)</span>			    <span class="n">property</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&#34;hostname&#34;</span><span class="p">)</span> 
+</span></span><span class="line"><span class="cl">      <span class="n">constant</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="s2">&#34;</span><span class="se">\&#34;</span><span class="s2">,</span><span class="se">\&#34;</span><span class="s2">type</span><span class="se">\&#34;</span><span class="s2">:</span><span class="se">\&#34;</span><span class="s2">syslog&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">      <span class="n">constant</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="s2">&#34;</span><span class="se">\&#34;</span><span class="s2">,</span><span class="se">\&#34;</span><span class="s2">syslog_timestamp</span><span class="se">\&#34;</span><span class="s2">:</span><span class="se">\&#34;</span><span class="s2">&#34;</span><span class="p">)</span>	<span class="n">property</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&#34;timereported&#34;</span> <span class="n">dateFormat</span><span class="o">=</span><span class="s2">&#34;rfc3164&#34;</span>  <span class="n">format</span><span class="o">=</span><span class="s2">&#34;json&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">      <span class="n">constant</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="s2">&#34;</span><span class="se">\&#34;</span><span class="s2">,</span><span class="se">\&#34;</span><span class="s2">syslog_hostname</span><span class="se">\&#34;</span><span class="s2">:</span><span class="se">\&#34;</span><span class="s2">&#34;</span><span class="p">)</span>	<span class="n">property</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&#34;hostname&#34;</span> <span class="n">format</span><span class="o">=</span><span class="s2">&#34;json&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">      <span class="n">constant</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="s2">&#34;</span><span class="se">\&#34;</span><span class="s2">,</span><span class="se">\&#34;</span><span class="s2">syslog_program</span><span class="se">\&#34;</span><span class="s2">:</span><span class="se">\&#34;</span><span class="s2">&#34;</span><span class="p">)</span>	<span class="n">property</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&#34;programname&#34;</span> <span class="n">format</span><span class="o">=</span><span class="s2">&#34;json&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">      <span class="n">constant</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="s2">&#34;</span><span class="se">\&#34;</span><span class="s2">,</span><span class="se">\&#34;</span><span class="s2">syslog_message</span><span class="se">\&#34;</span><span class="s2">:</span><span class="se">\&#34;</span><span class="s2">&#34;</span><span class="p">)</span>	<span class="n">property</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&#34;msg&#34;</span> <span class="n">format</span><span class="o">=</span><span class="s2">&#34;json&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">      <span class="n">constant</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="s2">&#34;</span><span class="se">\&#34;</span><span class="s2">,</span><span class="se">\&#34;</span><span class="s2">received_at</span><span class="se">\&#34;</span><span class="s2">:</span><span class="se">\&#34;</span><span class="s2">&#34;</span><span class="p">)</span>		<span class="n">property</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&#34;timegenerated&#34;</span> <span class="n">dateFormat</span><span class="o">=</span><span class="s2">&#34;rfc3339&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">      <span class="n">constant</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="s2">&#34;</span><span class="se">\&#34;</span><span class="s2">,</span><span class="se">\&#34;</span><span class="s2">received_from</span><span class="se">\&#34;</span><span class="s2">:</span><span class="se">\&#34;</span><span class="s2">&#34;</span><span class="p">)</span>	    <span class="n">property</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&#34;fromhost&#34;</span> <span class="n">format</span><span class="o">=</span><span class="s2">&#34;json&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">      <span class="n">constant</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="s2">&#34;</span><span class="se">\&#34;</span><span class="s2">,</span><span class="se">\&#34;</span><span class="s2">path</span><span class="se">\&#34;</span><span class="s2">:</span><span class="se">\&#34;</span><span class="s2">&#34;</span><span class="p">)</span>      	    <span class="n">property</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&#34;$!metadata!filename&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">      <span class="n">constant</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="s2">&#34;</span><span class="se">\&#34;</span><span class="s2">,</span><span class="se">\&#34;</span><span class="s2">name</span><span class="se">\&#34;</span><span class="s2">:</span><span class="se">\&#34;</span><span class="s2">&#34;</span><span class="p">)</span>              <span class="n">property</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&#34;$!name&#34;</span> <span class="n">format</span><span class="o">=</span><span class="s2">&#34;json&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">      <span class="n">constant</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="s2">&#34;</span><span class="se">\&#34;</span><span class="s2">,</span><span class="se">\&#34;</span><span class="s2">src_ip</span><span class="se">\&#34;</span><span class="s2">:</span><span class="se">\&#34;</span><span class="s2">&#34;</span><span class="p">)</span>            <span class="n">property</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&#34;$!src_ip&#34;</span> <span class="n">format</span><span class="o">=</span><span class="s2">&#34;json&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">      <span class="n">constant</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="s2">&#34;</span><span class="se">\&#34;</span><span class="s2">,</span><span class="se">\&#34;</span><span class="s2">src_geoip</span><span class="se">\&#34;</span><span class="s2">:{&#34;</span><span class="p">)</span>          <span class="n">property</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&#34;$!src_geo&#34;</span> <span class="n">position</span><span class="o">.</span><span class="n">from</span><span class="o">=</span><span class="s2">&#34;2&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">      <span class="n">constant</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="s2">&#34;}</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">#################</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#### Actions ####</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#################</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">###Fix text to utf8, disabled for now</span>
+</span></span><span class="line"><span class="cl"><span class="c1">###action(type=&#34;mmutf8fix&#34;)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">#action(type=&#34;omfile&#34; file=&#34;/tmp/logtesting&#34; template=&#34;RSYSLOG_DebugFormat&#34;)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="p">(</span><span class="o">$</span><span class="n">syslogtag</span> <span class="n">contains</span> <span class="s1">&#39;geoip&#39;</span><span class="p">)</span> <span class="n">then</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="n">action</span><span class="p">(</span><span class="n">type</span><span class="o">=</span><span class="s2">&#34;mmjsonparse&#34;</span> <span class="n">cookie</span><span class="o">=</span><span class="s2">&#34;&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="o">$</span><span class="n">parsesuccess</span> <span class="o">==</span> <span class="s2">&#34;OK&#34;</span> <span class="n">then</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="c1"># https://github.com/rsyslog/rsyslog/issues/1650</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="c1"># Add MaxMind/GeoIP DB lookup information</span>
+</span></span><span class="line"><span class="cl">        <span class="n">action</span><span class="p">(</span> <span class="n">type</span><span class="o">=</span><span class="s2">&#34;mmdblookup&#34;</span> <span class="n">mmdbfile</span><span class="o">=</span><span class="s2">&#34;/etc/rsyslog.d/GeoLite2-City.mmdb&#34;</span> <span class="n">key</span><span class="o">=</span><span class="s2">&#34;!src_ip&#34;</span> 
+</span></span><span class="line"><span class="cl">                <span class="n">fields</span><span class="o">=</span><span class="p">[</span><span class="s2">&#34;:timezone:!location!time_zone&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                        <span class="s2">&#34;:latitude:!location!latitude&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                        <span class="s2">&#34;:longitude:!location!longitude&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                        <span class="s2">&#34;:dma_code:!location!metro_code&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                        <span class="s2">&#34;:city_name:!names!en&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                        <span class="s2">&#34;:continent_code:!continent!code&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                        <span class="s2">&#34;:country_code2:!country!iso_code&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                        <span class="s2">&#34;:country_code3:!country!iso_code&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                        <span class="s2">&#34;:country_name:!country!names!en&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                        <span class="s2">&#34;:postal_code:!postal!code&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                        <span class="s2">&#34;:region_code:!subdivisions!iso_code&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                        <span class="s2">&#34;:region_name:!subdivisions!names!en&#34;</span>
+</span></span><span class="line"><span class="cl">                        <span class="p">]</span>
+</span></span><span class="line"><span class="cl">        <span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="c1"># Add MaxMind/GeoIP ISP DB lookup information</span>
+</span></span><span class="line"><span class="cl">        <span class="n">action</span><span class="p">(</span> <span class="n">type</span><span class="o">=</span><span class="s2">&#34;mmdblookup&#34;</span> <span class="n">mmdbfile</span><span class="o">=</span><span class="s2">&#34;/etc/rsyslog.d/GeoIP2-ISP.mmdb&#34;</span> <span class="n">key</span><span class="o">=</span><span class="s2">&#34;!src_ip&#34;</span> 
+</span></span><span class="line"><span class="cl">                <span class="n">fields</span><span class="o">=</span><span class="p">[</span><span class="s2">&#34;:asn:!autonomous_system_number&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                        <span class="s2">&#34;:as_org:!autonomous_system_organization&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                        <span class="s2">&#34;!isp&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                        <span class="s2">&#34;!organization&#34;</span>
+</span></span><span class="line"><span class="cl">                        <span class="p">]</span>
+</span></span><span class="line"><span class="cl">        <span class="p">)</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="c1"># Add IP to src_geo object</span>
+</span></span><span class="line"><span class="cl">        <span class="n">set</span> <span class="o">$!</span><span class="n">src_geo</span><span class="o">!</span><span class="n">ip</span> <span class="o">=</span> <span class="o">$!</span><span class="n">src_ip</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="c1"># If geolocation was successful, add lat,lon in a special location object</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="o">$!</span> <span class="n">contains</span> <span class="s1">&#39;latitude&#39;</span> <span class="n">then</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">set</span> <span class="o">$!</span><span class="n">src_geo</span><span class="o">!</span><span class="n">location</span><span class="o">!</span><span class="n">lat</span> <span class="o">=</span> <span class="o">$!</span><span class="n">src_geo</span><span class="o">!</span><span class="n">latitude</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            <span class="n">set</span> <span class="o">$!</span><span class="n">src_geo</span><span class="o">!</span><span class="n">location</span><span class="o">!</span><span class="n">lon</span> <span class="o">=</span> <span class="o">$!</span><span class="n">src_geo</span><span class="o">!</span><span class="n">longitude</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="c1"># Output to a new file</span>
+</span></span><span class="line"><span class="cl">        <span class="n">action</span><span class="p">(</span><span class="n">type</span><span class="o">=</span><span class="s2">&#34;omfile&#34;</span> <span class="ne">File</span><span class="o">=</span><span class="s2">&#34;/tmp/json-output&#34;</span> <span class="n">template</span><span class="o">=</span><span class="s2">&#34;geoip&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="c1"># Output to Elasticsearch</span>
+</span></span><span class="line"><span class="cl">        <span class="n">action</span><span class="p">(</span><span class="n">type</span><span class="o">=</span><span class="s2">&#34;omelasticsearch&#34;</span>
+</span></span><span class="line"><span class="cl">            <span class="n">server</span><span class="o">=</span><span class="s2">&#34;192.168.1.10&#34;</span>
+</span></span><span class="line"><span class="cl">            <span class="n">serverport</span><span class="o">=</span><span class="s2">&#34;9200&#34;</span>
+</span></span><span class="line"><span class="cl">            <span class="n">template</span><span class="o">=</span><span class="s2">&#34;geoip&#34;</span>  
+</span></span><span class="line"><span class="cl">            <span class="n">searchIndex</span><span class="o">=</span><span class="s2">&#34;geoindex&#34;</span>
+</span></span><span class="line"><span class="cl">            <span class="n">dynSearchIndex</span><span class="o">=</span><span class="s2">&#34;on&#34;</span>
+</span></span><span class="line"><span class="cl">            <span class="n">searchType</span><span class="o">=</span><span class="s2">&#34;syslog&#34;</span>
+</span></span><span class="line"><span class="cl">            <span class="n">bulkmode</span><span class="o">=</span><span class="s2">&#34;on&#34;</span>                   <span class="c1"># use the Bulk API</span>
+</span></span><span class="line"><span class="cl">            <span class="n">queue</span><span class="o">.</span><span class="n">dequeuebatchsize</span><span class="o">=</span><span class="s2">&#34;5000&#34;</span>   <span class="c1"># ES bulk size</span>
+</span></span><span class="line"><span class="cl">            <span class="n">queue</span><span class="o">.</span><span class="n">size</span><span class="o">=</span><span class="s2">&#34;100000&#34;</span>   <span class="c1"># capacity of the action queue</span>
+</span></span><span class="line"><span class="cl">            <span class="n">queue</span><span class="o">.</span><span class="n">workerthreads</span><span class="o">=</span><span class="s2">&#34;5&#34;</span>   <span class="c1"># 5 workers for the action</span>
+</span></span><span class="line"><span class="cl">            <span class="n">action</span><span class="o">.</span><span class="n">resumeretrycount</span><span class="o">=</span><span class="s2">&#34;-1&#34;</span>  <span class="c1"># retry indefinitely if ES is unreachable</span>
+</span></span><span class="line"><span class="cl">            <span class="n">errorfile</span><span class="o">=</span><span class="s2">&#34;/var/log/omelasticsearch.log&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="o">$</span><span class="n">parsesuccess</span> <span class="o">==</span> <span class="s2">&#34;FAIL&#34;</span> <span class="n">then</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">action</span><span class="p">(</span><span class="n">type</span><span class="o">=</span><span class="s2">&#34;omfile&#34;</span> <span class="ne">File</span><span class="o">=</span><span class="s2">&#34;/tmp/json-parse-failure&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>To run Logstash we chose the quickest way, hence run it in Docker , so we have put all required Logstash configuration, logs and Maxmind databases in a directory:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">linux@linux-VM:~$ ls -l
+</span></span><span class="line"><span class="cl">-rwxrwxr-x <span class="m">1</span> linux linux <span class="m">26331174</span> Aug   <span class="m">6</span> 19:11 GeoIP2-ISP.mmdb
+</span></span><span class="line"><span class="cl">-rwxrwxr-x <span class="m">1</span> linux linux <span class="m">51469823</span> Aug   <span class="m">6</span> 19:11 GeoLite2-City.mmdb
+</span></span><span class="line"><span class="cl">-rw-rw-r-- <span class="m">1</span> linux linux      <span class="m">107</span> Aug  <span class="m">18</span> 19:13 input-geo.json
+</span></span><span class="line"><span class="cl">-rwxrwxr-x <span class="m">1</span> linux linux     <span class="m">2244</span> Aug  <span class="m">18</span> 19:32 rsyslog.conf
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Running Rsyslog on Docker is not so relatively easy as the Docker images are a work in progress in <a class="link" href="https://github.com/rsyslog/rsyslog-docker/"  target="_blank" rel="noopener"
+    >Github</a> (last checked 2018-08-18). So we created a custom image in our personal account, called <a class="link" href="https://hub.docker.com/r/manios/rsyslog/"  target="_blank" rel="noopener"
+    >manios/rsyslog</a>. Let&rsquo;s run a Docker container with Rsyslog 8.37.0:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">docker run <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    -d <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --name myrsyslog <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    -v <span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/GeoLite2-City.mmdb:/etc/rsyslog.d/GeoLite2-City.mmdb <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    -v <span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/GeoIP2-ISP.mmdb:/etc/rsyslog.d/GeoIP2-ISP.mmdb <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    -v <span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/input-geo.json:/opt/input-geo.json <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    -v <span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/rsyslog.conf:/etc/rsyslog.conf <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    manios/rsyslog:8.37.0
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Now Rsyslog is running. Let&rsquo;s run a Bash shell inside the container:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">docker <span class="nb">exec</span> -it myrsyslog /bin/bash
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>While Rsyslog is running, if you examine the contents of <code>/tmp/json-output</code> file, you will notice that the messages contain a lot of geolocation information and they will resemble to the following:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;@version&#34;</span><span class="p">:</span> <span class="s2">&#34;1&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;@timestamp&#34;</span><span class="p">:</span> <span class="s2">&#34;2018-08-18T06:59:14.640903+00:00&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;host&#34;</span><span class="p">:</span> <span class="s2">&#34;b576d0a6022b&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;type&#34;</span><span class="p">:</span> <span class="s2">&#34;syslog&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;syslog_timestamp&#34;</span><span class="p">:</span> <span class="s2">&#34;Aug 18 06:59:14&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;syslog_hostname&#34;</span><span class="p">:</span> <span class="s2">&#34;b576d0a6022b&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;syslog_program&#34;</span><span class="p">:</span> <span class="s2">&#34;geoip&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;syslog_message&#34;</span><span class="p">:</span> <span class="s2">&#34;{\&#34;name\&#34;:\&#34;Christos\&#34;,\&#34;src_ip\&#34;:\&#34;63.145.248.101\&#34;,\&#34;age\&#34;:12}&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;received_at&#34;</span><span class="p">:</span> <span class="s2">&#34;2018-08-18T06:59:14.640903+00:00&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;received_from&#34;</span><span class="p">:</span> <span class="s2">&#34;&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;path&#34;</span><span class="p">:</span> <span class="s2">&#34;/opt/input-geo.json&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;Christos&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;src_ip&#34;</span><span class="p">:</span> <span class="s2">&#34;63.145.248.101&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;src_geoip&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;timezone&#34;</span><span class="p">:</span> <span class="s2">&#34;America\/Los_Angeles&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;latitude&#34;</span><span class="p">:</span> <span class="mf">37.925500</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;longitude&#34;</span><span class="p">:</span> <span class="mf">-122.343700</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;dma_code&#34;</span><span class="p">:</span> <span class="mi">807</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;city_name&#34;</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;continent_code&#34;</span><span class="p">:</span> <span class="s2">&#34;NA&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;country_code2&#34;</span><span class="p">:</span> <span class="s2">&#34;US&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;country_code3&#34;</span><span class="p">:</span> <span class="s2">&#34;US&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;country_name&#34;</span><span class="p">:</span> <span class="s2">&#34;UnitedStates&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;postal_code&#34;</span><span class="p">:</span> <span class="s2">&#34;94804&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;region_code&#34;</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;region_name&#34;</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;asn&#34;</span><span class="p">:</span> <span class="mi">209</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;as_org&#34;</span><span class="p">:</span> <span class="s2">&#34;QwestCommunicationsCompany,LLC&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;isp&#34;</span><span class="p">:</span> <span class="s2">&#34;CenturyLink&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;organization&#34;</span><span class="p">:</span> <span class="s2">&#34;CenturyLink&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;ip&#34;</span><span class="p">:</span> <span class="s2">&#34;63.145.248.101&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;location&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&#34;lat&#34;</span><span class="p">:</span> <span class="mf">37.9255</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&#34;lon&#34;</span><span class="p">:</span> <span class="mf">-122.3437</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Unfortunately, current version of Rsyslog contains a known bug (<a class="link" href="https://github.com/rsyslog/rsyslog/issues/1650"  target="_blank" rel="noopener"
+    >#1650</a>) which strips the space characters from strings. Notice that</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">&#34;country_name&#34;: &#34;UnitedStates&#34;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>should be</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">&#34;country_name&#34;: &#34;United States&#34;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>for example. Also, if you compare to our previous post (<code>TODO add link here</code>), <code>region_code</code> and <code>region_name</code> should have a value. You can easily spot the differences between Rsyslog and Logstash output in the following image:</p>
+<p><img src="/p/logstash-geoip-json-logs-maxmint-geolite-docker/maxmind-output-logstash-rsyslog.png"
+	width="1911"
+	height="440"
+	srcset="/p/logstash-geoip-json-logs-maxmint-geolite-docker/maxmind-output-logstash-rsyslog_hu_afdab6bc40ce3732.png 480w, /p/logstash-geoip-json-logs-maxmint-geolite-docker/maxmind-output-logstash-rsyslog_hu_843ba1d1d08101e3.png 1024w"
+	loading="lazy"
+	
+		alt="Rsyslog and Logstash output diff when using Maxmind GeoIP City and ISP lookup databases"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="434"
+		data-flex-basis="1042px"
+	
+></p>
+<p>We hope this article helped you get up and running with Rsyslog and the use of <a class="link" href="https://www.rsyslog.com/doc/v8-stable/configuration/modules/mmdblookup.html"  target="_blank" rel="noopener"
+    >MaxMind/GeoIP DB lookup (mmdblookup)</a> module!</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/rsyslog/">Rsyslog</a>
+        
+            <a href="/tags/mmdblookup/">Mmdblookup</a>
+        
+            <a href="/tags/omelasticsearch/">Omelasticsearch</a>
+        
+            <a href="/tags/geolocation/">Geolocation</a>
+        
+            <a href="/tags/ip/">Ip</a>
+        
+            <a href="/tags/maxmind/">Maxmind</a>
+        
+            <a href="/tags/geo/">Geo</a>
+        
+            <a href="/tags/geoip/">Geoip</a>
+        
+            <a href="/tags/geolite/">Geolite</a>
+        
+            <a href="/tags/geolite2/">Geolite2</a>
+        
+            <a href="/tags/database/">Database</a>
+        
+            <a href="/tags/json/">Json</a>
+        
+            <a href="/tags/parse/">Parse</a>
+        
+            <a href="/tags/message/">Message</a>
+        
+            <a href="/tags/log/">Log</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/p/logstash-geoip-json-logs-maxmint-geolite-docker/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Logstash - Enrich IP with Geolocation using Maxmind GeoLite2 City and ISP</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/p/postgre-sql-perform-queries-in-json-array-sub-documents/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">PostgreSQL perform queries in JSON array sub-documents</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/p/create-a-beat-based-on-metricbeat-resolving-bugs/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Creating a Beat based on Metricbeat resolving Init and create metricset failures</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/p/java-soap-service-client-debug-http-message/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Debug HTTP request of Java SOAP JAX-WS web service client</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/p/json-remove-new-lines-via-linux-and-use-it-as-string-variable-and-as-param-in-curl-post-request/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">JSON remove new lines via Linux and use it as string variable and as param in cURL POST request</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    <div class="disqus-container">
+    <div id="disqus_thread"></div>
+<script>
+    window.disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "manios-org" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+
+<style>
+    .disqus-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+</style>
+
+<script>
+    window.addEventListener('onColorSchemeChange', (e) => {
+        if (typeof DISQUS == 'object') {
+            DISQUS.reset({
+                reload: true
+            });
+        }
+    })
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2011 - 
+        
+        2025 Christos Manios
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.32.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.c922af694cc257bf1ecc41c0dd7b0430f9114ec280ccf67cd2c6ad55f5316c4e.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

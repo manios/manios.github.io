@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Pages on Christos Manios</title>
+        <link>https://manios.org/page/</link>
+        <description>Recent content in Pages on Christos Manios</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>en-us</language>
+        <lastBuildDate>Sun, 23 Nov 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://manios.org/page/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>Archives</title>
+        <link>https://manios.org/archives/</link>
+        <pubDate>Sun, 23 Nov 2025 00:00:00 +0000</pubDate>
+        
+        <guid>https://manios.org/archives/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>About</title>
+        <link>https://manios.org/about/</link>
+        <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+        
+        <guid>https://manios.org/about/</guid>
+        <description>&lt;ul&gt;
+&lt;li&gt;Name: Christos Manios&lt;/li&gt;
+&lt;li&gt;Profession: Software Developer&lt;/li&gt;
+&lt;li&gt;Country: Greece&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://www.linkedin.com/pub/christos-manios/3a/695/23b&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;My LinkedIn Profile&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Twitter profile: &lt;a class=&#34;link&#34; href=&#34;https://twitter.com/maniosolr&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;@maniosolr&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Main Interests: Whatever comes into my attention ! However I am quite curious about:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Computers (is that news?)&lt;/li&gt;
+&lt;li&gt;Aviation
+.. and other stuff. Return my mind control device or I am not telling you!&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+        </item>
+        <item>
+        <title>Search</title>
+        <link>https://manios.org/search/</link>
+        <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+        
+        <guid>https://manios.org/search/</guid>
+        <description></description>
+        </item>
+        
+    </channel>
+</rss>

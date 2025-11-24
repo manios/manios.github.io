@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>MS SQL Server on Christos Manios</title>
+        <link>https://manios.org/categories/ms-sql-server/</link>
+        <description>Recent content in MS SQL Server on Christos Manios</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>en-us</language>
+        <lastBuildDate>Fri, 23 Dec 2022 20:00:00 +0200</lastBuildDate><atom:link href="https://manios.org/categories/ms-sql-server/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>MS SQL Server Docker container restore database from .bak file created in Windows to a New Location</title>
+        <link>https://manios.org/2022/12/23/oracle-sql-select-date-range-between-range/</link>
+        <pubDate>Fri, 23 Dec 2022 20:00:00 +0200</pubDate>
+        
+        <guid>https://manios.org/2022/12/23/oracle-sql-select-date-range-between-range/</guid>
+        <description>&lt;p&gt;Yesterday, a client which uses Microsoft SQL Server 2008 R2 (SP2) wanted to test if his database backup can work in Microsoft SQL Server 2019 Developer version. He currently runs his SQL Server instance in Windows Server. He provided us with a &lt;code&gt;.bak&lt;/code&gt; file, let us call it for this post &lt;code&gt;WinCarFactorySQL.bak&lt;/code&gt;.&lt;/p&gt;
+&lt;h2 id=&#34;run-a-microsoft-sql-server-docker-container&#34;&gt;Run a Microsoft SQL Server Docker container
+&lt;/h2&gt;&lt;p&gt;In order to test quickly, we are going to use the official, Ubuntu based, &lt;a class=&#34;link&#34; href=&#34;https://hub.docker.com/_/microsoft-mssql-server&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Microsoft SQL Server 2019 docker container&lt;/a&gt;. Therefore we download it:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;docker pull mcr.microsoft.com/mssql/server:2019-CU18-ubuntu-20.04
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;and run it in &lt;code&gt;Developer&lt;/code&gt; mode:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;8
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;docker run -d &lt;span class=&#34;se&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;se&#34;&gt;&lt;/span&gt;    --name sqlserver2019 &lt;span class=&#34;se&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;se&#34;&gt;&lt;/span&gt;    -e &lt;span class=&#34;s2&#34;&gt;&amp;#34;ACCEPT_EULA=Y&amp;#34;&lt;/span&gt; &lt;span class=&#34;se&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;se&#34;&gt;&lt;/span&gt;    -e &lt;span class=&#34;s1&#34;&gt;&amp;#39;MSSQL_SA_PASSWORD=mysuperduperpassworD1234!56&amp;#39;&lt;/span&gt; &lt;span class=&#34;se&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;se&#34;&gt;&lt;/span&gt;    -e &lt;span class=&#34;s2&#34;&gt;&amp;#34;MSSQL_PID=Developer&amp;#34;&lt;/span&gt; &lt;span class=&#34;se&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;se&#34;&gt;&lt;/span&gt;    -p 1433:1433 &lt;span class=&#34;se&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;se&#34;&gt;&lt;/span&gt;    -v &lt;span class=&#34;s2&#34;&gt;&amp;#34;/home/mylinux/wincarfactorybak:/opt/wincarfactorybak&amp;#34;&lt;/span&gt; &lt;span class=&#34;se&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;se&#34;&gt;&lt;/span&gt;    mcr.microsoft.com/mssql/server:2019-CU18-ubuntu-20.04
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;As you can see we mount &lt;code&gt;/home/mylinux/wincarfactorybak&lt;/code&gt; directory which contains the &lt;code&gt;WinCarFactorySQL.bak&lt;/code&gt; in order to use it inside the container in &lt;code&gt;/opt/wincarfactorybak&lt;/code&gt; directory.&lt;/p&gt;
+&lt;p&gt;For more information you can read: &lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/en-us/sql/linux/quickstart-install-connect-docker?view=sql-server-ver16&amp;amp;pivots=cs1-bash&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Quickstart: Run SQL Server Linux container images with Docker&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&#34;examine-bak-file-contents&#34;&gt;Examine .bak file contents
+&lt;/h2&gt;&lt;p&gt;In order to restore the database properly, we have to examine the &lt;code&gt;.bak&lt;/code&gt; file contents. This can be achieved by executing this command on the running container:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;docker &lt;span class=&#34;nb&#34;&gt;exec&lt;/span&gt; -it sqlserver2019 /opt/mssql-tools/bin/sqlcmd -S localhost &lt;span class=&#34;se&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;se&#34;&gt;&lt;/span&gt;   -U SA -P &lt;span class=&#34;s1&#34;&gt;&amp;#39;mysuperduperpassworD1234!56&amp;#39;&lt;/span&gt; &lt;span class=&#34;se&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;se&#34;&gt;&lt;/span&gt;   -Q &lt;span class=&#34;s1&#34;&gt;&amp;#39;RESTORE FILELISTONLY FROM DISK = &amp;#34;/opt/wincarfactorybak/WinCarFactorySQL.bak&amp;#34;&amp;#39;&lt;/span&gt; &lt;span class=&#34;se&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;se&#34;&gt;&lt;/span&gt;   &lt;span class=&#34;p&#34;&gt;|&lt;/span&gt; tr -s &lt;span class=&#34;s1&#34;&gt;&amp;#39; &amp;#39;&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;|&lt;/span&gt; cut -d &lt;span class=&#34;s1&#34;&gt;&amp;#39; &amp;#39;&lt;/span&gt; -f 1-2
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;The output looks like this:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;LogicalName       PhysicalName
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;-----------       ------------
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;WinCarFactorySQL       c:\Program Files\Microsoft SQL Server\MSSQL10_50.SQLEXPRESS\MSSQL\DATA\WinCarFactorySQL.mdf
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;WinCarFactorySQL_log   c:\Program Files\Microsoft SQL Server\MSSQL10_50.SQLEXPRESS\MSSQL\DATA\WinCarFactorySQL_log.ldf
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;(2 rows)
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;For more information you can read: &lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/en-us/sql/linux/tutorial-restore-backup-in-sql-server-container?view=sql-server-ver16&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Restore a SQL Server database in a Linux Docker container&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&#34;restore-database&#34;&gt;Restore database
+&lt;/h2&gt;&lt;p&gt;Now we have to import and relocate these two files into the directory SQL Server uses to store these files in this container. The docker container uses a non-root user called &lt;code&gt;mssql&lt;/code&gt;. Therefore in order to find the directory we searched for &lt;code&gt;*.mdf&lt;/code&gt; files:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;bob@bobis:/home/mylinux$ docker &lt;span class=&#34;nb&#34;&gt;exec&lt;/span&gt; -it  sqlserver2019 /bin/bash
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;mssql@7b208ca8f759:/$ f^C
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;failed reverse-i-search&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;sb&#34;&gt;`&lt;/span&gt;fin&lt;span class=&#34;err&#34;&gt;&amp;#39;&lt;/span&gt;: ^C
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;mssql@7b208ca8f759:/$ find -iname &lt;span class=&#34;s2&#34;&gt;&amp;#34;*.mdf&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;./var/opt/mssql/data/tempdb.mdf
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;./var/opt/mssql/data/msdbdata.mdf
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;./var/opt/mssql/data/model_replicatedmaster.mdf
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;./var/opt/mssql/data/model_msdbdata.mdf
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;./var/opt/mssql/data/model.mdf
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;./var/opt/mssql/data/master.mdf
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;mssql@7b208ca8f759:/$ whoami
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;mssql
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;Finally we restore the &lt;code&gt;WinCarFactorySQL.bak&lt;/code&gt; file using the following command:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;docker &lt;span class=&#34;nb&#34;&gt;exec&lt;/span&gt; -it sqlserver2019 /opt/mssql-tools/bin/sqlcmd -S localhost &lt;span class=&#34;se&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;se&#34;&gt;&lt;/span&gt;    -U SA -P &lt;span class=&#34;s1&#34;&gt;&amp;#39;mysuperduperpassworD1234!56&amp;#39;&lt;/span&gt; &lt;span class=&#34;se&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;se&#34;&gt;&lt;/span&gt;    -Q &lt;span class=&#34;s1&#34;&gt;&amp;#39;RESTORE DATABASE WinCarFactorySQL FROM DISK = &amp;#34;/opt/wincarfactorybak/WinCarFactorySQL.bak&amp;#34; WITH MOVE &amp;#34;WinCarFactorySQL&amp;#34; TO &amp;#34;/var/opt/mssql/data/WinCarFactorySQL.mdf&amp;#34;, MOVE &amp;#34;WinCarFactorySQL_log&amp;#34; TO &amp;#34;/var/opt/mssql/data/WinCarFactorySQL_log.ldf&amp;#34;&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;If you get an output similar to the following, then your database restoration was successful!&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Processed 130576 pages for database &amp;#39;WinCarFactorySQL&amp;#39;, file &amp;#39;WinCarFactorySQL&amp;#39; on file 1.
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Processed 1 pages for database &amp;#39;WinCarFactorySQL&amp;#39;, file &amp;#39;WinCarFactorySQL_log&amp;#39; on file 1.
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Converting database &amp;#39;WinCarFactorySQL&amp;#39; from version 661 to the current version 904.
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Database &amp;#39;WinCarFactorySQL&amp;#39; running the upgrade step from version 661 to version 668.
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Database &amp;#39;WinCarFactorySQL&amp;#39; running the upgrade step from version 668 to version 669.
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;-- some lines truncated --
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Database &amp;#39;WinCarFactorySQL&amp;#39; running the upgrade step from version 901 to version 902.
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Database &amp;#39;WinCarFactorySQL&amp;#39; running the upgrade step from version 902 to version 903.
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Database &amp;#39;WinCarFactorySQL&amp;#39; running the upgrade step from version 903 to version 904.
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;RESTORE DATABASE successfully processed 130577 pages in 10.623 seconds (96.030 MB/sec).
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;For more information about these commands, you can read:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://learn.microsoft.com/en-us/sql/relational-databases/backup-restore/restore-files-to-a-new-location-sql-server?view=sql-server-ver16&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Restore Files to a New Location (SQL Server)&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.sqlshack.com/change-default-database-file-and-backup-paths-in-sql-server-on-linux/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Change default database file and backup paths in SQL Server on Linux&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;note-1-regarding-directory-permissions&#34;&gt;Note 1: Regarding directory permissions
+&lt;/h3&gt;&lt;p&gt;If you decide to use another directory to &lt;code&gt;MOVE&lt;/code&gt; your &lt;code&gt;.mdf&lt;/code&gt; and &lt;code&gt;.ldf&lt;/code&gt; files into any other random directory, you might stumble uppon permission issues. For instance if instead of using &lt;code&gt;/var/opt/mssql/data&lt;/code&gt; you use &lt;code&gt;/opt/wincarfactorybak&lt;/code&gt; which is not writable by &lt;code&gt;mssql&lt;/code&gt; user you might get errors like this:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;The operating system returned the error &amp;#39;5(Access is denied.)&amp;#39; while attempting &amp;#39;RestoreContainer::ValidateTargetForCreation&amp;#39; on &amp;#39;/opt/wincarfactorybak/WinCarFactorySQL.mdf&amp;#39;.
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Msg 3156, Level 16, State 5, Server 7b208ca8f759, Line 1
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;File &amp;#39;WinCarFactorySQL&amp;#39; cannot be restored to &amp;#39;/opt/wincarfactorybak/WinCarFactorySQL.mdf&amp;#39;. Use WITH MOVE to identify a valid location for the file.
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Msg 3634, Level 16, State 1, Server 7b208ca8f759, Line 1
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;The operating system returned the error &amp;#39;5(Access is denied.)&amp;#39; while attempting &amp;#39;RestoreContainer::ValidateTargetForCreation&amp;#39; on &amp;#39;/opt/wincarfactorybak/WinCarFactorySQL_log.ldf&amp;#39;.
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Msg 3156, Level 16, State 5, Server 7b208ca8f759, Line 1
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;File &amp;#39;WinCarFactorySQL&amp;#39; cannot be restored to &amp;#39;/opt/wincarfactorybak/WinCarFactorySQL_log.ldf&amp;#39;. Use WITH MOVE to identify a valid location for the file.
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Msg 3119, Level 16, State 1, Server 7b208ca8f759, Line 1
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Problems were identified while planning for the RESTORE statement. Previous messages provide details.
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Msg 3013, Level 16, State 1, Server 7b208ca8f759, Line 1
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;RESTORE DATABASE is terminating abnormally.
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id=&#34;note-2-regarding-sql-server-version-where-backup-was-made&#34;&gt;Note 2: Regarding SQL server version where backup was made
+&lt;/h3&gt;&lt;p&gt;If you received a database backup which fails to be restored locally getting the following error:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Msg 3169, Level 16, State 1, Server 203c41e3a2e1, Line 1
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;The database was backed up on a server running version 16.00.1000. That version is incompatible with this server, which is running version 15.00.4261. Either restore the database on a server that supports the backup, or use a backup that is compatible with this server.
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Msg 3013, Level 16, State 1, Server 203c41e3a2e1, Line 1
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;RESTORE DATABASE is terminating abnormally.
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;then it seems that the backup has been created using a different Microsoft SQL Server version than the one that you are running in your container. In this example we took help from &lt;a class=&#34;link&#34; href=&#34;https://sqlserverbuilds.blogspot.com/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://sqlserverbuilds.blogspot.com/&lt;/a&gt; and we found out that:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;The backup was created using Microsoft SQL Server &lt;strong&gt;2022&lt;/strong&gt; with build 16.0.1000.&lt;/li&gt;
+&lt;li&gt;We tried to restore it in an older Microsoft SQL Server &lt;strong&gt;2019&lt;/strong&gt; with build 15.0.4261.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Therefore we need to run a container using an updated image according &lt;a class=&#34;link&#34; href=&#34;https://hub.docker.com/_/microsoft-mssql-server?tab=description&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;to this table&lt;/a&gt; which will be in our case: &lt;code&gt;mcr.microsoft.com/mssql/server:2022-CU9-ubuntu-20.04&lt;/code&gt;&lt;/p&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>

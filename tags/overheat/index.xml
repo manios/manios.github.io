@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Overheat on Christos Manios</title>
+        <link>https://manios.org/tags/overheat/</link>
+        <description>Recent content in Overheat on Christos Manios</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>en-us</language>
+        <lastBuildDate>Sun, 07 Oct 2018 21:54:00 +0300</lastBuildDate><atom:link href="https://manios.org/tags/overheat/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>Solved: HP 630 notebook overheating problem</title>
+        <link>https://manios.org/2018/10/07/hp-630-notebook-overheating-problem/</link>
+        <pubDate>Sun, 07 Oct 2018 21:54:00 +0300</pubDate>
+        
+        <guid>https://manios.org/2018/10/07/hp-630-notebook-overheating-problem/</guid>
+        <description>&lt;h2 id=&#34;first-incident&#34;&gt;First Incident
+&lt;/h2&gt;&lt;p&gt;A year ago (April 2017) while we were using a &lt;a class=&#34;link&#34; href=&#34;https://support.hp.com/in-en/drivers/selfservice/hp-630-notebook-pc/5086782&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;HP 630&lt;/a&gt; notebook in a training, it started overheating and eventually made an emergency shutdown. The fan was spinning at maximum speed and the problem was not solved by restarting it. Temperatures could rise high up to 75 degrees Celcious when browsing pages, not to mention when running VMs for our training! At the same time a friend of ours, who owns the same notebook, informed us that due to the overheating, its WiFi module got burnt.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://manios.org/2018/10/07/hp-630-notebook-overheating-problem/temperature2018-08-3013-36-25.png&#34;
+	width=&#34;345&#34;
+	height=&#34;32&#34;
+	srcset=&#34;https://manios.org/2018/10/07/hp-630-notebook-overheating-problem/temperature2018-08-3013-36-25_hu_fac7032c6e2c42d4.png 480w, https://manios.org/2018/10/07/hp-630-notebook-overheating-problem/temperature2018-08-3013-36-25_hu_ab70ed670372a891.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;HP 630 Overheating problem. Screenshot of CPU temperatures in Linux Mint 18.1 while browsing&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;1078&#34;
+		data-flex-basis=&#34;2587px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;the-problem&#34;&gt;The problem
+&lt;/h2&gt;&lt;p&gt;After &lt;a class=&#34;link&#34; href=&#34;https://www.google.com/search?q=hp&amp;#43;630&amp;#43;overheat&amp;amp;ie=utf-8&amp;amp;oe=utf-8&amp;amp;client=firefox-b&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;searching in the internet&lt;/a&gt;, we found out that the issue can be caused by dust inside the CPU fan which blocks the air ventilation grilles. Thus, CPU is suffocating.&lt;/p&gt;
+&lt;p&gt;The solution proposed was to disassemble the notebook and clean the CPU fan. Be advised that the notebook worked for 4 years, overheating, but neglected because it had not reached the issue of abrupt shutdown.&lt;/p&gt;
+&lt;h2 id=&#34;remedy&#34;&gt;Remedy
+&lt;/h2&gt;&lt;p&gt;We wanted to clean the notebook ourselves, so we followed the official HP 630 &lt;a class=&#34;link&#34; href=&#34;http://h22235.www2.hp.com/hpinfo/globalcitizenship/environment/productdata/Countries/_MultiCountry/disassembly_notebo_2011418191247.pdf&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Product End-of-Life Disassembly Instructions&lt;/a&gt; (&lt;a class=&#34;link&#34; href=&#34;https://manios.org/images/2018-10-07-hp-630-overheat-problem-clean/disassembly_notebo_2011418191247.pdf&#34; &gt;alternative link&lt;/a&gt;) combined with visual assistance from a Youtube &lt;a class=&#34;link&#34; href=&#34;https://www.youtube.com/watch?v=GE_hqrxzX4E&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;video&lt;/a&gt; and we removed the CPU fan in order to clean it. After dissasembling the CPU fan we found out that all ventilation grilles were blocked by a &amp;ldquo;sponge&amp;rdquo; of dust formed in front of them. Under no circumstances air could could cool down the CPU!&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://manios.org/2018/10/07/hp-630-notebook-overheating-problem/IMG_20170403_233924.png&#34;
+	width=&#34;655&#34;
+	height=&#34;918&#34;
+	srcset=&#34;https://manios.org/2018/10/07/hp-630-notebook-overheating-problem/IMG_20170403_233924_hu_28465ee5e7c2af04.png 480w, https://manios.org/2018/10/07/hp-630-notebook-overheating-problem/IMG_20170403_233924_hu_801c928c559b428b.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;HP 630 dust forms a sponge which blocks all ventilation grilles of CPU Fan.&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;71&#34;
+		data-flex-basis=&#34;171px&#34;
+	
+&gt; &lt;img src=&#34;https://manios.org/2018/10/07/hp-630-notebook-overheating-problem/IMG_20170403_234022.png&#34;
+	width=&#34;679&#34;
+	height=&#34;855&#34;
+	srcset=&#34;https://manios.org/2018/10/07/hp-630-notebook-overheating-problem/IMG_20170403_234022_hu_98bf723ffe6d4c8b.png 480w, https://manios.org/2018/10/07/hp-630-notebook-overheating-problem/IMG_20170403_234022_hu_2f05f4958a0348bc.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;Focus on the thickness of the dust sponge which blocks all ventilation grilles of CPU Fan.&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;79&#34;
+		data-flex-basis=&#34;190px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;After cleaning the CPU fan from the dust, the temperatures went back to normal as seen in the screenshot:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://manios.org/2018/10/07/hp-630-notebook-overheating-problem/temperature2018-10-0617-25-28.png&#34;
+	width=&#34;358&#34;
+	height=&#34;26&#34;
+	srcset=&#34;https://manios.org/2018/10/07/hp-630-notebook-overheating-problem/temperature2018-10-0617-25-28_hu_8b00a831b64b3f7d.png 480w, https://manios.org/2018/10/07/hp-630-notebook-overheating-problem/temperature2018-10-0617-25-28_hu_c1489c04f4f97edb.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;HP 630 Overheating problem. Screenshot of CPU temperatures in Linux Mint 18.1 while browsing&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;1376&#34;
+		data-flex-basis=&#34;3304px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;annual-service&#34;&gt;Annual Service
+&lt;/h2&gt;&lt;p&gt;Yesterday we cleaned it again after 17 months as the notebook was overheating. We discovered that the dust had formed again a sponge&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://manios.org/2018/10/07/hp-630-notebook-overheating-problem/IMG_20181006_160202.png&#34;
+	width=&#34;535&#34;
+	height=&#34;756&#34;
+	srcset=&#34;https://manios.org/2018/10/07/hp-630-notebook-overheating-problem/IMG_20181006_160202_hu_2d897b848145c048.png 480w, https://manios.org/2018/10/07/hp-630-notebook-overheating-problem/IMG_20181006_160202_hu_3955c892c073979a.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;HP 630 dust sponge a year after the first cleaning. It still blocks all ventilation grilles of CPU Fan.&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;70&#34;
+		data-flex-basis=&#34;169px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;, lesser in thickness than the previous time.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://manios.org/2018/10/07/hp-630-notebook-overheating-problem/IMG_20181006_160229.png&#34;
+	width=&#34;537&#34;
+	height=&#34;898&#34;
+	srcset=&#34;https://manios.org/2018/10/07/hp-630-notebook-overheating-problem/IMG_20181006_160229_hu_a7d2f52b6a4265f3.png 480w, https://manios.org/2018/10/07/hp-630-notebook-overheating-problem/IMG_20181006_160229_hu_93bd54fe691c5697.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;HP 630 dust sponge thickness a year after the first cleaning.&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;59&#34;
+		data-flex-basis=&#34;143px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;Consequently we will monitor the temperature of our notebook and when it starts dangerously increasing, we will have to clean it again! We hope it does happen once in a year as the disassembly, cleaning and reassembly costs us two hours of work!&lt;/p&gt;
+&lt;p&gt;Cheers!&lt;/p&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>

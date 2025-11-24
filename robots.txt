@@ -1,1 +1,2 @@
+User-agent: *
 Sitemap: https://manios.org/sitemap.xml

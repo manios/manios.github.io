@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Source on Christos Manios</title>
+        <link>https://manios.org/tags/source/</link>
+        <description>Recent content in Source on Christos Manios</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>en-us</language>
+        <lastBuildDate>Sat, 12 Apr 2014 16:35:56 +0300</lastBuildDate><atom:link href="https://manios.org/tags/source/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>Export Untracked, modified, moved and deleted files from a Git repository to archive</title>
+        <link>https://manios.org/2014/04/12/export-untracked-modified-moved-and-deleted-files-from-a-git-repository-to-archive/</link>
+        <pubDate>Sat, 12 Apr 2014 16:35:56 +0300</pubDate>
+        
+        <guid>https://manios.org/2014/04/12/export-untracked-modified-moved-and-deleted-files-from-a-git-repository-to-archive/</guid>
+        <description>&lt;p&gt;Today I wanted to export to a .tar.gz archive all unstracked (new) , modified and deleted files from a Git repository. After some searching, I found &lt;a class=&#34;link&#34; href=&#34;http://stackoverflow.com/questions/855767/can-i-use-git-diff-on-untracked-files&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;a StackOverflow post&lt;/a&gt; which helped a lot. So after you &lt;strong&gt;cd&lt;/strong&gt; inside your repository and you have two options:&lt;/p&gt;
+&lt;h2 id=&#34;export-modified-moved-and-deleted-files&#34;&gt;Export modified moved and deleted files
+&lt;/h2&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;tar zvcf ~/new-files-cache.tar.gz &lt;span class=&#34;sb&#34;&gt;`&lt;/span&gt;git diff --name-only --diff-filter&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;ACMRT&lt;span class=&#34;sb&#34;&gt;`&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id=&#34;export-untracked-new-modified-and-deleted-files&#34;&gt;Export &lt;strong&gt;Untracked (new)&lt;/strong&gt;, modified and deleted files
+&lt;/h2&gt;&lt;p&gt;To achieve that I followed another custom route. If you find something smarter, please inform me!&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;tar zvcf ~/new-files-cache.tar.gz &lt;span class=&#34;sb&#34;&gt;`&lt;/span&gt; git status --short &lt;span class=&#34;p&#34;&gt;|&lt;/span&gt; sed &lt;span class=&#34;s1&#34;&gt;&amp;#39;s/^ *[^ ]* \(.*\)/\1/g&amp;#39;&lt;/span&gt; &lt;span class=&#34;sb&#34;&gt;`&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;That&amp;rsquo;s it! Have fun with Git!&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>Windows 7 64bit ODBC Data sources</title>
+        <link>https://manios.org/2012/09/26/windows-7-64bit-odbc-data-sources/</link>
+        <pubDate>Wed, 26 Sep 2012 14:52:39 +0300</pubDate>
+        
+        <guid>https://manios.org/2012/09/26/windows-7-64bit-odbc-data-sources/</guid>
+        <description>&lt;p&gt;Today I was trying to create and ODBC Data Source to a database using 32 bit database drivers. When I accessed ODBC Data Sources (32bit) from Control Panel, I could not create a data source using 32 bit drivers and I was facing two &lt;code&gt;Driver not found&lt;/code&gt; errors which can be seen in the following screenshots:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://manios.org/2012/09/26/windows-7-64bit-odbc-data-sources/dbdriverreinstall64bit.png&#34;
+	width=&#34;410&#34;
+	height=&#34;145&#34;
+	srcset=&#34;https://manios.org/2012/09/26/windows-7-64bit-odbc-data-sources/dbdriverreinstall64bit_hu_91c93aee535c7db0.png 480w, https://manios.org/2012/09/26/windows-7-64bit-odbc-data-sources/dbdriverreinstall64bit_hu_63ef1bcc946e63af.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;odbc administrator error reinstall driver - Database Driver not found error&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;282&#34;
+		data-flex-basis=&#34;678px&#34;
+	
+&gt; &lt;img src=&#34;https://manios.org/2012/09/26/windows-7-64bit-odbc-data-sources/dbdrivernotfound64bit.png&#34;
+	width=&#34;417&#34;
+	height=&#34;165&#34;
+	srcset=&#34;https://manios.org/2012/09/26/windows-7-64bit-odbc-data-sources/dbdrivernotfound64bit_hu_bc85cff7840731fb.png 480w, https://manios.org/2012/09/26/windows-7-64bit-odbc-data-sources/dbdrivernotfound64bit_hu_7d1d61c9ffb02de7.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;odbc architecture mismatch between driver and application error Driver’s ConfigDSN, ConfigDriver, or ConfigTranslator failed error&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;252&#34;
+		data-flex-basis=&#34;606px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;After searching in the web and asking my colleagues I found that when you want to use Microsoft ODBC Administrator for:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;64bit database drivers you have to run the 64bit version which is located in:
+&lt;code&gt;C:\Windows\System32\odbcad32.exe&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;32bit database drivers you have to run the 32bit version which is located in:
+&lt;code&gt;C:\Windows\SysWOW64\odbcad32.exe&lt;/code&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Both windows look identical but the underlying implementation is different.&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>Copy/Paste source code from Eclipse to Microsoft Word</title>
+        <link>https://manios.org/2012/03/08/copypaste-source-code-from-eclipse-to-microsoft-word/</link>
+        <pubDate>Thu, 08 Mar 2012 09:53:02 +0200</pubDate>
+        
+        <guid>https://manios.org/2012/03/08/copypaste-source-code-from-eclipse-to-microsoft-word/</guid>
+        <description>&lt;p&gt;Today I wanted to copy and paste a piece of code from Eclipse Indigo to Microsoft Word 2007 &lt;strong&gt;and keep the syntax highlighting&lt;/strong&gt;. In some cases it worked but in some other not.
+After searching in the webI found that if the area you want to copy has folded code in it, the syntax highlight will not be preserved (picture 1)&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://manios.org/2012/03/08/copypaste-source-code-from-eclipse-to-microsoft-word/codefoldeclipse.png&#34;
+	width=&#34;408&#34;
+	height=&#34;111&#34;
+	srcset=&#34;https://manios.org/2012/03/08/copypaste-source-code-from-eclipse-to-microsoft-word/codefoldeclipse_hu_988f79f48cdd0dfb.png 480w, https://manios.org/2012/03/08/copypaste-source-code-from-eclipse-to-microsoft-word/codefoldeclipse_hu_626b16e8117820cb.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;code fold&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;367&#34;
+		data-flex-basis=&#34;882px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;So before you start copying and pasting from Eclipse to Microsoft Word unfold any part of the code you want to copy (picture 2)&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://manios.org/2012/03/08/copypaste-source-code-from-eclipse-to-microsoft-word/nofolding.png&#34;
+	width=&#34;409&#34;
+	height=&#34;254&#34;
+	srcset=&#34;https://manios.org/2012/03/08/copypaste-source-code-from-eclipse-to-microsoft-word/nofolding_hu_ce378b5de8a9250d.png 480w, https://manios.org/2012/03/08/copypaste-source-code-from-eclipse-to-microsoft-word/nofolding_hu_de8266b1bc24958e.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;unfold Code in Eclipse&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;161&#34;
+		data-flex-basis=&#34;386px&#34;
+	
+&gt;&lt;/p&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>

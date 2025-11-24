@@ -1,1609 +1,1519 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-<url>
-<loc>https://manios.org/2011/10/14/hello-world</loc>
-<lastmod>2011-10-14T14:53:46-05:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2012/01/18/zip-and-unzip-in-java</loc>
-<lastmod>2012-01-18T01:49:30-06:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2012/02/22/android-get-sqlite-library-version</loc>
-<lastmod>2012-02-22T07:19:02-06:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2012/02/28/object-arraylist-sort</loc>
-<lastmod>2012-02-28T07:19:55-06:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2012/03/07/android-external-storage-free-space</loc>
-<lastmod>2012-03-07T05:40:01-06:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2012/03/08/copypaste-source-code-from-eclipse-to-microsoft-word</loc>
-<lastmod>2012-03-08T01:53:02-06:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2012/03/19/android-md5-password-encryption</loc>
-<lastmod>2012-03-19T04:56:53-05:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2012/04/05/check-network-connectivity-in-android</loc>
-<lastmod>2012-04-05T05:26:35-05:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2012/05/07/android-custom-dialogs-part-1-set-value</loc>
-<lastmod>2012-05-07T08:39:23-05:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2012/05/08/install-jboss-5-1-0-ga-to-windows-7</loc>
-<lastmod>2012-05-08T02:31:12-05:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2012/05/09/bluetooth-adapter-device-name-and-mac-address-in-android</loc>
-<lastmod>2012-05-09T03:12:27-05:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2012/05/14/android-pre-populated-database</loc>
-<lastmod>2012-05-14T01:12:48-05:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2012/05/15/check-network-connectivity-and-obtain-wifi-mac-address-in-android</loc>
-<lastmod>2012-05-15T03:47:00-05:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2012/05/17/extend-sqliteopenhelper-as-a-singleton-class-in-android</loc>
-<lastmod>2012-05-17T05:13:50-05:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2012/06/01/sql-server-truncate-all-table-data</loc>
-<lastmod>2012-06-01T07:33:11-05:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2012/06/22/sql-server-select-table-information</loc>
-<lastmod>2012-06-22T03:53:57-05:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2012/08/07/powerbuilder-10-get-and-change-system-language</loc>
-<lastmod>2012-08-07T06:46:33-05:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2012/08/09/java-get-file-size-and-download-using-http</loc>
-<lastmod>2012-08-09T04:50:03-05:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2012/08/09/ubuntu-linux-useful-commands</loc>
-<lastmod>2012-08-09T16:27:29-05:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2012/08/14/java-calculate-orthodox-easter-date</loc>
-<lastmod>2012-08-14T04:45:31-05:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2012/08/15/perl-utf-8-and-regular-expressions</loc>
-<lastmod>2012-08-15T06:12:00-05:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2012/08/24/powerbuilder-datawindow-grid-delete-selected-rows-efficiently</loc>
-<lastmod>2012-08-24T06:27:26-05:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2012/09/12/send-email-from-vbscript-using-smtp-and-gmail</loc>
-<lastmod>2012-09-12T01:32:55-05:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2012/09/26/windows-7-64bit-odbc-data-sources</loc>
-<lastmod>2012-09-26T06:52:39-05:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2012/12/27/198</loc>
-<lastmod>2012-12-27T01:52:19-06:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2013/02/27/java-send-smtp-mail-using-gmail</loc>
-<lastmod>2013-02-27T08:45:15-06:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2013/03/05/change-timezone-to-apache-server-and-php</loc>
-<lastmod>2013-03-05T06:36:24-06:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2013/03/10/install-raspbian-wheezy-linux-to-raspberry-pi-using-linux</loc>
-<lastmod>2013-03-10T06:09:32-05:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2013/03/19/import-a-large-sql-dump-file-to-a-mysql-database-from-command-line</loc>
-<lastmod>2013-03-19T10:05:00-05:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2013/04/19/mysql-connect-error-1129</loc>
-<lastmod>2013-04-19T02:24:58-05:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2013/04/23/vi-set-color-scheme-line-numbers-and-syntax-highlighting</loc>
-<lastmod>2013-04-23T08:34:21-05:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2013/06/12/fix-vmware-tools-kernel-header-path-is-not-valid-error</loc>
-<lastmod>2013-06-12T00:57:35-05:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2013/08/06/linux-mount-windows-shared-directory-via-cifs-and-samba</loc>
-<lastmod>2013-08-06T08:32:28-05:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2013/08/13/linux-get-hard-disk-statistics-using-python</loc>
-<lastmod>2013-08-13T01:12:13-05:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2013/10/28/read-sms-directly-from-sqlite-database-in-android</loc>
-<lastmod>2013-10-28T16:22:48-05:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2013/12/31/remove-special-and-control-characters-from-string-using-python</loc>
-<lastmod>2013-12-31T00:12:33-06:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2014/02/15/install-apache-solr-as-windows-service-using-nssm</loc>
-<lastmod>2014-02-15T07:00:52-06:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2014/04/12/export-untracked-modified-moved-and-deleted-files-from-a-git-repository-to-archive</loc>
-<lastmod>2014-04-12T08:35:56-05:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2014/04/12/nginx-https-reverse-proxy-to-wordpress-with-apache-http-and-different-port</loc>
-<lastmod>2014-04-12T09:32:52-05:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2014/07/28/linux-extract-audio-and-video-using-ffmpeg</loc>
-<lastmod>2014-07-28T06:21:08-05:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2014/11/01/solr-fix-corrupted-index-using-lucene</loc>
-<lastmod>2014-11-01T09:40:40-05:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2014/12/30/json-remove-new-lines-via-linux-and-use-it-as-string-variable-and-as-param-in-curl-post-request</loc>
-<lastmod>2014-12-30T15:58:16-06:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2015/12/04/migrate-a-gitlab-docker-container-from-version-8-0-4-to-8-2-0</loc>
-<lastmod>2015-12-04T14:47:06-06:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2016/07/12/lets-encrypt-ssl-certificate-without-root-or-sudo-privileges</loc>
-<lastmod>2016-07-12T14:32:53-05:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2017/08/09/configure-eclipse-in-order-to-build-mapstruct-in-java-projects</loc>
-<lastmod>2017-08-09T05:14:00-05:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2017/10/17/sublime-3-fix-greek-accented-characters</loc>
-<lastmod>2017-10-17T13:27:48-05:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2017/11/15/use-haproxy-and-docker-for-solr-load-balancing</loc>
-<lastmod>2017-11-15T04:14:00-06:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2017/11/23/mongodb-replica-stale-during-recovery</loc>
-<lastmod>2017-11-23T02:09:00-06:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2017/12/14/install-and-configure-and-troubleshoot-ntp-servers-in-debian-linux</loc>
-<lastmod>2017-12-14T02:42:00-06:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2018/03/30/java-soap-jax-ws-client-basic-auth</loc>
-<lastmod>2018-03-30T09:42:00-05:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2018/04/03/java-soap-service-client-debug-http-message</loc>
-<lastmod>2018-04-03T11:42:00-05:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2018/05/30/git-merge-conflicts-using-tortoise-git-merge-windows</loc>
-<lastmod>2018-05-30T12:42:00-05:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2018/07/23/create-a-beat-based-on-metricbeat-resolving-bugs</loc>
-<lastmod>2018-07-23T14:31:00-05:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2018/08/14/logstash-geoip-json-logs-maxmint-geolite-docker</loc>
-<lastmod>2018-08-14T10:35:00-05:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2018/08/18/logstash-geoip-json-logs-maxmint-geolite-docker</loc>
-<lastmod>2018-08-18T02:13:44-05:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2018/10/05/metricbeat-debug-frame-section-error</loc>
-<lastmod>2018-10-05T14:35:00-05:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2018/10/07/hp-630-notebook-overheating-problem</loc>
-<lastmod>2018-10-07T13:54:00-05:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2019/08/11/mongodb-aggregate-documents-by-property</loc>
-<lastmod>2019-08-11T02:41:00-05:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2019/08/21/force-maven-offline-execute-goal-dependencies</loc>
-<lastmod>2019-08-21T12:57:53-05:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2020/01/08/convert-markdown-to-pdf-using-docker-pandoc-asciidoctor</loc>
-<lastmod>2020-01-08T10:01:00-06:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2020/01/12/lenovo-thinkpad-t470p-camera-problem-windows-10</loc>
-<lastmod>2020-09-13T05:44:00-05:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2021/02/17/postgresql-case-accent-insentitive-sql-queries</loc>
-<lastmod>2021-02-17T13:00:00-06:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2021/07/24/golang-decimal-field-in-struct-json-convert</loc>
-<lastmod>2021-07-24T11:27:00-05:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2021/08/04/go-mongodb-error-cannot-create-field-in-element-null</loc>
-<lastmod>2021-08-04T13:55:00-05:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2022/07/22/oracle-sql-select-date-range-between-range</loc>
-<lastmod>2022-07-22T13:55:00-05:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2022/12/23/oracle-sql-select-date-range-between-range</loc>
-<lastmod>2022-12-23T12:00:00-06:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2023/06/18/kubernetes-view-pod-json-log-in-plain-text-with-stern-template</loc>
-<lastmod>2023-06-18T08:50:00-05:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2023/08/30/java-spring-hibernate-error-ora-17026-numeric-overflow-oracle-function-call</loc>
-<lastmod>2023-08-30T14:43:27-05:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/2024/02/11/linux-mint-mate-screensaver-command-line-configure-enable-disable</loc>
-<lastmod>2024-02-11T06:17:00-06:00</lastmod>
-</url>
-<url>
-<loc>https://manios.org/</loc>
-</url>
-<url>
-<loc>https://manios.org/about/</loc>
-</url>
-<url>
-<loc>https://manios.org/year-archive/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/android/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/database/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/library/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/sqlite/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/arraylist/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/collection/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/java/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/object/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/sort/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/availabe/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/sd/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/space/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/copy/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/eclipse/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/highlighting/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/microsoft/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/paste/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/source/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/syntax/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/word/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/address/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/card/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/connectivity/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/mac/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/network/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/wifi/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/install/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/jboss/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/server/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/windows/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/adapter/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/bluetooth/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/asset/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/pre-populated/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/log/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/logcat/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/output/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/public/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/singleton/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/all/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/check-constraint/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/data/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/delete/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/sql/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/truncate/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/column/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/select/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/table/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/pb/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/pb10/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/powerbuilder/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/system-language/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/win32/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/content-length/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/download/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/http/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/bash/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/command/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/debian/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/linux/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/shell/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/easter/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/easter-date/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/orthodox/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/expression/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/perl/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/regular/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/unicode/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/utf-8/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/utf8/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/buffer/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/datawindow/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/efficient/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/filter/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/grid/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/primary/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/gmail/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/smtp/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/vbscript/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/wscript/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/driver/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/odbc/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/empty/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/manipulation/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/method/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/string/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/mail/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/ssl/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/tls/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/apache/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/conf/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/date/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/httpd/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/ini/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/module/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/my/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/mysql/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/php/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/timezone/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/dd/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/df/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/format/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/lubuntu/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/pi/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/raspberry/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/raspbian/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/ubuntu/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/umount/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/wheezy/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/constraint/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/dump/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/file/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/foreign/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/import/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/key/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/line/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/connection/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/error/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/haproxy/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/colour/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/highlight/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/scheme/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/vi/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/vim/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/header/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/kernel/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/link/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/symbolic/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/tools/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/vmware/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/active/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/cifs/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/directory/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/domain/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/mount/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/samba/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/share/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/authentication/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/basic/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/disk/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/python/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/statistic/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/adb/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/cyanogenmod/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/location/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/root/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/sms/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/telephony/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/thread/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/convert/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/escape/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/create/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/daemon/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/nssm/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/service/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/solr/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/archive/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/control/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/deleted/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/export/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/git/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/modified/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/moved/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/new/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/repository/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/tar/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/untracked/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/blog/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/https/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/nginx/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/port/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/proxy/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/reverse/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/wordpress/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/audio/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/extract/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/ffmpeg/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/mp3/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/mp4/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/video/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/check/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/core/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/corrupt/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/fix/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/index/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/lucene/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/repair/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/segment/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/curl/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/json/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/junit/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/newline/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/parse/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/container/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/docker/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/gitlab/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/image/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/migrate/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/centos/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/certificate/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/encrypt/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/free/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/jelastic/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/let-s-encrypt/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/lets/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/ssh/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/sudo/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/spring/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/maven/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/m2e/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/m2e-apt/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/plugin/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/compile/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/annotation/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/mapper/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/sublimetext/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/sublime/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/text/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/editor/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/accented/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/accent/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/char/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/character/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/greek/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/solrcloud/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/load/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/balancing/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/mongo/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/mongodb/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/replication/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/recovery/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/secondary/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/replica/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/sync/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/synchronisation/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/ntp/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/time/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/configure/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/ntpdate/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/ntpq/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/strata/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/high/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/suitable/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/minpoll/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/maxpoll/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/pool/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/iburst/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/soap/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/auth/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/client/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/jax/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/ws/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/jax-ws/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/web/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/netbeans/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/wsdl/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/request/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/message/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/debug/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/print/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/console/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/merge/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/mergetool/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/tortoise/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/conflict/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/elastic/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/metricbeat/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/beats/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/elasticsearch/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/generator/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/go/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/golang/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/elk/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/search/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/kibana/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/monitor/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/logstash/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/geolocation/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/ip/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/geoip/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/maxmind/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/geo/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/geolite/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/geolite2/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/rsyslog/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/mmdblookup/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/omelasticsearch/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/frame/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/delve/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/hp/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/630/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/hp630/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/hp-630/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/overheat/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/overheating/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/problem/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/shutdown/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/clean/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/fan/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/nosql/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/query/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/aggregation/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/framework/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/offline/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/goal/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/dependencies/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/without/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/internet/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/parent/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/pom/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/non/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/resolvable/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/markdown/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/md/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/pdf/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/asciidoctor/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/lenovo/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/thinkpad/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/t470p/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/camera/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/issue/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/not/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/working/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/update/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/postgres/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/postgresql/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/case/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/insensitive/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/like/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/statement/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/struct/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/field/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/decimal/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/number/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/floating/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/point/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/marshal/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/unmarshal/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/dot/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/nested/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/oracle/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/range/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/mssql/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/sqlserver/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/restore/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/bak/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/kubernetes/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/boot/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/pod/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/tail/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/stern/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/hibernate/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/function/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/overflow/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/spring-boot/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/mint/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/screensaver/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/display/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/sleep/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/power/</loc>
-</url>
-<url>
-<loc>https://manios.org/tag/management/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/databases/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/linux/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/android/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/java/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/application-server/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/jboss/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/sql-server/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/powerbuilder/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/networking/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/smtp/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/apache/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/http/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/mysql/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/php/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/raspberry-pi/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/raspbian/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/ubuntu/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/haproxy/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/mint/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/virtualisation/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/vmware/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/python/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/sqlite/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/solr/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/windows/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/git/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/source-control/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/nginx/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/server/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/lucene/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/docker/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/gitlab/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/eclipse/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/spring/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/text-editor/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/haproxy/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/debian/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/go/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/golang/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/elasticsearch/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/logstash/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/rsyslog/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/elastic/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/beats/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/hp/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/notebook/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/mongodb/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/database/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/nosql/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/markdown/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/pdf/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/file/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/conversion/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/lenovo/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/camera/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/postgres/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/sql/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/json/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/oracle/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/ms-sql-server/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/ms-sql/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/kubernetes/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/spring-boot/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/hibernate/</loc>
-</url>
-<url>
-<loc>https://manios.org/category/bash/</loc>
-</url>
-<url>
-<loc>https://manios.org/page2/</loc>
-</url>
-<url>
-<loc>https://manios.org/page3/</loc>
-</url>
-<url>
-<loc>https://manios.org/page4/</loc>
-</url>
-<url>
-<loc>https://manios.org/page5/</loc>
-</url>
-<url>
-<loc>https://manios.org/page6/</loc>
-</url>
-<url>
-<loc>https://manios.org/page7/</loc>
-</url>
-<url>
-<loc>https://manios.org/page8/</loc>
-</url>
-<url>
-<loc>https://manios.org/page9/</loc>
-</url>
-<url>
-<loc>https://manios.org/page10/</loc>
-</url>
-<url>
-<loc>https://manios.org/page11/</loc>
-</url>
-<url>
-<loc>https://manios.org/page12/</loc>
-</url>
-<url>
-<loc>https://manios.org/page13/</loc>
-</url>
-<url>
-<loc>https://manios.org/page14/</loc>
-</url>
-<url>
-<loc>https://manios.org/images/2018-10-07-hp-630-overheat-problem-clean/disassembly_notebo_2011418191247.pdf</loc>
-<lastmod>2021-07-25T06:07:09-05:00</lastmod>
-</url>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://manios.org/</loc>
+    <lastmod>2025-11-23T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/archives/</loc>
+    <lastmod>2025-11-23T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/page/</loc>
+    <lastmod>2025-11-23T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/</loc>
+    <lastmod>2025-11-22T12:43:27+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/database/</loc>
+    <lastmod>2025-11-22T12:43:27+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/database/</loc>
+    <lastmod>2025-11-22T12:43:27+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/document/</loc>
+    <lastmod>2025-11-22T12:43:27+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/json/</loc>
+    <lastmod>2025-11-22T12:43:27+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/postgres/</loc>
+    <lastmod>2025-11-22T12:43:27+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/postgres/</loc>
+    <lastmod>2025-11-22T12:43:27+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/postgresql/</loc>
+    <lastmod>2025-11-22T12:43:27+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2025/11/22/postgre-sql-perform-queries-in-json-array-sub-documents/</loc>
+    <lastmod>2025-11-22T12:43:27+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/post/</loc>
+    <lastmod>2025-11-22T12:43:27+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/query/</loc>
+    <lastmod>2025-11-22T12:43:27+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/sql/</loc>
+    <lastmod>2025-11-22T12:43:27+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/sql/</loc>
+    <lastmod>2025-11-22T12:43:27+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/statement/</loc>
+    <lastmod>2025-11-22T12:43:27+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/</loc>
+    <lastmod>2025-11-22T12:43:27+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/bash/</loc>
+    <lastmod>2024-02-11T14:17:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/configure/</loc>
+    <lastmod>2024-02-11T14:17:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/display/</loc>
+    <lastmod>2024-02-11T14:17:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/linux/</loc>
+    <lastmod>2024-02-11T14:17:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/linux/</loc>
+    <lastmod>2024-02-11T14:17:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2024/02/11/linux-mint-mate-screensaver-command-line-configure-enable-disable/</loc>
+    <lastmod>2024-02-11T14:17:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/management/</loc>
+    <lastmod>2024-02-11T14:17:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/mint/</loc>
+    <lastmod>2024-02-11T14:17:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/mint/</loc>
+    <lastmod>2024-02-11T14:17:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/power/</loc>
+    <lastmod>2024-02-11T14:17:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/screensaver/</loc>
+    <lastmod>2024-02-11T14:17:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/sleep/</loc>
+    <lastmod>2024-02-11T14:17:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/ubuntu/</loc>
+    <lastmod>2024-02-11T14:17:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/error/</loc>
+    <lastmod>2023-08-30T22:43:27+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/function/</loc>
+    <lastmod>2023-08-30T22:43:27+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/hibernate/</loc>
+    <lastmod>2023-08-30T22:43:27+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/hibernate/</loc>
+    <lastmod>2023-08-30T22:43:27+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/java/</loc>
+    <lastmod>2023-08-30T22:43:27+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/java/</loc>
+    <lastmod>2023-08-30T22:43:27+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2023/08/30/java-spring-hibernate-error-ora-17026-numeric-overflow-oracle-function-call/</loc>
+    <lastmod>2023-08-30T22:43:27+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/oracle/</loc>
+    <lastmod>2023-08-30T22:43:27+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/oracle/</loc>
+    <lastmod>2023-08-30T22:43:27+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/overflow/</loc>
+    <lastmod>2023-08-30T22:43:27+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/spring/</loc>
+    <lastmod>2023-08-30T22:43:27+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/spring/</loc>
+    <lastmod>2023-08-30T22:43:27+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/spring-boot/</loc>
+    <lastmod>2023-08-30T22:43:27+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/spring-boot/</loc>
+    <lastmod>2023-08-30T22:43:27+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/boot/</loc>
+    <lastmod>2023-06-18T16:50:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/kubernetes/</loc>
+    <lastmod>2023-06-18T16:50:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/kubernetes/</loc>
+    <lastmod>2023-06-18T16:50:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2023/06/18/kubernetes-view-pod-json-log-in-plain-text-with-stern-template/</loc>
+    <lastmod>2023-06-18T16:50:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/log/</loc>
+    <lastmod>2023-06-18T16:50:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/pod/</loc>
+    <lastmod>2023-06-18T16:50:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/stern/</loc>
+    <lastmod>2023-06-18T16:50:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/tail/</loc>
+    <lastmod>2023-06-18T16:50:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/bak/</loc>
+    <lastmod>2022-12-23T20:00:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/container/</loc>
+    <lastmod>2022-12-23T20:00:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/databases/</loc>
+    <lastmod>2022-12-23T20:00:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/docker/</loc>
+    <lastmod>2022-12-23T20:00:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/ms-sql/</loc>
+    <lastmod>2022-12-23T20:00:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/ms-sql-server/</loc>
+    <lastmod>2022-12-23T20:00:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2022/12/23/oracle-sql-select-date-range-between-range/</loc>
+    <lastmod>2022-12-23T20:00:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/mssql/</loc>
+    <lastmod>2022-12-23T20:00:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/restore/</loc>
+    <lastmod>2022-12-23T20:00:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/sqlserver/</loc>
+    <lastmod>2022-12-23T20:00:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/date/</loc>
+    <lastmod>2022-07-22T21:55:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/range/</loc>
+    <lastmod>2022-07-22T21:55:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2022/07/22/oracle-sql-select-date-range-between-range/</loc>
+    <lastmod>2022-07-22T21:55:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/dot/</loc>
+    <lastmod>2021-08-04T21:55:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/driver/</loc>
+    <lastmod>2021-08-04T21:55:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/field/</loc>
+    <lastmod>2021-08-04T21:55:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/go/</loc>
+    <lastmod>2021-08-04T21:55:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/go/</loc>
+    <lastmod>2021-08-04T21:55:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2021/08/04/go-mongodb-error-cannot-create-field-in-element-null/</loc>
+    <lastmod>2021-08-04T21:55:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/golang/</loc>
+    <lastmod>2021-08-04T21:55:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/golang/</loc>
+    <lastmod>2021-08-04T21:55:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/mongodb/</loc>
+    <lastmod>2021-08-04T21:55:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/mongodb/</loc>
+    <lastmod>2021-08-04T21:55:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/nested/</loc>
+    <lastmod>2021-08-04T21:55:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2021/07/24/golang-decimal-field-in-struct-json-convert/</loc>
+    <lastmod>2021-07-24T19:27:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/decimal/</loc>
+    <lastmod>2021-07-24T19:27:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/floating/</loc>
+    <lastmod>2021-07-24T19:27:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/json/</loc>
+    <lastmod>2021-07-24T19:27:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/marshal/</loc>
+    <lastmod>2021-07-24T19:27:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/number/</loc>
+    <lastmod>2021-07-24T19:27:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/point/</loc>
+    <lastmod>2021-07-24T19:27:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/struct/</loc>
+    <lastmod>2021-07-24T19:27:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/unmarshal/</loc>
+    <lastmod>2021-07-24T19:27:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/accent/</loc>
+    <lastmod>2021-02-17T21:00:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/case/</loc>
+    <lastmod>2021-02-17T21:00:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/insensitive/</loc>
+    <lastmod>2021-02-17T21:00:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/like/</loc>
+    <lastmod>2021-02-17T21:00:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2021/02/17/postgresql-case--accent-insentitive-sql-queries/</loc>
+    <lastmod>2021-02-17T21:00:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/search/</loc>
+    <lastmod>2021-02-17T21:00:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/camera/</loc>
+    <lastmod>2020-01-12T12:19:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/camera/</loc>
+    <lastmod>2020-01-12T12:19:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/issue/</loc>
+    <lastmod>2020-01-12T12:19:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/lenovo/</loc>
+    <lastmod>2020-01-12T12:19:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/lenovo/</loc>
+    <lastmod>2020-01-12T12:19:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2020/01/12/lenovo-thinkpad-t470p-camera-problem-windows-10/</loc>
+    <lastmod>2020-01-12T12:19:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/not/</loc>
+    <lastmod>2020-01-12T12:19:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/problem/</loc>
+    <lastmod>2020-01-12T12:19:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/t470p/</loc>
+    <lastmod>2020-01-12T12:19:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/thinkpad/</loc>
+    <lastmod>2020-01-12T12:19:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/update/</loc>
+    <lastmod>2020-01-12T12:19:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/windows/</loc>
+    <lastmod>2020-01-12T12:19:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/working/</loc>
+    <lastmod>2020-01-12T12:19:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/asciidoctor/</loc>
+    <lastmod>2020-01-08T18:01:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/conversion/</loc>
+    <lastmod>2020-01-08T18:01:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/convert/</loc>
+    <lastmod>2020-01-08T18:01:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2020/01/08/convert-markdown-to-pdf-using-docker-pandoc-asciidoctor/</loc>
+    <lastmod>2020-01-08T18:01:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/file/</loc>
+    <lastmod>2020-01-08T18:01:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/file/</loc>
+    <lastmod>2020-01-08T18:01:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/markdown/</loc>
+    <lastmod>2020-01-08T18:01:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/markdown/</loc>
+    <lastmod>2020-01-08T18:01:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/md/</loc>
+    <lastmod>2020-01-08T18:01:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/pdf/</loc>
+    <lastmod>2020-01-08T18:01:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/pdf/</loc>
+    <lastmod>2020-01-08T18:01:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/connection/</loc>
+    <lastmod>2019-08-21T20:57:53+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/dependencies/</loc>
+    <lastmod>2019-08-21T20:57:53+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2019/08/21/force-maven-offline-execute-goal-dependencies/</loc>
+    <lastmod>2019-08-21T20:57:53+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/goal/</loc>
+    <lastmod>2019-08-21T20:57:53+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/internet/</loc>
+    <lastmod>2019-08-21T20:57:53+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/maven/</loc>
+    <lastmod>2019-08-21T20:57:53+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/non/</loc>
+    <lastmod>2019-08-21T20:57:53+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/nosql/</loc>
+    <lastmod>2019-08-21T20:57:53+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/offline/</loc>
+    <lastmod>2019-08-21T20:57:53+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/parent/</loc>
+    <lastmod>2019-08-21T20:57:53+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/pom/</loc>
+    <lastmod>2019-08-21T20:57:53+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/resolvable/</loc>
+    <lastmod>2019-08-21T20:57:53+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/without/</loc>
+    <lastmod>2019-08-21T20:57:53+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/aggregation/</loc>
+    <lastmod>2019-08-11T10:41:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/framework/</loc>
+    <lastmod>2019-08-11T10:41:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2019/08/11/mongodb-aggregate-documents-by-property/</loc>
+    <lastmod>2019-08-11T10:41:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/nosql/</loc>
+    <lastmod>2019-08-11T10:41:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/630/</loc>
+    <lastmod>2018-10-07T21:54:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/clean/</loc>
+    <lastmod>2018-10-07T21:54:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/fan/</loc>
+    <lastmod>2018-10-07T21:54:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/hp/</loc>
+    <lastmod>2018-10-07T21:54:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/hp/</loc>
+    <lastmod>2018-10-07T21:54:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/hp-630/</loc>
+    <lastmod>2018-10-07T21:54:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/hp630/</loc>
+    <lastmod>2018-10-07T21:54:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/notebook/</loc>
+    <lastmod>2018-10-07T21:54:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/overheat/</loc>
+    <lastmod>2018-10-07T21:54:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/overheating/</loc>
+    <lastmod>2018-10-07T21:54:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/shutdown/</loc>
+    <lastmod>2018-10-07T21:54:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2018/10/07/hp-630-notebook-overheating-problem/</loc>
+    <lastmod>2018-10-07T21:54:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/beats/</loc>
+    <lastmod>2018-10-05T22:35:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/beats/</loc>
+    <lastmod>2018-10-05T22:35:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/debug/</loc>
+    <lastmod>2018-10-05T22:35:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/delve/</loc>
+    <lastmod>2018-10-05T22:35:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/elastic/</loc>
+    <lastmod>2018-10-05T22:35:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/elastic/</loc>
+    <lastmod>2018-10-05T22:35:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/elasticsearch/</loc>
+    <lastmod>2018-10-05T22:35:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/elk/</loc>
+    <lastmod>2018-10-05T22:35:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/frame/</loc>
+    <lastmod>2018-10-05T22:35:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/index/</loc>
+    <lastmod>2018-10-05T22:35:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/kibana/</loc>
+    <lastmod>2018-10-05T22:35:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/metricbeat/</loc>
+    <lastmod>2018-10-05T22:35:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/monitor/</loc>
+    <lastmod>2018-10-05T22:35:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2018/10/05/metricbeat-debug-frame-section-error/</loc>
+    <lastmod>2018-10-05T22:35:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/elasticsearch/</loc>
+    <lastmod>2018-08-18T10:13:44+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/geo/</loc>
+    <lastmod>2018-08-18T10:13:44+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/geoip/</loc>
+    <lastmod>2018-08-18T10:13:44+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/geolite/</loc>
+    <lastmod>2018-08-18T10:13:44+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/geolite2/</loc>
+    <lastmod>2018-08-18T10:13:44+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/geolocation/</loc>
+    <lastmod>2018-08-18T10:13:44+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/ip/</loc>
+    <lastmod>2018-08-18T10:13:44+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/maxmind/</loc>
+    <lastmod>2018-08-18T10:13:44+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/message/</loc>
+    <lastmod>2018-08-18T10:13:44+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/mmdblookup/</loc>
+    <lastmod>2018-08-18T10:13:44+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/omelasticsearch/</loc>
+    <lastmod>2018-08-18T10:13:44+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/parse/</loc>
+    <lastmod>2018-08-18T10:13:44+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/rsyslog/</loc>
+    <lastmod>2018-08-18T10:13:44+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/rsyslog/</loc>
+    <lastmod>2018-08-18T10:13:44+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2018/08/18/logstash-geoip-json-logs-maxmint-geolite-docker/</loc>
+    <lastmod>2018-08-18T10:13:44+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/logstash/</loc>
+    <lastmod>2018-08-14T18:35:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/logstash/</loc>
+    <lastmod>2018-08-14T18:35:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2018/08/14/logstash-geoip-json-logs-maxmint-geolite-docker/</loc>
+    <lastmod>2018-08-14T18:35:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/create/</loc>
+    <lastmod>2018-07-23T22:31:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2018/07/23/create-a-beat-based-on-metricbeat-resolving-bugs/</loc>
+    <lastmod>2018-07-23T22:31:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/generator/</loc>
+    <lastmod>2018-07-23T22:31:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/client/</loc>
+    <lastmod>2018-05-30T20:42:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/conflict/</loc>
+    <lastmod>2018-05-30T20:42:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/git/</loc>
+    <lastmod>2018-05-30T20:42:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/git/</loc>
+    <lastmod>2018-05-30T20:42:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2018/05/30/git-merge-conflicts-using-tortoise-git-merge-windows/</loc>
+    <lastmod>2018-05-30T20:42:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/merge/</loc>
+    <lastmod>2018-05-30T20:42:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/mergetool/</loc>
+    <lastmod>2018-05-30T20:42:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/tortoise/</loc>
+    <lastmod>2018-05-30T20:42:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/console/</loc>
+    <lastmod>2018-04-03T19:42:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2018/04/03/java-soap-service-client-debug-http-message/</loc>
+    <lastmod>2018-04-03T19:42:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/http/</loc>
+    <lastmod>2018-04-03T19:42:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/jax/</loc>
+    <lastmod>2018-04-03T19:42:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/jax-ws/</loc>
+    <lastmod>2018-04-03T19:42:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/print/</loc>
+    <lastmod>2018-04-03T19:42:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/request/</loc>
+    <lastmod>2018-04-03T19:42:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/service/</loc>
+    <lastmod>2018-04-03T19:42:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/soap/</loc>
+    <lastmod>2018-04-03T19:42:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/web/</loc>
+    <lastmod>2018-04-03T19:42:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/ws/</loc>
+    <lastmod>2018-04-03T19:42:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/wsdl/</loc>
+    <lastmod>2018-04-03T19:42:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/auth/</loc>
+    <lastmod>2018-03-30T17:42:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/authentication/</loc>
+    <lastmod>2018-03-30T17:42:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/basic/</loc>
+    <lastmod>2018-03-30T17:42:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2018/03/30/java-soap-jax-ws-client-basic-auth/</loc>
+    <lastmod>2018-03-30T17:42:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/netbeans/</loc>
+    <lastmod>2018-03-30T17:42:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/debian/</loc>
+    <lastmod>2017-12-14T10:42:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/debian/</loc>
+    <lastmod>2017-12-14T10:42:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/high/</loc>
+    <lastmod>2017-12-14T10:42:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/iburst/</loc>
+    <lastmod>2017-12-14T10:42:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/install/</loc>
+    <lastmod>2017-12-14T10:42:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2017/12/14/install-and-configure-and-troubleshoot-ntp-servers-in-debian-linux/</loc>
+    <lastmod>2017-12-14T10:42:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/maxpoll/</loc>
+    <lastmod>2017-12-14T10:42:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/minpoll/</loc>
+    <lastmod>2017-12-14T10:42:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/network/</loc>
+    <lastmod>2017-12-14T10:42:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/ntp/</loc>
+    <lastmod>2017-12-14T10:42:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/ntpdate/</loc>
+    <lastmod>2017-12-14T10:42:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/ntpq/</loc>
+    <lastmod>2017-12-14T10:42:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/pool/</loc>
+    <lastmod>2017-12-14T10:42:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/server/</loc>
+    <lastmod>2017-12-14T10:42:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/strata/</loc>
+    <lastmod>2017-12-14T10:42:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/suitable/</loc>
+    <lastmod>2017-12-14T10:42:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/sync/</loc>
+    <lastmod>2017-12-14T10:42:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/synchronisation/</loc>
+    <lastmod>2017-12-14T10:42:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/time/</loc>
+    <lastmod>2017-12-14T10:42:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/ubuntu/</loc>
+    <lastmod>2017-12-14T10:42:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/mongo/</loc>
+    <lastmod>2017-11-23T10:09:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2017/11/23/mongodb-replica-stale-during-recovery/</loc>
+    <lastmod>2017-11-23T10:09:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/recovery/</loc>
+    <lastmod>2017-11-23T10:09:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/replica/</loc>
+    <lastmod>2017-11-23T10:09:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/replication/</loc>
+    <lastmod>2017-11-23T10:09:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/secondary/</loc>
+    <lastmod>2017-11-23T10:09:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/balancing/</loc>
+    <lastmod>2017-11-15T12:14:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/haproxy/</loc>
+    <lastmod>2017-11-15T12:14:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/haproxy/</loc>
+    <lastmod>2017-11-15T12:14:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/load/</loc>
+    <lastmod>2017-11-15T12:14:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/solr/</loc>
+    <lastmod>2017-11-15T12:14:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/solr/</loc>
+    <lastmod>2017-11-15T12:14:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/solrcloud/</loc>
+    <lastmod>2017-11-15T12:14:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2017/11/15/use-haproxy-and-docker-for-solr-load-balancing/</loc>
+    <lastmod>2017-11-15T12:14:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/accented/</loc>
+    <lastmod>2017-10-17T21:27:48+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/char/</loc>
+    <lastmod>2017-10-17T21:27:48+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/character/</loc>
+    <lastmod>2017-10-17T21:27:48+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/editor/</loc>
+    <lastmod>2017-10-17T21:27:48+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/fix/</loc>
+    <lastmod>2017-10-17T21:27:48+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/greek/</loc>
+    <lastmod>2017-10-17T21:27:48+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/sublime/</loc>
+    <lastmod>2017-10-17T21:27:48+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/sublimetext/</loc>
+    <lastmod>2017-10-17T21:27:48+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2017/10/17/sublime-3-fix-greek-accented-characters/</loc>
+    <lastmod>2017-10-17T21:27:48+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/text/</loc>
+    <lastmod>2017-10-17T21:27:48+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/text-editor/</loc>
+    <lastmod>2017-10-17T21:27:48+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/annotation/</loc>
+    <lastmod>2017-08-09T13:14:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/compile/</loc>
+    <lastmod>2017-08-09T13:14:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2017/08/09/configure-eclipse-in-order-to-build-mapstruct-in-java-projects/</loc>
+    <lastmod>2017-08-09T13:14:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/eclipse/</loc>
+    <lastmod>2017-08-09T13:14:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/eclipse/</loc>
+    <lastmod>2017-08-09T13:14:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/m2e/</loc>
+    <lastmod>2017-08-09T13:14:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/m2e-apt/</loc>
+    <lastmod>2017-08-09T13:14:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/mapper/</loc>
+    <lastmod>2017-08-09T13:14:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/plugin/</loc>
+    <lastmod>2017-08-09T13:14:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/apache/</loc>
+    <lastmod>2016-07-12T22:32:53+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/bash/</loc>
+    <lastmod>2016-07-12T22:32:53+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/centos/</loc>
+    <lastmod>2016-07-12T22:32:53+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/certificate/</loc>
+    <lastmod>2016-07-12T22:32:53+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/encrypt/</loc>
+    <lastmod>2016-07-12T22:32:53+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/free/</loc>
+    <lastmod>2016-07-12T22:32:53+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/http/</loc>
+    <lastmod>2016-07-12T22:32:53+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/jelastic/</loc>
+    <lastmod>2016-07-12T22:32:53+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/lets-encrypt/</loc>
+    <lastmod>2016-07-12T22:32:53+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2016/07/12/lets-encrypt-ssl-certificate-without-root-or-sudo-privileges/</loc>
+    <lastmod>2016-07-12T22:32:53+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/lets/</loc>
+    <lastmod>2016-07-12T22:32:53+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/root/</loc>
+    <lastmod>2016-07-12T22:32:53+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/ssh/</loc>
+    <lastmod>2016-07-12T22:32:53+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/ssl/</loc>
+    <lastmod>2016-07-12T22:32:53+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/sudo/</loc>
+    <lastmod>2016-07-12T22:32:53+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/docker/</loc>
+    <lastmod>2015-12-04T22:47:06+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/gitlab/</loc>
+    <lastmod>2015-12-04T22:47:06+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/gitlab/</loc>
+    <lastmod>2015-12-04T22:47:06+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/image/</loc>
+    <lastmod>2015-12-04T22:47:06+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/migrate/</loc>
+    <lastmod>2015-12-04T22:47:06+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2015/12/04/migrate-a-gitlab-docker-container-from-version-8-0-4-to-8-2-0/</loc>
+    <lastmod>2015-12-04T22:47:06+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/source-control/</loc>
+    <lastmod>2015-12-04T22:47:06+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/curl/</loc>
+    <lastmod>2014-12-30T23:58:16+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2014/12/30/json-remove-new-lines-via-linux-and-use-it-as-string-variable-and-as-param-in-curl-post-request/</loc>
+    <lastmod>2014-12-30T23:58:16+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/junit/</loc>
+    <lastmod>2014-12-30T23:58:16+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/newline/</loc>
+    <lastmod>2014-12-30T23:58:16+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/shell/</loc>
+    <lastmod>2014-12-30T23:58:16+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/apache/</loc>
+    <lastmod>2014-11-01T16:40:40+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/check/</loc>
+    <lastmod>2014-11-01T16:40:40+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/core/</loc>
+    <lastmod>2014-11-01T16:40:40+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/corrupt/</loc>
+    <lastmod>2014-11-01T16:40:40+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/lucene/</loc>
+    <lastmod>2014-11-01T16:40:40+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/lucene/</loc>
+    <lastmod>2014-11-01T16:40:40+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/repair/</loc>
+    <lastmod>2014-11-01T16:40:40+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/segment/</loc>
+    <lastmod>2014-11-01T16:40:40+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2014/11/01/solr-fix-corrupted-index-using-lucene/</loc>
+    <lastmod>2014-11-01T16:40:40+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/windows/</loc>
+    <lastmod>2014-11-01T16:40:40+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/audio/</loc>
+    <lastmod>2014-07-28T14:21:08+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/extract/</loc>
+    <lastmod>2014-07-28T14:21:08+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/ffmpeg/</loc>
+    <lastmod>2014-07-28T14:21:08+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2014/07/28/linux-extract-audio-and-video-using-ffmpeg/</loc>
+    <lastmod>2014-07-28T14:21:08+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/mp3/</loc>
+    <lastmod>2014-07-28T14:21:08+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/mp4/</loc>
+    <lastmod>2014-07-28T14:21:08+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/video/</loc>
+    <lastmod>2014-07-28T14:21:08+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/blog/</loc>
+    <lastmod>2014-04-12T17:32:52+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/https/</loc>
+    <lastmod>2014-04-12T17:32:52+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/nginx/</loc>
+    <lastmod>2014-04-12T17:32:52+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/nginx/</loc>
+    <lastmod>2014-04-12T17:32:52+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2014/04/12/nginx-https-reverse-proxy-to-wordpress-with-apache-http-and-different-port/</loc>
+    <lastmod>2014-04-12T17:32:52+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/port/</loc>
+    <lastmod>2014-04-12T17:32:52+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/proxy/</loc>
+    <lastmod>2014-04-12T17:32:52+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/reverse/</loc>
+    <lastmod>2014-04-12T17:32:52+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/server/</loc>
+    <lastmod>2014-04-12T17:32:52+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/wordpress/</loc>
+    <lastmod>2014-04-12T17:32:52+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/archive/</loc>
+    <lastmod>2014-04-12T16:35:56+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/control/</loc>
+    <lastmod>2014-04-12T16:35:56+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/deleted/</loc>
+    <lastmod>2014-04-12T16:35:56+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/export/</loc>
+    <lastmod>2014-04-12T16:35:56+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2014/04/12/export-untracked-modified-moved-and-deleted-files-from-a-git-repository-to-archive/</loc>
+    <lastmod>2014-04-12T16:35:56+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/modified/</loc>
+    <lastmod>2014-04-12T16:35:56+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/moved/</loc>
+    <lastmod>2014-04-12T16:35:56+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/new/</loc>
+    <lastmod>2014-04-12T16:35:56+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/repository/</loc>
+    <lastmod>2014-04-12T16:35:56+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/source/</loc>
+    <lastmod>2014-04-12T16:35:56+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/tar/</loc>
+    <lastmod>2014-04-12T16:35:56+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/untracked/</loc>
+    <lastmod>2014-04-12T16:35:56+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/daemon/</loc>
+    <lastmod>2014-02-15T15:00:52+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2014/02/15/install-apache-solr-as-windows-service-using-nssm/</loc>
+    <lastmod>2014-02-15T15:00:52+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/nssm/</loc>
+    <lastmod>2014-02-15T15:00:52+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/escape/</loc>
+    <lastmod>2013-12-31T08:12:33+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/python/</loc>
+    <lastmod>2013-12-31T08:12:33+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/python/</loc>
+    <lastmod>2013-12-31T08:12:33+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2013/12/31/remove-special-and-control-characters-from-string-using-python/</loc>
+    <lastmod>2013-12-31T08:12:33+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/string/</loc>
+    <lastmod>2013-12-31T08:12:33+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/unicode/</loc>
+    <lastmod>2013-12-31T08:12:33+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/utf-8/</loc>
+    <lastmod>2013-12-31T08:12:33+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/utf8/</loc>
+    <lastmod>2013-12-31T08:12:33+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/adb/</loc>
+    <lastmod>2013-10-28T23:22:48+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/android/</loc>
+    <lastmod>2013-10-28T23:22:48+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/android/</loc>
+    <lastmod>2013-10-28T23:22:48+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/cyanogenmod/</loc>
+    <lastmod>2013-10-28T23:22:48+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/location/</loc>
+    <lastmod>2013-10-28T23:22:48+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2013/10/28/read-sms-directly-from-sqlite-database-in-android/</loc>
+    <lastmod>2013-10-28T23:22:48+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/sms/</loc>
+    <lastmod>2013-10-28T23:22:48+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/sqlite/</loc>
+    <lastmod>2013-10-28T23:22:48+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/sqlite/</loc>
+    <lastmod>2013-10-28T23:22:48+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/telephony/</loc>
+    <lastmod>2013-10-28T23:22:48+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/thread/</loc>
+    <lastmod>2013-10-28T23:22:48+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/command/</loc>
+    <lastmod>2013-08-13T09:12:13+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/df/</loc>
+    <lastmod>2013-08-13T09:12:13+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/disk/</loc>
+    <lastmod>2013-08-13T09:12:13+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2013/08/13/linux-get-hard-disk-statistics-using-python/</loc>
+    <lastmod>2013-08-13T09:12:13+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/statistic/</loc>
+    <lastmod>2013-08-13T09:12:13+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/active/</loc>
+    <lastmod>2013-08-06T16:32:28+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/cifs/</loc>
+    <lastmod>2013-08-06T16:32:28+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/directory/</loc>
+    <lastmod>2013-08-06T16:32:28+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/domain/</loc>
+    <lastmod>2013-08-06T16:32:28+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2013/08/06/linux-mount-windows-shared-directory-via-cifs-and-samba/</loc>
+    <lastmod>2013-08-06T16:32:28+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/lubuntu/</loc>
+    <lastmod>2013-08-06T16:32:28+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/mount/</loc>
+    <lastmod>2013-08-06T16:32:28+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/samba/</loc>
+    <lastmod>2013-08-06T16:32:28+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/share/</loc>
+    <lastmod>2013-08-06T16:32:28+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/umount/</loc>
+    <lastmod>2013-08-06T16:32:28+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2013/06/12/fix-vmware-tools-kernel-header-path-is-not-valid-error/</loc>
+    <lastmod>2013-06-12T08:57:35+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/header/</loc>
+    <lastmod>2013-06-12T08:57:35+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/kernel/</loc>
+    <lastmod>2013-06-12T08:57:35+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/link/</loc>
+    <lastmod>2013-06-12T08:57:35+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/symbolic/</loc>
+    <lastmod>2013-06-12T08:57:35+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/tools/</loc>
+    <lastmod>2013-06-12T08:57:35+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/virtualisation/</loc>
+    <lastmod>2013-06-12T08:57:35+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/vmware/</loc>
+    <lastmod>2013-06-12T08:57:35+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/vmware/</loc>
+    <lastmod>2013-06-12T08:57:35+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/colour/</loc>
+    <lastmod>2013-04-23T16:34:21+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/highlight/</loc>
+    <lastmod>2013-04-23T16:34:21+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/raspbian/</loc>
+    <lastmod>2013-04-23T16:34:21+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/scheme/</loc>
+    <lastmod>2013-04-23T16:34:21+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/syntax/</loc>
+    <lastmod>2013-04-23T16:34:21+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/vi/</loc>
+    <lastmod>2013-04-23T16:34:21+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2013/04/23/vi-set-color-scheme-line-numbers-and-syntax-highlighting/</loc>
+    <lastmod>2013-04-23T16:34:21+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/vim/</loc>
+    <lastmod>2013-04-23T16:34:21+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/mysql/</loc>
+    <lastmod>2013-04-19T10:24:58+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/mysql/</loc>
+    <lastmod>2013-04-19T10:24:58+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2013/04/19/mysql-connect-error-1129/</loc>
+    <lastmod>2013-04-19T10:24:58+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/constraint/</loc>
+    <lastmod>2013-03-19T17:05:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/data/</loc>
+    <lastmod>2013-03-19T17:05:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/dump/</loc>
+    <lastmod>2013-03-19T17:05:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/foreign/</loc>
+    <lastmod>2013-03-19T17:05:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/import/</loc>
+    <lastmod>2013-03-19T17:05:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2013/03/19/import-a-large-sql-dump-file-to-a-mysql-database-from-command-line/</loc>
+    <lastmod>2013-03-19T17:05:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/key/</loc>
+    <lastmod>2013-03-19T17:05:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/line/</loc>
+    <lastmod>2013-03-19T17:05:00+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/card/</loc>
+    <lastmod>2013-03-10T13:09:32+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/dd/</loc>
+    <lastmod>2013-03-10T13:09:32+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/format/</loc>
+    <lastmod>2013-03-10T13:09:32+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2013/03/10/install-raspbian-wheezy-linux-to-raspberry-pi-using-linux/</loc>
+    <lastmod>2013-03-10T13:09:32+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/pi/</loc>
+    <lastmod>2013-03-10T13:09:32+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/raspberry/</loc>
+    <lastmod>2013-03-10T13:09:32+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/raspberry-pi/</loc>
+    <lastmod>2013-03-10T13:09:32+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/raspbian/</loc>
+    <lastmod>2013-03-10T13:09:32+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/sd/</loc>
+    <lastmod>2013-03-10T13:09:32+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/wheezy/</loc>
+    <lastmod>2013-03-10T13:09:32+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2013/03/05/change-timezone-to-apache-server-and-php/</loc>
+    <lastmod>2013-03-05T14:36:24+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/conf/</loc>
+    <lastmod>2013-03-05T14:36:24+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/httpd/</loc>
+    <lastmod>2013-03-05T14:36:24+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/ini/</loc>
+    <lastmod>2013-03-05T14:36:24+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/module/</loc>
+    <lastmod>2013-03-05T14:36:24+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/my/</loc>
+    <lastmod>2013-03-05T14:36:24+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/php/</loc>
+    <lastmod>2013-03-05T14:36:24+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/php/</loc>
+    <lastmod>2013-03-05T14:36:24+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/timezone/</loc>
+    <lastmod>2013-03-05T14:36:24+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/gmail/</loc>
+    <lastmod>2013-02-27T16:45:15+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2013/02/27/java-send-smtp-mail-using-gmail/</loc>
+    <lastmod>2013-02-27T16:45:15+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/mail/</loc>
+    <lastmod>2013-02-27T16:45:15+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/networking/</loc>
+    <lastmod>2013-02-27T16:45:15+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/smtp/</loc>
+    <lastmod>2013-02-27T16:45:15+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/smtp/</loc>
+    <lastmod>2013-02-27T16:45:15+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/tls/</loc>
+    <lastmod>2013-02-27T16:45:15+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/empty/</loc>
+    <lastmod>2012-12-27T09:52:19+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2012/12/27/java-string-util-class/</loc>
+    <lastmod>2012-12-27T09:52:19+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/manipulation/</loc>
+    <lastmod>2012-12-27T09:52:19+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/method/</loc>
+    <lastmod>2012-12-27T09:52:19+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/truncate/</loc>
+    <lastmod>2012-12-27T09:52:19+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/odbc/</loc>
+    <lastmod>2012-09-26T14:52:39+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/sql-server/</loc>
+    <lastmod>2012-09-26T14:52:39+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2012/09/26/windows-7-64bit-odbc-data-sources/</loc>
+    <lastmod>2012-09-26T14:52:39+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2012/09/12/send-email-from-vbscript-using-smtp-and-gmail/</loc>
+    <lastmod>2012-09-12T09:32:55+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/vbscript/</loc>
+    <lastmod>2012-09-12T09:32:55+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/wscript/</loc>
+    <lastmod>2012-09-12T09:32:55+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/buffer/</loc>
+    <lastmod>2012-08-24T14:27:26+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/datawindow/</loc>
+    <lastmod>2012-08-24T14:27:26+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/delete/</loc>
+    <lastmod>2012-08-24T14:27:26+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/efficient/</loc>
+    <lastmod>2012-08-24T14:27:26+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/filter/</loc>
+    <lastmod>2012-08-24T14:27:26+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/grid/</loc>
+    <lastmod>2012-08-24T14:27:26+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/powerbuilder/</loc>
+    <lastmod>2012-08-24T14:27:26+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/powerbuilder/</loc>
+    <lastmod>2012-08-24T14:27:26+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2012/08/24/powerbuilder-datawindow-grid-delete-selected-rows-efficiently/</loc>
+    <lastmod>2012-08-24T14:27:26+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/primary/</loc>
+    <lastmod>2012-08-24T14:27:26+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/expression/</loc>
+    <lastmod>2012-08-15T14:12:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/perl/</loc>
+    <lastmod>2012-08-15T14:12:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2012/08/15/perl-utf-8-and-regular-expressions/</loc>
+    <lastmod>2012-08-15T14:12:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/regular/</loc>
+    <lastmod>2012-08-15T14:12:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/easter/</loc>
+    <lastmod>2012-08-14T12:45:31+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/easter-date/</loc>
+    <lastmod>2012-08-14T12:45:31+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2012/08/14/java-calculate-orthodox-easter-date/</loc>
+    <lastmod>2012-08-14T12:45:31+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/orthodox/</loc>
+    <lastmod>2012-08-14T12:45:31+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2012/08/10/ubuntu-linux-useful-commands/</loc>
+    <lastmod>2012-08-10T00:27:29+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/content-length/</loc>
+    <lastmod>2012-08-09T12:50:03+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/download/</loc>
+    <lastmod>2012-08-09T12:50:03+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2012/08/09/java-get-file-size-and-download-using-http/</loc>
+    <lastmod>2012-08-09T12:50:03+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/pb/</loc>
+    <lastmod>2012-08-07T14:46:33+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/pb10/</loc>
+    <lastmod>2012-08-07T14:46:33+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2012/08/07/powerbuilder-10-get-and-change-system-language/</loc>
+    <lastmod>2012-08-07T14:46:33+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/system-language/</loc>
+    <lastmod>2012-08-07T14:46:33+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/win32/</loc>
+    <lastmod>2012-08-07T14:46:33+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/column/</loc>
+    <lastmod>2012-06-22T11:53:57+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/select/</loc>
+    <lastmod>2012-06-22T11:53:57+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2012/06/22/sql-server-select-table-information/</loc>
+    <lastmod>2012-06-22T11:53:57+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/table/</loc>
+    <lastmod>2012-06-22T11:53:57+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/all/</loc>
+    <lastmod>2012-06-01T15:33:11+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/check-constraint/</loc>
+    <lastmod>2012-06-01T15:33:11+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2012/06/01/sql-server-truncate-all-table-data/</loc>
+    <lastmod>2012-06-01T15:33:11+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2012/05/17/extend-sqliteopenhelper-as-a-singleton-class-in-android/</loc>
+    <lastmod>2012-05-17T13:13:50+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/public/</loc>
+    <lastmod>2012-05-17T13:13:50+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/singleton/</loc>
+    <lastmod>2012-05-17T13:13:50+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2012/05/15/check-network-connectivity-and-obtain-wifi-mac-address-in-android/</loc>
+    <lastmod>2012-05-15T11:47:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/logcat/</loc>
+    <lastmod>2012-05-15T11:47:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/output/</loc>
+    <lastmod>2012-05-15T11:47:00+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2012/05/14/android-pre-populated-database/</loc>
+    <lastmod>2012-05-14T09:12:48+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/asset/</loc>
+    <lastmod>2012-05-14T09:12:48+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/pre-populated/</loc>
+    <lastmod>2012-05-14T09:12:48+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/adapter/</loc>
+    <lastmod>2012-05-09T11:12:27+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/address/</loc>
+    <lastmod>2012-05-09T12:43:27+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/bluetooth/</loc>
+    <lastmod>2012-05-09T11:12:27+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2012/05/09/bluetooth-adapter-device-name-and-mac-address-in-android/</loc>
+    <lastmod>2012-05-09T11:12:27+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/connectivity/</loc>
+    <lastmod>2012-05-09T12:43:27+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/mac/</loc>
+    <lastmod>2012-05-09T12:43:27+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/application-server/</loc>
+    <lastmod>2012-05-08T10:31:12+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2012/05/08/install-jboss-5-1-0-ga-to-windows-7/</loc>
+    <lastmod>2012-05-08T10:31:12+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/jboss/</loc>
+    <lastmod>2012-05-08T10:31:12+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/categories/jboss/</loc>
+    <lastmod>2012-05-08T10:31:12+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2012/05/07/android-custom-dialogs-part-1-set-value/</loc>
+    <lastmod>2012-05-07T16:39:23+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2012/04/05/check-network-connectivity-in-android/</loc>
+    <lastmod>2012-05-09T12:43:27+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/wifi/</loc>
+    <lastmod>2012-05-09T12:43:27+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2012/03/19/android-md5-password-encryption/</loc>
+    <lastmod>2012-03-19T11:56:53+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/copy/</loc>
+    <lastmod>2012-03-08T09:53:02+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2012/03/08/copypaste-source-code-from-eclipse-to-microsoft-word/</loc>
+    <lastmod>2012-03-08T09:53:02+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/highlighting/</loc>
+    <lastmod>2012-03-08T09:53:02+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/microsoft/</loc>
+    <lastmod>2012-03-08T09:53:02+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/paste/</loc>
+    <lastmod>2012-03-08T09:53:02+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/word/</loc>
+    <lastmod>2012-03-08T09:53:02+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2012/03/07/android-external-storage-free-space/</loc>
+    <lastmod>2012-03-07T13:40:01+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/availabe/</loc>
+    <lastmod>2012-03-07T13:40:01+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/space/</loc>
+    <lastmod>2012-03-07T13:40:01+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/arraylist/</loc>
+    <lastmod>2012-02-28T15:19:55+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/collection/</loc>
+    <lastmod>2012-02-28T15:19:55+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/object/</loc>
+    <lastmod>2012-02-28T15:19:55+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2012/02/28/object-arraylist-sort/</loc>
+    <lastmod>2012-02-28T15:19:55+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/sort/</loc>
+    <lastmod>2012-02-28T15:19:55+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2012/02/22/android-get-sqlite-library-version/</loc>
+    <lastmod>2012-02-22T15:19:02+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/tags/library/</loc>
+    <lastmod>2012-02-22T15:19:02+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2012/01/18/zip-and-unzip-in-java/</loc>
+    <lastmod>2012-01-18T09:49:30+02:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/2011/10/14/hello-world/</loc>
+    <lastmod>2011-10-14T22:53:46+03:00</lastmod>
+  </url><url>
+    <loc>https://manios.org/1/01/01/</loc>
+  </url><url>
+    <loc>https://manios.org/about/</loc>
+  </url><url>
+    <loc>https://manios.org/categories/example-category/</loc>
+  </url><url>
+    <loc>https://manios.org/search/</loc>
+  </url>
 </urlset>

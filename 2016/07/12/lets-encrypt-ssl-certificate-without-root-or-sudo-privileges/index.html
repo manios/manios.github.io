@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="Five days ago we had to renew a number of SSL certificates using free Let&rsquo;s Encrypt SSL authority to a few Apache servers which were installed in Jelastic PaaS environment. The Apache servers were installed in an environment where:\nWe did have SSH access.\nWe did not have any root privileges or sudo command permission.\nThe SSH access was done using a limited apache user.\nThe underlying operating system was CentOS release 6.6 (Final) . (found out about it by running: cat /etc/centos-release)\n">
+<title>Let&#39;s Encrypt SSL certificate without root or sudo privileges</title>
+
+<link rel='canonical' href='https://manios.org/2016/07/12/lets-encrypt-ssl-certificate-without-root-or-sudo-privileges/'>
+
+<link rel="stylesheet" href="/scss/style.min.b0e76e98cdd4f7082d1fc36f7af7e0843a81201db2197c03ca426751dc923735.css"><meta property='og:title' content="Let's Encrypt SSL certificate without root or sudo privileges">
+<meta property='og:description' content="Five days ago we had to renew a number of SSL certificates using free Let&rsquo;s Encrypt SSL authority to a few Apache servers which were installed in Jelastic PaaS environment. The Apache servers were installed in an environment where:\nWe did have SSH access.\nWe did not have any root privileges or sudo command permission.\nThe SSH access was done using a limited apache user.\nThe underlying operating system was CentOS release 6.6 (Final) . (found out about it by running: cat /etc/centos-release)\n">
+<meta property='og:url' content='https://manios.org/2016/07/12/lets-encrypt-ssl-certificate-without-root-or-sudo-privileges/'>
+<meta property='og:site_name' content='Christos Manios'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='bash' /><meta property='article:tag' content='centos' /><meta property='article:tag' content='certificate' /><meta property='article:tag' content='encrypt' /><meta property='article:tag' content='free' /><meta property='article:tag' content='install' /><meta property='article:tag' content='jelastic' /><meta property='article:tag' content='let&#39;s encrypt' /><meta property='article:tag' content='lets' /><meta property='article:tag' content='linux' /><meta property='article:tag' content='root' /><meta property='article:tag' content='ssh' /><meta property='article:tag' content='ssl' /><meta property='article:tag' content='sudo' /><meta property='article:published_time' content='2016-07-12T22:32:53&#43;03:00'/><meta property='article:modified_time' content='2016-07-12T22:32:53&#43;03:00'/><meta property='og:image' content='https://manios.org/hubble_space.png' />
+<meta name="twitter:title" content="Let's Encrypt SSL certificate without root or sudo privileges">
+<meta name="twitter:description" content="Five days ago we had to renew a number of SSL certificates using free Let&rsquo;s Encrypt SSL authority to a few Apache servers which were installed in Jelastic PaaS environment. The Apache servers were installed in an environment where:\nWe did have SSH access.\nWe did not have any root privileges or sudo command permission.\nThe SSH access was done using a limited apache user.\nThe underlying operating system was CentOS release 6.6 (Final) . (found out about it by running: cat /etc/centos-release)\n"><meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content='https://manios.org/hubble_space.png' />
+    <link rel="shortcut icon" href="/favicon.png" />
+
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-7TD74CVVZ2"></script>
+      <script>
+        var doNotTrack = false;
+        if ( false ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-7TD74CVVZ2');
+        }
+      </script>
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avatar_hu_b3778195aee6cc3.png" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Christos Manios</a></h1>
+            <h2 class="site-description">Developer life is a NullPointerException</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/manios'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://www.linkedin.com/in/christos-manios-23b6953a/'
+                        target="_blank"
+                        title="Linkedin"
+                        rel="me"
+                    >
+                        
+                        
+                            <?xml version="1.0" encoding="iso-8859-1"?>
+<!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+<svg height="800px" width="800px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
+	 viewBox="0 0 382 382" xml:space="preserve">
+<path style="fill:#0077B7;" d="M347.445,0H34.555C15.471,0,0,15.471,0,34.555v312.889C0,366.529,15.471,382,34.555,382h312.889
+	C366.529,382,382,366.529,382,347.444V34.555C382,15.471,366.529,0,347.445,0z M118.207,329.844c0,5.554-4.502,10.056-10.056,10.056
+	H65.345c-5.554,0-10.056-4.502-10.056-10.056V150.403c0-5.554,4.502-10.056,10.056-10.056h42.806
+	c5.554,0,10.056,4.502,10.056,10.056V329.844z M86.748,123.432c-22.459,0-40.666-18.207-40.666-40.666S64.289,42.1,86.748,42.1
+	s40.666,18.207,40.666,40.666S109.208,123.432,86.748,123.432z M341.91,330.654c0,5.106-4.14,9.246-9.246,9.246H286.73
+	c-5.106,0-9.246-4.14-9.246-9.246v-84.168c0-12.556,3.683-55.021-32.813-55.021c-28.309,0-34.051,29.066-35.204,42.11v97.079
+	c0,5.106-4.139,9.246-9.246,9.246h-44.426c-5.106,0-9.246-4.14-9.246-9.246V149.593c0-5.106,4.14-9.246,9.246-9.246h44.426
+	c5.106,0,9.246,4.14,9.246,9.246v15.655c10.497-15.753,26.097-27.912,59.312-27.912c73.552,0,73.131,68.716,73.131,106.472
+	L341.91,330.654L341.91,330.654z"/>
+</svg>
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://x.com/maniosolr'
+                        target="_blank"
+                        title="Twitter"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>Home</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/about/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>About</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li>
+      <ol>
+        <li><a href="#prerequisites">Prerequisites</a></li>
+        <li><a href="#know-thy-environment">Know thy environment</a></li>
+        <li><a href="#clone-letsecryptsh-script">Clone letsecrypt.sh script</a></li>
+        <li><a href="#configure-the-script">Configure the script</a></li>
+        <li><a href="#configure-your-web-server">Configure your web server</a></li>
+        <li><a href="#run-the-script">Run the script</a></li>
+        <li><a href="#find-the-certificates">Find the certificates</a></li>
+        <li><a href="#configure-your-web-server-to-use-the-certificates">Configure your web server to use the certificates</a></li>
+        <li><a href="#upload-ssl-certificates-to-jelastic-administration-panel">Upload SSL certificates to Jelastic Administration Panel</a></li>
+        <li><a href="#reload-or-restart-web-server-and-test-configuration">Reload or restart web server and test configuration</a></li>
+      </ol>
+    </li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="has-image main-article">
+    <header class="article-header">
+        <div class="article-image">
+            <a href="/2016/07/12/lets-encrypt-ssl-certificate-without-root-or-sudo-privileges/">
+                
+                    <img src="/hubble_space.png" loading="lazy" alt="Featured image of post Let&#39;s Encrypt SSL certificate without root or sudo privileges" />
+                
+            </a>
+        </div>
+    
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/apache/" >
+                Apache
+            </a>
+        
+            <a href="/categories/http/" >
+                HTTP
+            </a>
+        
+            <a href="/categories/linux/" >
+                Linux
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/2016/07/12/lets-encrypt-ssl-certificate-without-root-or-sudo-privileges/">Let&#39;s Encrypt SSL certificate without root or sudo privileges</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published" datetime='2016-07-12T22:32:53&#43;03:00'>Jul 12, 2016</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    5 minute read
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <p>Five days ago we had to renew a number of SSL certificates using free <a class="link" href="http://letsencrypt.org/"  target="_blank" rel="noopener"
+    >Let&rsquo;s Encrypt</a> SSL authority to a few Apache servers which were installed in <a class="link" href="http://www.layershift.com/"  target="_blank" rel="noopener"
+    >Jelastic PaaS environment</a>. The Apache servers were installed in an environment where:</p>
+<ol>
+<li>
+<p>We did have SSH access.</p>
+</li>
+<li>
+<p>We <strong>did not have any root privileges or sudo command permission</strong>.</p>
+</li>
+<li>
+<p>The SSH access was done using a limited <code>apache</code> user.</p>
+</li>
+<li>
+<p>The underlying operating system was CentOS release 6.6 (Final) . (found out about it by running: <code>cat /etc/centos-release</code>)</p>
+</li>
+</ol>
+<p>Thus we could not use the official <a class="link" href="https://github.com/letsencrypt/letsencrypt"  target="_blank" rel="noopener"
+    >Let&rsquo;s Encrypt client</a> as it requires root privileges. After 3 hours of searching and striving to use <a class="link" href="https://community.letsencrypt.org/t/list-of-client-implementations/2103"  target="_blank" rel="noopener"
+    >multiple client implementations</a>, we stumbled upon <a class="link" href="https://github.com/lukas2511/letsencrypt.sh"  target="_blank" rel="noopener"
+    >letsencrypt.sh</a>. With the guidance of a <a class="link" href="https://knallisworld.de/blog/2016/02/06/next-level-step-2-renewal-a-la-cron/"  target="_blank" rel="noopener"
+    >tutorial written in German!!</a> we finally managed to create our SSL certificates. So today, at last, we will show you how!!!</p>
+<p>In this example, we assume that our domain name is <code>bobos.org</code>. We want to create a certificate for <a class="link" href="http://bobos.org"  target="_blank" rel="noopener"
+    >bobos.org</a> and <a class="link" href="http://www.bobos.org"  target="_blank" rel="noopener"
+    >www.bobos.org</a>. Note that Let&rsquo;s Encrypt <strong>does not generate wildcard certificates yet!!</strong>.</p>
+<h3 id="prerequisites">Prerequisites
+</h3><ol>
+<li>
+<p>No root access or sudo is required.</p>
+</li>
+<li>
+<p>We Obtain an A record for bobos.org and <a class="link" href="https://www.bobos.org"  target="_blank" rel="noopener"
+    >www.bobos.org</a> which points to the IP of the server you are using.</p>
+</li>
+<li>
+<p>Inside the aforementioned server we have to run a web server which listens to port 80. Listening to port 443 is optional.</p>
+</li>
+<li>
+<p>Shell access to the server.</p>
+</li>
+</ol>
+<p>If you want to have a thourough understanding of why we are going to perform the following steps, you can refer to <a class="link" href="https://letsencrypt.org/how-it-works/"  target="_blank" rel="noopener"
+    >How it works</a> official article. Few! It is high time we started. Shall we?</p>
+<ol>
+<li>Know thy environment.</li>
+<li>Clone letsecrypt.sh script.</li>
+<li>Configure the script.</li>
+<li>Configure your web server.</li>
+<li>Run the script.</li>
+<li>Find the certificates.</li>
+<li>Configure your web server to use the certificates</li>
+<li>Upload SSL certificates to Jelastic Administration Panel</li>
+<li>Reload or restart web server and test configuration</li>
+</ol>
+<h3 id="know-thy-environment">Know thy environment
+</h3><p>After login via SSH we are in <code>/var/www/</code> directory:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">apache@apache2 ~ $ <span class="nb">pwd</span>
+</span></span><span class="line"><span class="cl">/var/www
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Then we check CentOS version, because we can!</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">apache@apache2 ~ $ cat /etc/centos-release 
+</span></span><span class="line"><span class="cl">CentOS release 6.6 <span class="o">(</span>Final<span class="o">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="clone-letsecryptsh-script">Clone letsecrypt.sh script
+</h3><p>While being in that directory we clone <a class="link" href="https://github.com/lukas2511/letsencrypt.sh"  target="_blank" rel="noopener"
+    >letsencrypt.sh</a>:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">apache@apache2 ~ $ git clone https://github.com/lukas2511/letsencrypt.sh.git
+</span></span><span class="line"><span class="cl">Cloning into <span class="s1">&#39;letsencrypt.sh&#39;</span>...
+</span></span><span class="line"><span class="cl">remote: Counting objects: 873, <span class="k">done</span>.
+</span></span><span class="line"><span class="cl">remote: Total <span class="m">873</span> <span class="o">(</span>delta 0<span class="o">)</span>, reused <span class="m">0</span> <span class="o">(</span>delta 0<span class="o">)</span>, pack-reused <span class="m">873</span>
+</span></span><span class="line"><span class="cl">Receiving objects: 100% <span class="o">(</span>873/873<span class="o">)</span>, 223.44 KiB <span class="p">|</span> <span class="m">0</span> bytes/s, <span class="k">done</span>.
+</span></span><span class="line"><span class="cl">Resolving deltas: 100% <span class="o">(</span>530/530<span class="o">)</span>, <span class="k">done</span>.
+</span></span><span class="line"><span class="cl">Checking connectivity... <span class="k">done</span>.
+</span></span><span class="line"><span class="cl">apache@apache2 ~ $ chown -R apache:apache letsencrypt.sh
+</span></span><span class="line"><span class="cl">apache@apache2 ~ $ <span class="nb">cd</span> letsencrypt.sh
+</span></span><span class="line"><span class="cl">apache@apache2 ~ $ <span class="nb">pwd</span>
+</span></span><span class="line"><span class="cl">/var/www/etsencrypt.sh
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="configure-the-script">Configure the script
+</h3><p>Then, we have perform a little configuration so the script is aware of our environment and the domains for which we want to generate free SSL certificates:</p>
+<ol>
+<li>Prepare <code>base</code> and <code>conf</code> directories:
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">apache@apache2 ~/letsencrypt.sh $ mkdir conf 
+</span></span><span class="line"><span class="cl">apache@apache2 ~/letsencrypt.sh $ mkdir base
+</span></span><span class="line"><span class="cl">apache@apache2 ~/letsencrypt.sh $ cp config.sh.example conf/config.sh
+</span></span><span class="line"><span class="cl">apache@apache2 ~/letsencrypt.sh $ cp domains.txt.exampleconfig.sh.example conf/domains.txt
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+<li>Edit configuration in <code>/var/www/letsencrypt.sh/conf/config.sh</code>:
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-ini" data-lang="ini"><span class="line"><span class="cl"><span class="na">CONFIG_D</span><span class="o">=</span><span class="s">&#34;/var/www/letsencrypt.sh&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="na">BASEDIR</span><span class="o">=</span><span class="s">&#34;/var/www/letsencrypt.sh/base&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="na">WELLKNOWN</span><span class="o">=</span><span class="s">&#34;${BASEDIR}/.acme-challenges&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="na">CONTACT_EMAIL</span><span class="o">=</span><span class="s">&#34;aValidEmail@whateverServer.com&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+<li>Add the domain names in /var/www/letsencrypt.sh/conf/domains.txt```:
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">bobos.org www.bobos.org
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+</ol>
+<h3 id="configure-your-web-server">Configure your web server
+</h3><p>Now we have to put the following lines in your site&rsquo;s special apache conf i.e. <code>/etc/httpd/sites-available/bobos.conf</code> or in <code>/etc/httpd/conf/httpd.conf</code>. This will help Let&rsquo;s Encrypt to access your server, perform domain validation and perform some challenges in order to generate our SSL certificate.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">Alias /.well-known/acme-challenge /var/www/letsencrypt.sh/base/.acme-challenges
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">&lt;Directory /var/www/letsencrypt.sh/base/.acme-challenges&gt;
+</span></span><span class="line"><span class="cl">      Options None
+</span></span><span class="line"><span class="cl">      AllowOverride None
+</span></span><span class="line"><span class="cl">      Order allow,deny
+</span></span><span class="line"><span class="cl">      Allow from all
+</span></span><span class="line"><span class="cl">&lt;/Directory&gt;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="run-the-script">Run the script
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">apache@apache2 ~/letsencrypt.sh $ ./letsencrypt.sh --config /var/www/letsencrypt.sh/conf/config.sh -c
+</span></span><span class="line"><span class="cl"><span class="c1"># INFO: Using main config file /var/www/letsencrypt.sh/conf/config.sh</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># INFO: Using additional config file /var/www/letsencrypt.sh/conf/config.sh</span>
+</span></span><span class="line"><span class="cl">Processing bobos.org with alternative names: www.bobos.org
+</span></span><span class="line"><span class="cl"> + Signing domains...
+</span></span><span class="line"><span class="cl"> + Creating new directory /var/www/letsencrypt.sh/base/certs/bobos.org ...
+</span></span><span class="line"><span class="cl"> + Generating private key...
+</span></span><span class="line"><span class="cl"> + Generating signing request...
+</span></span><span class="line"><span class="cl"> + Requesting challenge <span class="k">for</span> bobos.org...
+</span></span><span class="line"><span class="cl"> + Requesting challenge <span class="k">for</span> www.bobos.org...
+</span></span><span class="line"><span class="cl"> + Responding to challenge <span class="k">for</span> bobos.org...
+</span></span><span class="line"><span class="cl"> + Challenge is valid!
+</span></span><span class="line"><span class="cl"> + Responding to challenge <span class="k">for</span> www.bobos.org...
+</span></span><span class="line"><span class="cl"> + Challenge is valid!
+</span></span><span class="line"><span class="cl"> + Requesting certificate...
+</span></span><span class="line"><span class="cl"> + Checking certificate...
+</span></span><span class="line"><span class="cl"> + Done!
+</span></span><span class="line"><span class="cl"> + Creating fullchain.pem...
+</span></span><span class="line"><span class="cl"> + Done!
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="find-the-certificates">Find the certificates
+</h3><p>The certificates are created in <code>$BASE/certs//</code> directory:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">apache@apache2 ~/letsencrypt.sh $ ls -l base/certs/bobos.org/
+</span></span><span class="line"><span class="cl">total <span class="m">20</span>
+</span></span><span class="line"><span class="cl">-rw------- <span class="m">1</span> apache apache <span class="m">1655</span> Jul  <span class="m">7</span> 06:49 cert-1457333387.csr
+</span></span><span class="line"><span class="cl">-rw------- <span class="m">1</span> apache apache <span class="m">2143</span> Jul  <span class="m">7</span> 06:49 cert-1457333387.pem
+</span></span><span class="line"><span class="cl">lrwxrwxrwx <span class="m">1</span> apache apache   <span class="m">19</span> Jul  <span class="m">7</span> 06:50 cert.csr -&gt; cert-1457333387.csr
+</span></span><span class="line"><span class="cl">lrwxrwxrwx <span class="m">1</span> apache apache   <span class="m">19</span> Jul  <span class="m">7</span> 06:50 cert.pem -&gt; cert-1457333387.pem
+</span></span><span class="line"><span class="cl">-rw------- <span class="m">1</span> apache apache <span class="m">1675</span> Jul  <span class="m">7</span> 06:50 chain-1457333387.pem
+</span></span><span class="line"><span class="cl">lrwxrwxrwx <span class="m">1</span> apache apache   <span class="m">20</span> Jul  <span class="m">7</span> 06:50 chain.pem -&gt; chain-1457333387.pem
+</span></span><span class="line"><span class="cl">-rw------- <span class="m">1</span> apache apache <span class="m">3818</span> Jul  <span class="m">7</span> 06:50 fullchain-1457333387.pem
+</span></span><span class="line"><span class="cl">lrwxrwxrwx <span class="m">1</span> apache apache   <span class="m">24</span> Jul  <span class="m">7</span> 06:50 fullchain.pem -&gt; fullchain-1457333387.pem
+</span></span><span class="line"><span class="cl">-rw------- <span class="m">1</span> apache apache <span class="m">3243</span> Jul  <span class="m">7</span> 06:49 privkey-1457333387.pem
+</span></span><span class="line"><span class="cl">lrwxrwxrwx <span class="m">1</span> apache apache   <span class="m">22</span> Jul  <span class="m">7</span> 06:50 privkey.pem -&gt; privkey-1457333387.pem
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="configure-your-web-server-to-use-the-certificates">Configure your web server to use the certificates
+</h3><p>Configure Apache in order to use the created certificates. It might by your site&rsquo;s special conf i.e. <code>/etc/httpd/sites-available/bobos.conf</code> or global <code>/etc/httpd/conf/httpd.conf</code>:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-apache" data-lang="apache"><span class="line"><span class="cl"><span class="nb">SSLEngine</span> <span class="k">On</span>
+</span></span><span class="line"><span class="cl"><span class="nb">SSLCertificateFile</span>      <span class="sx">/var/www/letsencrypt.sh/base/certs/bobos.org/cert.pem</span>
+</span></span><span class="line"><span class="cl"><span class="nb">SSLCertificateKeyFile</span>   <span class="sx">/var/www/letsencrypt.sh/base/certs/bobos.org/privkey.pem</span>
+</span></span><span class="line"><span class="cl"><span class="nb">SSLCertificateChainFile</span> <span class="sx">/var/www/letsencrypt.sh/base/certs/bobos.org/chain.pem</span>
+</span></span><span class="line"><span class="cl"><span class="nb">SSLCACertificateFile</span>    <span class="sx">/var/www/letsencrypt.sh/base/certs/bobos.org/fullchain.pem</span>
+</span></span><span class="line"><span class="cl"><span class="nb">SSLHonorCipherOrder</span> <span class="k">On</span>
+</span></span><span class="line"><span class="cl"><span class="nb">SSLCipherSuite</span> ECDHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA256:ECDHE-RSA-AES256-SHA:ECDHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-RSA-AES128-SHA256:DHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA:ECDHE-RSA-DES-CBC3-SHA:EDH-RSA-DES-CBC3-SHA:AES256-GCM-SHA384:AES128-GCM-SHA256:AES256-SHA256:AES128-SHA256:AES256-SHA:AES128-SHA:DES-CBC3-SHA:HIGH:!aNULL:!eNULL:!EXPORT:!DES:!MD5:!PSK:!RC4
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>IMPORTANT NOTE!!</strong> The previous configuration <strong>will not work</strong> in Jelastic Paas environment, as it forces us to add the certificates via <a class="link" href="https://app.j.layershift.co.uk/"  target="_blank" rel="noopener"
+    >Jelastic Administration Panel</a>. Jelastic puts the certificates to <code>/var/lib/jelastic/SSL</code>.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-apache" data-lang="apache"><span class="line"><span class="cl"><span class="nb">SSLEngine</span> <span class="k">on</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">SSLProtocol</span> <span class="k">ALL</span> -SSLv2 -SSLv3
+</span></span><span class="line"><span class="cl"><span class="nb">SSLHonorCipherOrder</span> <span class="k">On</span>
+</span></span><span class="line"><span class="cl"><span class="nb">SSLCipherSuite</span> ECDH+AESGCM:DH+AESGCM:ECDH+AES256:DH+AES256:ECDH+AES128:DH+AES:ECDH+3DES:DH+3DES:RSA+AESGCM:RSA+AES:RSA+3DES:!aNULL:!MD5:!DSS
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">SSLCertificateFile</span> <span class="sx">/var/lib/jelastic/SSL/jelastic.crt</span>
+</span></span><span class="line"><span class="cl"><span class="nb">SSLCertificateKeyFile</span> <span class="sx">/var/lib/jelastic/SSL/jelastic.key</span>
+</span></span><span class="line"><span class="cl"><span class="nb">SSLCACertificateFile</span> <span class="sx">/var/lib/jelastic/SSL/jelastic-ca.crt</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="upload-ssl-certificates-to-jelastic-administration-panel">Upload SSL certificates to Jelastic Administration Panel
+</h3><p>Then we have to upload SSL certificates to Jelastic Administration Panel. To achieve that you can use <a class="link" href="https://docs.jelastic.com/custom-ssl#docs-internal-guid-ccfc9b2c-ad8f-bb9d-9503-26def475aa76"  target="_blank" rel="noopener"
+    >this guide</a>. Otherwise (i.e. putting files via SSH) it will not work.</p>
+<h3 id="reload-or-restart-web-server-and-test-configuration">Reload or restart web server and test configuration
+</h3><p>Finally we reload <code>sudo /etc/init.d/apache2 reload</code> or restart (<code>sudo /etc/init.d/apache2 restart</code>) Apache web server and verify that <code>https://bobos.org</code> works.</p>
+<p>That is all folks! Greetings from a hot and striving for the best Greece!</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/bash/">Bash</a>
+        
+            <a href="/tags/centos/">Centos</a>
+        
+            <a href="/tags/certificate/">Certificate</a>
+        
+            <a href="/tags/encrypt/">Encrypt</a>
+        
+            <a href="/tags/free/">Free</a>
+        
+            <a href="/tags/install/">Install</a>
+        
+            <a href="/tags/jelastic/">Jelastic</a>
+        
+            <a href="/tags/lets-encrypt/">Let&#39;s Encrypt</a>
+        
+            <a href="/tags/lets/">Lets</a>
+        
+            <a href="/tags/linux/">Linux</a>
+        
+            <a href="/tags/root/">Root</a>
+        
+            <a href="/tags/ssh/">Ssh</a>
+        
+            <a href="/tags/ssl/">Ssl</a>
+        
+            <a href="/tags/sudo/">Sudo</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/2014/11/01/solr-fix-corrupted-index-using-lucene/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Solr fix corrupted index using Lucene</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/2017/12/14/install-and-configure-and-troubleshoot-ntp-servers-in-debian-linux/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Install, configure and troubleshoot NTP servers in Debian Linux</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/2017/11/15/use-haproxy-and-docker-for-solr-load-balancing/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Use HAProxy and Docker to load balance requests to Solr and SolrCloud</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/2013/10/28/read-sms-directly-from-sqlite-database-in-android/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Read SMS directly from Sqlite database in Android</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/2013/03/05/change-timezone-to-apache-server-and-php/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Change timezone to Apache server , PHP and MySql in XAMPP</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    <div class="disqus-container">
+    <div id="disqus_thread"></div>
+<script>
+    window.disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "manios-org" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+
+<style>
+    .disqus-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+</style>
+
+<script>
+    window.addEventListener('onColorSchemeChange', (e) => {
+        if (typeof DISQUS == 'object') {
+            DISQUS.reset({
+                reload: true
+            });
+        }
+    })
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2011 - 
+        
+        2025 Christos Manios
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.32.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.c922af694cc257bf1ecc41c0dd7b0430f9114ec280ccf67cd2c6ad55f5316c4e.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

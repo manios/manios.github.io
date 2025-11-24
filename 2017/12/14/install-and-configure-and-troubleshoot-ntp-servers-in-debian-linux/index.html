@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="If you are reading this article, perhaps you have searched a lot about NTP server installation in Linux, issues and problems encountered and how to troubleshoot them! We know that there are so many articles about how to configure NTP servers but we could not find any which contains all the issues we faced in the same place!\nOur story A client of ours has a sever infrastructure where from the 40+ VMs in the tenant environment, only 3 are allowed to communicate with external NTP servers. Thus we had to install NTP servers in 3 Linux virtual machines in order to synchronise their clocks with the external pools and in the meantime act as internal environment primary NTP servers. The following diagram (kudos to AsciiFlow) summarizes the installation:\n">
+<title>Install, configure and troubleshoot NTP servers in Debian Linux</title>
+
+<link rel='canonical' href='https://manios.org/2017/12/14/install-and-configure-and-troubleshoot-ntp-servers-in-debian-linux/'>
+
+<link rel="stylesheet" href="/scss/style.min.b0e76e98cdd4f7082d1fc36f7af7e0843a81201db2197c03ca426751dc923735.css"><meta property='og:title' content="Install, configure and troubleshoot NTP servers in Debian Linux">
+<meta property='og:description' content="If you are reading this article, perhaps you have searched a lot about NTP server installation in Linux, issues and problems encountered and how to troubleshoot them! We know that there are so many articles about how to configure NTP servers but we could not find any which contains all the issues we faced in the same place!\nOur story A client of ours has a sever infrastructure where from the 40+ VMs in the tenant environment, only 3 are allowed to communicate with external NTP servers. Thus we had to install NTP servers in 3 Linux virtual machines in order to synchronise their clocks with the external pools and in the meantime act as internal environment primary NTP servers. The following diagram (kudos to AsciiFlow) summarizes the installation:\n">
+<meta property='og:url' content='https://manios.org/2017/12/14/install-and-configure-and-troubleshoot-ntp-servers-in-debian-linux/'>
+<meta property='og:site_name' content='Christos Manios'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='linux' /><meta property='article:tag' content='ntp' /><meta property='article:tag' content='debian' /><meta property='article:tag' content='ubuntu' /><meta property='article:tag' content='server' /><meta property='article:tag' content='time' /><meta property='article:tag' content='sync' /><meta property='article:tag' content='synchronisation' /><meta property='article:tag' content='install' /><meta property='article:tag' content='configure' /><meta property='article:tag' content='error' /><meta property='article:tag' content='network' /><meta property='article:tag' content='ntpdate' /><meta property='article:tag' content='ntpq' /><meta property='article:tag' content='service' /><meta property='article:tag' content='strata' /><meta property='article:tag' content='high' /><meta property='article:tag' content='suitable' /><meta property='article:tag' content='minpoll' /><meta property='article:tag' content='maxpoll' /><meta property='article:tag' content='pool' /><meta property='article:tag' content='iburst' /><meta property='article:published_time' content='2017-12-14T10:42:00&#43;02:00'/><meta property='article:modified_time' content='2017-12-14T10:42:00&#43;02:00'/>
+<meta name="twitter:title" content="Install, configure and troubleshoot NTP servers in Debian Linux">
+<meta name="twitter:description" content="If you are reading this article, perhaps you have searched a lot about NTP server installation in Linux, issues and problems encountered and how to troubleshoot them! We know that there are so many articles about how to configure NTP servers but we could not find any which contains all the issues we faced in the same place!\nOur story A client of ours has a sever infrastructure where from the 40+ VMs in the tenant environment, only 3 are allowed to communicate with external NTP servers. Thus we had to install NTP servers in 3 Linux virtual machines in order to synchronise their clocks with the external pools and in the meantime act as internal environment primary NTP servers. The following diagram (kudos to AsciiFlow) summarizes the installation:\n">
+    <link rel="shortcut icon" href="/favicon.png" />
+
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-7TD74CVVZ2"></script>
+      <script>
+        var doNotTrack = false;
+        if ( false ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-7TD74CVVZ2');
+        }
+      </script>
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avatar_hu_b3778195aee6cc3.png" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Christos Manios</a></h1>
+            <h2 class="site-description">Developer life is a NullPointerException</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/manios'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://www.linkedin.com/in/christos-manios-23b6953a/'
+                        target="_blank"
+                        title="Linkedin"
+                        rel="me"
+                    >
+                        
+                        
+                            <?xml version="1.0" encoding="iso-8859-1"?>
+<!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+<svg height="800px" width="800px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
+	 viewBox="0 0 382 382" xml:space="preserve">
+<path style="fill:#0077B7;" d="M347.445,0H34.555C15.471,0,0,15.471,0,34.555v312.889C0,366.529,15.471,382,34.555,382h312.889
+	C366.529,382,382,366.529,382,347.444V34.555C382,15.471,366.529,0,347.445,0z M118.207,329.844c0,5.554-4.502,10.056-10.056,10.056
+	H65.345c-5.554,0-10.056-4.502-10.056-10.056V150.403c0-5.554,4.502-10.056,10.056-10.056h42.806
+	c5.554,0,10.056,4.502,10.056,10.056V329.844z M86.748,123.432c-22.459,0-40.666-18.207-40.666-40.666S64.289,42.1,86.748,42.1
+	s40.666,18.207,40.666,40.666S109.208,123.432,86.748,123.432z M341.91,330.654c0,5.106-4.14,9.246-9.246,9.246H286.73
+	c-5.106,0-9.246-4.14-9.246-9.246v-84.168c0-12.556,3.683-55.021-32.813-55.021c-28.309,0-34.051,29.066-35.204,42.11v97.079
+	c0,5.106-4.139,9.246-9.246,9.246h-44.426c-5.106,0-9.246-4.14-9.246-9.246V149.593c0-5.106,4.14-9.246,9.246-9.246h44.426
+	c5.106,0,9.246,4.14,9.246,9.246v15.655c10.497-15.753,26.097-27.912,59.312-27.912c73.552,0,73.131,68.716,73.131,106.472
+	L341.91,330.654L341.91,330.654z"/>
+</svg>
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://x.com/maniosolr'
+                        target="_blank"
+                        title="Twitter"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>Home</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/about/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>About</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#our-story">Our story</a></li>
+    <li><a href="#install-ntp-server-in-debian-linux">Install NTP Server in Debian Linux</a></li>
+    <li><a href="#configure-ntp-server">Configure NTP Server</a></li>
+    <li><a href="#configure-linux-ntp-client">Configure Linux NTP Client</a></li>
+    <li><a href="#configure-windows-ntp-client">Configure Windows NTP Client</a></li>
+    <li><a href="#troubleshooting">Troubleshooting</a>
+      <ol>
+        <li><a href="#ntp-server-dropped-strata-too-high">NTP Server dropped: strata too high</a></li>
+        <li><a href="#no-server-suitable-for-synchronization-found">No server suitable for synchronization found</a></li>
+        <li><a href="#ntpq-tool-command-shows-zeroes-in-output">NTPQ tool command shows zeroes in output</a></li>
+      </ol>
+    </li>
+    <li><a href="#bibliography">Bibliography</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/linux/" >
+                Linux
+            </a>
+        
+            <a href="/categories/debian/" >
+                Debian
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/2017/12/14/install-and-configure-and-troubleshoot-ntp-servers-in-debian-linux/">Install, configure and troubleshoot NTP servers in Debian Linux</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published" datetime='2017-12-14T10:42:00&#43;02:00'>Dec 14, 2017</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    11 minute read
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <p>If you are reading this article, perhaps you have searched a lot about NTP server installation in Linux, issues and problems encountered and how to troubleshoot them! We know that there are so many articles about how to configure NTP servers but we could not find any which contains all the issues we faced in the same place!</p>
+<h2 id="our-story">Our story
+</h2><p>A client of ours has a sever infrastructure where from the 40+ VMs in the tenant environment, only 3 are allowed to communicate with external NTP servers. Thus we had to install NTP servers in 3 Linux virtual machines in order to synchronise their clocks with the external pools and in the meantime act as internal environment  primary NTP servers. The following diagram (kudos to <a class="link" href="http://asciiflow.com/"  target="_blank" rel="noopener"
+    >AsciiFlow</a>) summarizes the installation:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">                  +---------------------+
+</span></span><span class="line"><span class="cl">                  |     External NTP    |
+</span></span><span class="line"><span class="cl">                  |1.europe.pool.ntp.org|
+</span></span><span class="line"><span class="cl">                  +----------+----------+
+</span></span><span class="line"><span class="cl">                             ^
+</span></span><span class="line"><span class="cl">                             |
+</span></span><span class="line"><span class="cl">                             |
+</span></span><span class="line"><span class="cl">        +---------------------------------------+
+</span></span><span class="line"><span class="cl">        |                    |                  |
+</span></span><span class="line"><span class="cl">        |                    |                  |
+</span></span><span class="line"><span class="cl">+-------+--------+  +--------+-------+  +-------+--------+
+</span></span><span class="line"><span class="cl">|      VM1       |  |      VM2       |  |      VM3       |
+</span></span><span class="line"><span class="cl">|  192.168.10.1  |  |  192.168.10.2  |  |  192.168.10.3  |
+</span></span><span class="line"><span class="cl">|    NTP srv1    |  |    NTP srv2    |  |    NTP srv3    |
+</span></span><span class="line"><span class="cl">+-------+--------+  +--------+-------+  +-----+----------+
+</span></span><span class="line"><span class="cl">        ^                    ^                ^
+</span></span><span class="line"><span class="cl">        |                    |                |
+</span></span><span class="line"><span class="cl">        +-------------------------------------+
+</span></span><span class="line"><span class="cl">                             |
+</span></span><span class="line"><span class="cl">                     +-------+--------+
+</span></span><span class="line"><span class="cl">                     |      VM4 (any) |
+</span></span><span class="line"><span class="cl">                     |  192.168.10.4  |
+</span></span><span class="line"><span class="cl">                     |   NTP client   |
+</span></span><span class="line"><span class="cl">                     +----------------+
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Notes on diagram:</p>
+<ul>
+<li><code>External NTP</code> is one of the many <a class="link" href="http://www.pool.ntp.org"  target="_blank" rel="noopener"
+    >NTP pools</a> in the internet.</li>
+<li><code>VM1</code>, <code>VM2</code> and <code>VM3</code> are the Linux virtual machines which are allowed to connect to the internet using port 123 and synchronise their clocks with the external pool.</li>
+<li><code>VM4</code> is any virtual machine (Linux or Windows) in the infrastructure which cannot communicate with external NTP servers, thus it will use VM1, VM2 and VM3 to update its clock.</li>
+</ul>
+<blockquote>
+<p><strong>IMPORTANT NOTES</strong>:</p>
+<ol>
+<li>If you are a developer or a devops person and you have to communicate with network admins for any network issues you might encounter, please be meticulous and describe the problems in detail.</li>
+<li>During this operation (yes, debugging was like war!), the majority of our problems were network related so we had to debug every step and inform network administrators in order to configure firewalls.</li>
+<li>If your infrastructure is completely blocked by a firewall and you cannot access UDP port 123 (ntp) in any way, then you might consider using <a class="link" href="https://linux.die.net/man/8/htpdate"  target="_blank" rel="noopener"
+    >htpdate</a> in VM1, VM2, VM3.</li>
+</ol>
+</blockquote>
+<h2 id="install-ntp-server-in-debian-linux">Install NTP Server in Debian Linux
+</h2><p>So, to install NTP server in Debian Linux, you just execute:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo apt-get install ntp
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>in VM1, VM2, VM3 and VM4 . After it is installed, our efforts are focused on one single file: <code>/etc/ntp.conf</code>.</p>
+<h2 id="configure-ntp-server">Configure NTP Server
+</h2><p>As we mentioned, we open <code>/etc/ntp.conf</code> and edit the pools in VM1, VM2, VM3 according to our needs:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-gdscript3" data-lang="gdscript3"><span class="line"><span class="cl"><span class="c1"># /etc/ntp.conf, configuration for ntpd; see ntp.conf(5) for help</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">driftfile</span> <span class="o">/</span><span class="k">var</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">ntp</span><span class="o">/</span><span class="n">ntp</span><span class="o">.</span><span class="n">drift</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Enable this if you want statistics to be logged.</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#statsdir /var/log/ntpstats/</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">statistics</span> <span class="n">loopstats</span> <span class="n">peerstats</span> <span class="n">clockstats</span>
+</span></span><span class="line"><span class="cl"><span class="n">filegen</span> <span class="n">loopstats</span> <span class="n">file</span> <span class="n">loopstats</span> <span class="n">type</span> <span class="n">day</span> <span class="n">enable</span>
+</span></span><span class="line"><span class="cl"><span class="n">filegen</span> <span class="n">peerstats</span> <span class="n">file</span> <span class="n">peerstats</span> <span class="n">type</span> <span class="n">day</span> <span class="n">enable</span>
+</span></span><span class="line"><span class="cl"><span class="n">filegen</span> <span class="n">clockstats</span> <span class="n">file</span> <span class="n">clockstats</span> <span class="n">type</span> <span class="n">day</span> <span class="n">enable</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># You do need to talk to an NTP server or two (or three).</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#server ntp.your-provider.example</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># pool.ntp.org maps to about 1000 low-stratum NTP servers.  Your server will</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># pick a different set every time it starts up.  Please consider joining the</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># pool: &lt;http://www.pool.ntp.org/join.html&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="n">server</span> <span class="mf">3.</span><span class="n">gr</span><span class="o">.</span><span class="n">pool</span><span class="o">.</span><span class="n">ntp</span><span class="o">.</span><span class="n">org</span>  <span class="n">iburst</span> <span class="n">minpoll</span> <span class="mi">6</span> <span class="n">maxpoll</span> <span class="mi">8</span>
+</span></span><span class="line"><span class="cl"><span class="n">server</span> <span class="mf">1.</span><span class="n">europe</span><span class="o">.</span><span class="n">pool</span><span class="o">.</span><span class="n">ntp</span><span class="o">.</span><span class="n">org</span>  <span class="n">iburst</span> <span class="n">minpoll</span> <span class="mi">6</span> <span class="n">maxpoll</span> <span class="mi">8</span>
+</span></span><span class="line"><span class="cl"><span class="n">server</span> <span class="mf">2.</span><span class="n">europe</span><span class="o">.</span><span class="n">pool</span><span class="o">.</span><span class="n">ntp</span><span class="o">.</span><span class="n">org</span>  <span class="n">iburst</span> <span class="n">minpoll</span> <span class="mi">6</span> <span class="n">maxpoll</span> <span class="mi">8</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Undisciplined Local Clock. This is a fake driver intended for backup</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># and when no outside source of synchronized time is available. </span>
+</span></span><span class="line"><span class="cl"><span class="n">server</span>  <span class="mf">127.127</span><span class="o">.</span><span class="mf">1.0</span>     <span class="c1"># local clock</span>
+</span></span><span class="line"><span class="cl"><span class="n">fudge</span>   <span class="mf">127.127</span><span class="o">.</span><span class="mf">1.0</span> <span class="n">stratum</span> <span class="mi">8</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Access control configuration; see /usr/share/doc/ntp-doc/html/accopt.html for</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># details.  The web page &lt;http://support.ntp.org/bin/view/Support/AccessRestrictions&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># might also be helpful.</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># Note that &#34;restrict&#34; applies to both servers and clients, so a configuration</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># that might be intended to block requests from certain clients could also end</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># up blocking replies from your own upstream servers.</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># By default, exchange time with everybody, but don&#39;t allow configuration.</span>
+</span></span><span class="line"><span class="cl"><span class="n">restrict</span> <span class="o">-</span><span class="mi">4</span> <span class="n">default</span> <span class="n">kod</span> <span class="n">notrap</span> <span class="n">nomodify</span> <span class="n">nopeer</span> <span class="n">noquery</span> <span class="n">limited</span>
+</span></span><span class="line"><span class="cl"><span class="n">restrict</span> <span class="o">-</span><span class="mi">6</span> <span class="n">default</span> <span class="n">kod</span> <span class="n">notrap</span> <span class="n">nomodify</span> <span class="n">nopeer</span> <span class="n">noquery</span> <span class="n">limited</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Local users may interrogate the ntp server more closely.</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#restrict 127.0.0.1</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#restrict ::1</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Needed for adding pool entries</span>
+</span></span><span class="line"><span class="cl"><span class="n">restrict</span> <span class="n">source</span> <span class="n">notrap</span> <span class="n">nomodify</span> <span class="n">noquery</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Clients from this (example!) subnet have unlimited access, but only if</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># cryptographically authenticated.</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#restrict 192.168.123.0 mask 255.255.255.0 notrust</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># If you want to provide time to your local subnet, change the next line.</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># (Again, the address is an example only.)</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#broadcast 192.168.123.255</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># If you want to listen to time broadcasts on your local subnet, de-comment the</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># next lines.  Please do this only if you trust everybody on the network!</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#disable auth</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#broadcastclient</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>NOTES</strong>:</p>
+<ul>
+<li>
+<p>We have put <code>minpoll</code> to 6 (2^6 = 64 sec) and <code>maxpoll</code> to 8 (2^8 = 256 sec) as we noticed that our local NTP servers tended to drift for minutes. Sometimes, +4 minutes in a day! You can find more information about <code>minpoll</code> and <code>maxpoll</code> <a class="link" href="https://access.redhat.com/solutions/625863"  target="_blank" rel="noopener"
+    >here</a>.</p>
+</li>
+<li>
+<p>The following lines:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">server  127.127.1.0     # local clock
+</span></span><span class="line"><span class="cl">fudge   127.127.1.0 stratum 8
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>are used  in order to instruct the local server to act as a low stratum server and be preferred from the local clients. (more information : <a class="link" href="http://en.linuxreviews.org/NTP_-_Howto_make_the_clock_show_the_correct_time"  target="_blank" rel="noopener"
+    >here</a>)</p>
+</li>
+</ul>
+<h2 id="configure-linux-ntp-client">Configure Linux NTP Client
+</h2><p>We edit <code>/etc/ntp.conf</code> of VM4 and replace any external pools with our local NTP servers (VM1, VM2, VM3). Your configuration might look like the following:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># pool.ntp.org maps to about 1000 low-stratum NTP servers.  Your server will
+</span></span><span class="line"><span class="cl"># pick a different set every time it starts up.  Please consider joining the
+</span></span><span class="line"><span class="cl"># pool: &lt;http://www.pool.ntp.org/join.html&gt;
+</span></span><span class="line"><span class="cl">#pool 0.debian.pool.ntp.org iburst
+</span></span><span class="line"><span class="cl">#pool 1.debian.pool.ntp.org iburst
+</span></span><span class="line"><span class="cl">#pool 2.debian.pool.ntp.org iburst
+</span></span><span class="line"><span class="cl">#pool 3.debian.pool.ntp.org iburst
+</span></span><span class="line"><span class="cl">server 192.168.10.1 iburst minpoll 6 maxpoll 8
+</span></span><span class="line"><span class="cl">server 192.168.10.2 iburst minpoll 6 maxpoll 8
+</span></span><span class="line"><span class="cl">server 192.168.10.3 iburst minpoll 6 maxpoll 8
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Again as you can you may notice we have put <code>minpoll</code> to 6 (2^6 = 64 sec) and <code>maxpoll</code> to 8 (2^8 = 256 sec) as we noticed that our local NTP servers tended to drift for minutes. Sometimes, +4 minutes in a day! You can find more information about <code>minpoll</code> and <code>maxpoll</code> <a class="link" href="https://access.redhat.com/solutions/625863"  target="_blank" rel="noopener"
+    >here</a>.</p>
+<h2 id="configure-windows-ntp-client">Configure Windows NTP Client
+</h2><p>Our virtual machines use Windows Server 2012 R2 (for Windows 2003 and older see <a class="link" href="http://www.pool.ntp.org/en/use.html"  target="_blank" rel="noopener"
+    >here</a>). We followed the instructions from <a class="link" href="http://www.pool.ntp.org/en/use.html"  target="_blank" rel="noopener"
+    >pool.ntp.org</a> and <a class="link" href="https://serverfault.com/questions/294787/how-do-i-force-sync-the-time-on-windows-workstation-or-server"  target="_blank" rel="noopener"
+    >this</a> article. So we open a windows command line prompt with administrative privileges (WinKey + R + type &ldquo;cmd&rdquo; + hit enter key) and run :</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">w32tm /config /syncfromflags:manual /manualpeerlist:<span class="s2">&#34;192.168.10.1 192.168.10.2 192.168.10.3&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>and then restart the time service so changes take effect and force it to resync:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">net stop W32Time
+</span></span><span class="line"><span class="cl">net start W32Time
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="troubleshooting">Troubleshooting
+</h2><p>This is going to be the longest of all sections! Yes! Debugging was hard, we dare say! For our debugging purposes in Linux VMs we used <code>ntpdate</code> tool at first, although is <a class="link" href="https://support.ntp.org/bin/view/Dev/DeprecatingNtpdate"  target="_blank" rel="noopener"
+    >deprecated</a>. Also we have used <code>ntpq</code> and <code>nmap</code>. So this is what you have to do if you encounter the following errors both in your local NTP servers and clients.</p>
+<h3 id="ntp-server-dropped-strata-too-high">NTP Server dropped: strata too high
+</h3><p>If you see in <code>syslog</code> or in the output of the command:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo ntpdate -dv 2.europe.pool.ntp.org
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>the error:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">91.228.108.200: Server dropped: strata too high
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>then, acccording to <a class="link" href="http://www.markelov.org/wiki/index.php?title=NTP._Server_dropped:_strata_too_high"  target="_blank" rel="noopener"
+    >this</a> and <a class="link" href="http://www.tuxradar.com/answers/547"  target="_blank" rel="noopener"
+    >this</a> article, the server is too far out of sync with the upstream servers, so it sets an artificially high stratum value to prevent other computers trusting it.</p>
+<p>A possible solution is to set the time in the server manually as described <a class="link" href="https://www.cyberciti.biz/faq/howto-set-date-time-from-linux-command-prompt/"  target="_blank" rel="noopener"
+    >here</a> and then restart <code>ntp</code> service to see what happens.</p>
+<h3 id="no-server-suitable-for-synchronization-found">No server suitable for synchronization found
+</h3><p>If you use <code>ntpdate</code> to debug like this:</p>
+<p><strong>WARNING!</strong> NTP service has to be stopped in order to perform the following test.
+{: .notice&ndash;warning}</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo ntpdate -s -B -v 3.gr.pool.ntp.org
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>and the output in syslog is like this:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-gdscript3" data-lang="gdscript3"><span class="line"><span class="cl"><span class="n">bobos</span><span class="err">@</span><span class="n">WEBSRV01</span><span class="p">:</span><span class="o">~$</span> <span class="n">sudo</span> <span class="n">tail</span> <span class="o">-</span><span class="n">f</span> <span class="o">-</span><span class="n">n</span> <span class="mi">10</span> <span class="o">/</span><span class="k">var</span><span class="o">/</span><span class="nb">log</span><span class="o">/</span><span class="n">syslog</span>
+</span></span><span class="line"><span class="cl"><span class="n">Nov</span> <span class="mi">24</span> <span class="mi">13</span><span class="p">:</span><span class="mi">33</span><span class="p">:</span><span class="mi">39</span> <span class="n">WEBWEBSRV01</span> <span class="n">ntpdate</span><span class="p">[</span><span class="mi">26635</span><span class="p">]:</span> <span class="n">ntpdate</span> <span class="mf">4.2</span><span class="o">.</span><span class="mi">8</span><span class="n">p10</span><span class="err">@</span><span class="mf">1.3728</span><span class="o">-</span><span class="n">o</span> <span class="n">Sat</span> <span class="n">Nov</span> <span class="mi">24</span> <span class="mi">19</span><span class="p">:</span><span class="mi">02</span><span class="p">:</span><span class="mi">40</span> <span class="n">UTC</span> <span class="mi">2017</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">Nov</span> <span class="mi">24</span> <span class="mi">13</span><span class="p">:</span><span class="mi">33</span><span class="p">:</span><span class="mi">48</span> <span class="n">WEBSRV01</span> <span class="n">ntpdate</span><span class="p">[</span><span class="mi">26635</span><span class="p">]:</span> <span class="n">no</span> <span class="n">server</span> <span class="n">suitable</span> <span class="k">for</span> <span class="n">synchronization</span> <span class="n">found</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>then it might a network issue. To be sure, run <code>nmap</code> :</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">bobos@WEBSRV01:~$ sudo nmap -p123 -sU -P0 3.gr.pool.ntp.org
+</span></span><span class="line"><span class="cl">Starting Nmap 7.40 <span class="o">(</span> https://nmap.org <span class="o">)</span> at 2017-11-24 13:43 EEST
+</span></span><span class="line"><span class="cl">Nmap scan report <span class="k">for</span> 3.gr.pool.ntp.org <span class="o">(</span>194.177.210.54<span class="o">)</span>
+</span></span><span class="line"><span class="cl">Host is up <span class="o">(</span>0.00011s latency<span class="o">)</span>.
+</span></span><span class="line"><span class="cl">Other addresses <span class="k">for</span> 3.gr.pool.ntp.org <span class="o">(</span>not scanned<span class="o">)</span>: ::1
+</span></span><span class="line"><span class="cl">PORT    STATE  SERVICE
+</span></span><span class="line"><span class="cl">123/udp closed ntp
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>As you can see UTDP port 123 is closed, so we cannot communicate. Let&rsquo;s run a second test:</p>
+<p><strong>WARNING!</strong> NTP service has to be stopped in order to perform the following test.
+{: .notice&ndash;warning}</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span><span class="lnt">75
+</span><span class="lnt">76
+</span><span class="lnt">77
+</span><span class="lnt">78
+</span><span class="lnt">79
+</span><span class="lnt">80
+</span><span class="lnt">81
+</span><span class="lnt">82
+</span><span class="lnt">83
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">bobos@WEBSRV01:~$ sudo ntpdate -dv 2.europe.pool.ntp.org
+</span></span><span class="line"><span class="cl"><span class="m">24</span> Oct 12:02:20 ntpdate<span class="o">[</span>26399<span class="o">]</span>: ntpdate 4.2.8p10@1.3728-o Sat Sep <span class="m">23</span> 19:02:40 UTC <span class="m">2017</span> <span class="o">(</span>1<span class="o">)</span>
+</span></span><span class="line"><span class="cl">transmit<span class="o">(</span>87.118.124.35<span class="o">)</span>
+</span></span><span class="line"><span class="cl">transmit<span class="o">(</span>91.228.108.200<span class="o">)</span>
+</span></span><span class="line"><span class="cl">transmit<span class="o">(</span>194.177.4.1<span class="o">)</span>
+</span></span><span class="line"><span class="cl">transmit<span class="o">(</span>81.16.38.161<span class="o">)</span>
+</span></span><span class="line"><span class="cl">transmit<span class="o">(</span>87.118.124.35<span class="o">)</span>
+</span></span><span class="line"><span class="cl">transmit<span class="o">(</span>91.228.108.200<span class="o">)</span>
+</span></span><span class="line"><span class="cl">transmit<span class="o">(</span>194.177.4.1<span class="o">)</span>
+</span></span><span class="line"><span class="cl">transmit<span class="o">(</span>81.16.38.161<span class="o">)</span>
+</span></span><span class="line"><span class="cl">transmit<span class="o">(</span>87.118.124.35<span class="o">)</span>
+</span></span><span class="line"><span class="cl">transmit<span class="o">(</span>91.228.108.200<span class="o">)</span>
+</span></span><span class="line"><span class="cl">transmit<span class="o">(</span>194.177.4.1<span class="o">)</span>
+</span></span><span class="line"><span class="cl">transmit<span class="o">(</span>81.16.38.161<span class="o">)</span>
+</span></span><span class="line"><span class="cl">transmit<span class="o">(</span>87.118.124.35<span class="o">)</span>
+</span></span><span class="line"><span class="cl">transmit<span class="o">(</span>91.228.108.200<span class="o">)</span>
+</span></span><span class="line"><span class="cl">transmit<span class="o">(</span>194.177.4.1<span class="o">)</span>
+</span></span><span class="line"><span class="cl">transmit<span class="o">(</span>81.16.38.161<span class="o">)</span>
+</span></span><span class="line"><span class="cl">transmit<span class="o">(</span>87.118.124.35<span class="o">)</span>
+</span></span><span class="line"><span class="cl">transmit<span class="o">(</span>91.228.108.200<span class="o">)</span>
+</span></span><span class="line"><span class="cl">transmit<span class="o">(</span>194.177.4.1<span class="o">)</span>
+</span></span><span class="line"><span class="cl">transmit<span class="o">(</span>81.16.38.161<span class="o">)</span>
+</span></span><span class="line"><span class="cl">87.118.124.35: Server dropped: no data
+</span></span><span class="line"><span class="cl">91.228.108.200: Server dropped: no data
+</span></span><span class="line"><span class="cl">194.177.4.1: Server dropped: no data
+</span></span><span class="line"><span class="cl">81.16.38.161: Server dropped: no data
+</span></span><span class="line"><span class="cl">server 87.118.124.35, port <span class="m">123</span>
+</span></span><span class="line"><span class="cl">stratum 0, precision 0, leap 00, trust <span class="m">000</span>
+</span></span><span class="line"><span class="cl">refid <span class="o">[</span>87.118.124.35<span class="o">]</span>, delay 0.00000, dispersion 64.00000
+</span></span><span class="line"><span class="cl">transmitted 4, in filter <span class="m">4</span>
+</span></span><span class="line"><span class="cl">reference time:    00000000.00000000  Thu, Feb  <span class="m">7</span> <span class="m">2036</span>  8:28:16.000
+</span></span><span class="line"><span class="cl">originate timestamp: 00000000.00000000  Thu, Feb  <span class="m">7</span> <span class="m">2036</span>  8:28:16.000
+</span></span><span class="line"><span class="cl">transmit timestamp:  dd998022.d88eee1a  Tue, Oct <span class="m">24</span> <span class="m">2017</span> 12:02:26.845
+</span></span><span class="line"><span class="cl">filter delay:  0.00000  0.00000  0.00000  0.00000 
+</span></span><span class="line"><span class="cl">         0.00000  0.00000  0.00000  0.00000 
+</span></span><span class="line"><span class="cl">filter offset: 0.000000 0.000000 0.000000 0.000000
+</span></span><span class="line"><span class="cl">         0.000000 0.000000 0.000000 0.000000
+</span></span><span class="line"><span class="cl">delay 0.00000, dispersion 64.00000
+</span></span><span class="line"><span class="cl">offset 0.000000
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">server 91.228.108.200, port <span class="m">123</span>
+</span></span><span class="line"><span class="cl">stratum 0, precision 0, leap 00, trust <span class="m">000</span>
+</span></span><span class="line"><span class="cl">refid <span class="o">[</span>91.228.108.200<span class="o">]</span>, delay 0.00000, dispersion 64.00000
+</span></span><span class="line"><span class="cl">transmitted 4, in filter <span class="m">4</span>
+</span></span><span class="line"><span class="cl">reference time:    00000000.00000000  Thu, Feb  <span class="m">7</span> <span class="m">2036</span>  8:28:16.000
+</span></span><span class="line"><span class="cl">originate timestamp: 00000000.00000000  Thu, Feb  <span class="m">7</span> <span class="m">2036</span>  8:28:16.000
+</span></span><span class="line"><span class="cl">transmit timestamp:  dd998023.0bc09a0a  Tue, Oct <span class="m">24</span> <span class="m">2017</span> 12:02:27.045
+</span></span><span class="line"><span class="cl">filter delay:  0.00000  0.00000  0.00000  0.00000 
+</span></span><span class="line"><span class="cl">         0.00000  0.00000  0.00000  0.00000 
+</span></span><span class="line"><span class="cl">filter offset: 0.000000 0.000000 0.000000 0.000000
+</span></span><span class="line"><span class="cl">         0.000000 0.000000 0.000000 0.000000
+</span></span><span class="line"><span class="cl">delay 0.00000, dispersion 64.00000
+</span></span><span class="line"><span class="cl">offset 0.000000
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">server 194.177.4.1, port <span class="m">123</span>
+</span></span><span class="line"><span class="cl">stratum 0, precision 0, leap 00, trust <span class="m">000</span>
+</span></span><span class="line"><span class="cl">refid <span class="o">[</span>194.177.4.1<span class="o">]</span>, delay 0.00000, dispersion 64.00000
+</span></span><span class="line"><span class="cl">transmitted 4, in filter <span class="m">4</span>
+</span></span><span class="line"><span class="cl">reference time:    00000000.00000000  Thu, Feb  <span class="m">7</span> <span class="m">2036</span>  8:28:16.000
+</span></span><span class="line"><span class="cl">originate timestamp: 00000000.00000000  Thu, Feb  <span class="m">7</span> <span class="m">2036</span>  8:28:16.000
+</span></span><span class="line"><span class="cl">transmit timestamp:  dd998023.3ef4248c  Tue, Oct <span class="m">24</span> <span class="m">2017</span> 12:02:27.245
+</span></span><span class="line"><span class="cl">filter delay:  0.00000  0.00000  0.00000  0.00000 
+</span></span><span class="line"><span class="cl">         0.00000  0.00000  0.00000  0.00000 
+</span></span><span class="line"><span class="cl">filter offset: 0.000000 0.000000 0.000000 0.000000
+</span></span><span class="line"><span class="cl">         0.000000 0.000000 0.000000 0.000000
+</span></span><span class="line"><span class="cl">delay 0.00000, dispersion 64.00000
+</span></span><span class="line"><span class="cl">offset 0.000000
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">server 81.16.38.161, port <span class="m">123</span>
+</span></span><span class="line"><span class="cl">stratum 0, precision 0, leap 00, trust <span class="m">000</span>
+</span></span><span class="line"><span class="cl">refid <span class="o">[</span>81.16.38.161<span class="o">]</span>, delay 0.00000, dispersion 64.00000
+</span></span><span class="line"><span class="cl">transmitted 4, in filter <span class="m">4</span>
+</span></span><span class="line"><span class="cl">reference time:    00000000.00000000  Thu, Feb  <span class="m">7</span> <span class="m">2036</span>  8:28:16.000
+</span></span><span class="line"><span class="cl">originate timestamp: 00000000.00000000  Thu, Feb  <span class="m">7</span> <span class="m">2036</span>  8:28:16.000
+</span></span><span class="line"><span class="cl">transmit timestamp:  dd998023.72276991  Tue, Oct <span class="m">24</span> <span class="m">2017</span> 12:02:27.445
+</span></span><span class="line"><span class="cl">filter delay:  0.00000  0.00000  0.00000  0.00000 
+</span></span><span class="line"><span class="cl">         0.00000  0.00000  0.00000  0.00000 
+</span></span><span class="line"><span class="cl">filter offset: 0.000000 0.000000 0.000000 0.000000
+</span></span><span class="line"><span class="cl">         0.000000 0.000000 0.000000 0.000000
+</span></span><span class="line"><span class="cl">delay 0.00000, dispersion 64.00000
+</span></span><span class="line"><span class="cl">offset 0.000000
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="m">24</span> Oct 12:02:29 ntpdate<span class="o">[</span>26399<span class="o">]</span>: no server suitable <span class="k">for</span> synchronization found
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>As you can see from the output above, we cannot communicate with any server. Contact your network administrator.</p>
+<h3 id="ntpq-tool-command-shows-zeroes-in-output">NTPQ tool command shows zeroes in output
+</h3><p>If you use <code>ntpq</code> tool and the output is the following:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">bobos@WEBSRV01:~$ sudo date <span class="o">&amp;&amp;</span> ntpq -p
+</span></span><span class="line"><span class="cl">Tue Nov <span class="m">24</span> 13:26:45 EEST <span class="m">2017</span>
+</span></span><span class="line"><span class="cl">     remote           refid      st t when poll reach   delay   offset  <span class="nv">jitter</span>
+</span></span><span class="line"><span class="cl"><span class="o">==============================================================================</span>
+</span></span><span class="line"><span class="cl"> 3.gr.pool.ntp.o .POOL.          <span class="m">16</span> p    -   <span class="m">64</span>    <span class="m">0</span>    0.000    0.000   0.000
+</span></span><span class="line"><span class="cl"> 1.europe.pool.n .POOL.          <span class="m">16</span> p    -   <span class="m">64</span>    <span class="m">0</span>    0.000    0.000   0.000
+</span></span><span class="line"><span class="cl"> 2.europe.pool.n .POOL.          <span class="m">16</span> p    -   <span class="m">64</span>    <span class="m">0</span>    0.000    0.000   0.000
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>then it means that you have no communication at all with your NTP servers.  Contact your network administrator. A valid and working output would be:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">bobos@WEBSRV01:~$ date <span class="o">&amp;&amp;</span> ntpq -p
+</span></span><span class="line"><span class="cl">Tue Nov <span class="m">24</span> 11:00:34 EEST <span class="m">2017</span>
+</span></span><span class="line"><span class="cl">     remote           refid      st t when poll reach   delay   offset  <span class="nv">jitter</span>
+</span></span><span class="line"><span class="cl"><span class="o">==============================================================================</span>
+</span></span><span class="line"><span class="cl">* 3.gr.pool.ntp.o    .POOL.      <span class="m">4</span> u  <span class="m">988</span> <span class="m">1024</span>  <span class="m">377</span>    1.180   39.213  24.397
+</span></span><span class="line"><span class="cl">* 1.europe.pool.n    .POOL.      <span class="m">4</span> u  <span class="m">986</span> <span class="m">1024</span>  <span class="m">377</span>    1.080   38.984  24.397
+</span></span><span class="line"><span class="cl">* 2.europe.pool.n    .POOL.      <span class="m">4</span> u  <span class="m">985</span> <span class="m">1024</span>  <span class="m">377</span>    1.710   39.213  24.397
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="bibliography">Bibliography
+</h2><p>For a more &ldquo;in depth dive&rdquo; you can find more in the following links:</p>
+<ol>
+<li><a class="link" href="https://help.ubuntu.com/lts/serverguide/NTP.html"  target="_blank" rel="noopener"
+    >https://help.ubuntu.com/lts/serverguide/NTP.html</a></li>
+<li><a class="link" href="https://wiki.debian.org/NTP"  target="_blank" rel="noopener"
+    >https://wiki.debian.org/NTP</a></li>
+<li><a class="link" href="https://askubuntu.com/questions/429306/ntpdate-no-server-suitable-for-synchronization-found"  target="_blank" rel="noopener"
+    >https://askubuntu.com/questions/429306/ntpdate-no-server-suitable-for-synchronization-found</a></li>
+<li><a class="link" href="https://askubuntu.com/questions/825869/ntpd-does-not-sync-clock-while-ntpdate-does"  target="_blank" rel="noopener"
+    >https://askubuntu.com/questions/825869/ntpd-does-not-sync-clock-while-ntpdate-does</a></li>
+</ol>
+<p>That&rsquo;s it! We hope it helped you! It was a long story to debug and actually narrate afterwards!</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/linux/">Linux</a>
+        
+            <a href="/tags/ntp/">Ntp</a>
+        
+            <a href="/tags/debian/">Debian</a>
+        
+            <a href="/tags/ubuntu/">Ubuntu</a>
+        
+            <a href="/tags/server/">Server</a>
+        
+            <a href="/tags/time/">Time</a>
+        
+            <a href="/tags/sync/">Sync</a>
+        
+            <a href="/tags/synchronisation/">Synchronisation</a>
+        
+            <a href="/tags/install/">Install</a>
+        
+            <a href="/tags/configure/">Configure</a>
+        
+            <a href="/tags/error/">Error</a>
+        
+            <a href="/tags/network/">Network</a>
+        
+            <a href="/tags/ntpdate/">Ntpdate</a>
+        
+            <a href="/tags/ntpq/">Ntpq</a>
+        
+            <a href="/tags/service/">Service</a>
+        
+            <a href="/tags/strata/">Strata</a>
+        
+            <a href="/tags/high/">High</a>
+        
+            <a href="/tags/suitable/">Suitable</a>
+        
+            <a href="/tags/minpoll/">Minpoll</a>
+        
+            <a href="/tags/maxpoll/">Maxpoll</a>
+        
+            <a href="/tags/pool/">Pool</a>
+        
+            <a href="/tags/iburst/">Iburst</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/2017/11/23/mongodb-replica-stale-during-recovery/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">MongoDB replica error RS102 too stale to catch up during full recovery</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/2024/02/11/linux-mint-mate-screensaver-command-line-configure-enable-disable/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Linux Mint Mate configure screensaver and display sleep via command line</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/2017/11/15/use-haproxy-and-docker-for-solr-load-balancing/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Use HAProxy and Docker to load balance requests to Solr and SolrCloud</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/2016/07/12/lets-encrypt-ssl-certificate-without-root-or-sudo-privileges/">
+        
+        
+            <div class="article-image">
+                
+                    <img src="/hubble_space.png" loading="lazy" data-key="lets-encrypt-ssl-certificate-without-root-or-sudo-privileges" data-hash="/hubble_space.png"/>
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Let&#39;s Encrypt SSL certificate without root or sudo privileges</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/2013/06/12/fix-vmware-tools-kernel-header-path-is-not-valid-error/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Fix Vmware tools &#34; kernel header path is not valid &#34; error</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    <div class="disqus-container">
+    <div id="disqus_thread"></div>
+<script>
+    window.disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "manios-org" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+
+<style>
+    .disqus-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+</style>
+
+<script>
+    window.addEventListener('onColorSchemeChange', (e) => {
+        if (typeof DISQUS == 'object') {
+            DISQUS.reset({
+                reload: true
+            });
+        }
+    })
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2011 - 
+        
+        2025 Christos Manios
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.32.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.c922af694cc257bf1ecc41c0dd7b0430f9114ec280ccf67cd2c6ad55f5316c4e.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

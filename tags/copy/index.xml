@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Copy on Christos Manios</title>
+        <link>https://manios.org/tags/copy/</link>
+        <description>Recent content in Copy on Christos Manios</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>en-us</language>
+        <lastBuildDate>Thu, 08 Mar 2012 09:53:02 +0200</lastBuildDate><atom:link href="https://manios.org/tags/copy/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>Copy/Paste source code from Eclipse to Microsoft Word</title>
+        <link>https://manios.org/2012/03/08/copypaste-source-code-from-eclipse-to-microsoft-word/</link>
+        <pubDate>Thu, 08 Mar 2012 09:53:02 +0200</pubDate>
+        
+        <guid>https://manios.org/2012/03/08/copypaste-source-code-from-eclipse-to-microsoft-word/</guid>
+        <description>&lt;p&gt;Today I wanted to copy and paste a piece of code from Eclipse Indigo to Microsoft Word 2007 &lt;strong&gt;and keep the syntax highlighting&lt;/strong&gt;. In some cases it worked but in some other not.
+After searching in the webI found that if the area you want to copy has folded code in it, the syntax highlight will not be preserved (picture 1)&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://manios.org/2012/03/08/copypaste-source-code-from-eclipse-to-microsoft-word/codefoldeclipse.png&#34;
+	width=&#34;408&#34;
+	height=&#34;111&#34;
+	srcset=&#34;https://manios.org/2012/03/08/copypaste-source-code-from-eclipse-to-microsoft-word/codefoldeclipse_hu_988f79f48cdd0dfb.png 480w, https://manios.org/2012/03/08/copypaste-source-code-from-eclipse-to-microsoft-word/codefoldeclipse_hu_626b16e8117820cb.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;code fold&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;367&#34;
+		data-flex-basis=&#34;882px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;So before you start copying and pasting from Eclipse to Microsoft Word unfold any part of the code you want to copy (picture 2)&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://manios.org/2012/03/08/copypaste-source-code-from-eclipse-to-microsoft-word/nofolding.png&#34;
+	width=&#34;409&#34;
+	height=&#34;254&#34;
+	srcset=&#34;https://manios.org/2012/03/08/copypaste-source-code-from-eclipse-to-microsoft-word/nofolding_hu_ce378b5de8a9250d.png 480w, https://manios.org/2012/03/08/copypaste-source-code-from-eclipse-to-microsoft-word/nofolding_hu_de8266b1bc24958e.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;unfold Code in Eclipse&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;161&#34;
+		data-flex-basis=&#34;386px&#34;
+	
+&gt;&lt;/p&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>

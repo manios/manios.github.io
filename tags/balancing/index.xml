@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Balancing on Christos Manios</title>
+        <link>https://manios.org/tags/balancing/</link>
+        <description>Recent content in Balancing on Christos Manios</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>en-us</language>
+        <lastBuildDate>Wed, 15 Nov 2017 12:14:00 +0200</lastBuildDate><atom:link href="https://manios.org/tags/balancing/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>Use HAProxy and Docker to load balance requests to Solr and SolrCloud</title>
+        <link>https://manios.org/2017/11/15/use-haproxy-and-docker-for-solr-load-balancing/</link>
+        <pubDate>Wed, 15 Nov 2017 12:14:00 +0200</pubDate>
+        
+        <guid>https://manios.org/2017/11/15/use-haproxy-and-docker-for-solr-load-balancing/</guid>
+        <description>&lt;p&gt;We use Solr 4.6 with SolrCloud configuration in a production system. You may say: &amp;ldquo;It is hight time you upgraded to the latest version, isn&amp;rsquo;t it?&amp;rdquo;. And you will be absolute right! But currently this is not the case because full reindexing costs! Our SolrCloud consists of one shard and five replicas as seen in the screenshot bellow:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://manios.org/2017/11/15/use-haproxy-and-docker-for-solr-load-balancing/2017-11-15-solrcloud.png&#34;
+	width=&#34;828&#34;
+	height=&#34;101&#34;
+	srcset=&#34;https://manios.org/2017/11/15/use-haproxy-and-docker-for-solr-load-balancing/2017-11-15-solrcloud_hu_7cc84fe46c807a6e.png 480w, https://manios.org/2017/11/15/use-haproxy-and-docker-for-solr-load-balancing/2017-11-15-solrcloud_hu_4d5234cf3feb6d9c.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;SolrCloud with one shard and five replicas&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;819&#34;
+		data-flex-basis=&#34;1967px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;The problem we were facing was that SolrJ library does balance the requests using round robin algorithm when using class &lt;a class=&#34;link&#34; href=&#34;https://lucene.apache.org/solr/4_6_0/solr-solrj/org/apache/solr/client/solrj/impl/LBHttpSolrServer.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;LBHttpSolrServer&lt;/a&gt;. Furthermore, when a request to a node fails for any reason (timeout, http 403, http 404, etc), it &lt;a class=&#34;link&#34; href=&#34;http://grepcode.com/file/repo1.maven.org/maven2/org.apache.solr/solr-solrj/4.6.0/org/apache/solr/client/solrj/impl/LBHttpSolrServer.java?av=f#265&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;puts the node to a zombie list&lt;/a&gt; for 60 seconds. This can become a burden when the SolrCloud has heavy loads and you will start to see in your application logs:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Exception in thread &amp;#34;main&amp;#34; org.apache.solr.client.solrj.SolrServerException: No live SolrServers available to handle this request
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;	at org.apache.solr.client.solrj.impl.LBHttpSolrServer.request(LBHttpSolrServer.java:289)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;	at org.apache.solr.client.solrj.impl.CloudSolrServer.request(CloudSolrServer.java:310)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;	at org.apache.solr.client.solrj.request.AbstractUpdateRequest.process(AbstractUpdateRequest.java:117)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;	at org.apache.solr.client.solrj.SolrServer.add(SolrServer.java:116)
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;	at org.apache.solr.client.solrj.SolrServer.add(SolrServer.java:102)
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;So we decided to put a HAProxy instance to load balance the query requests to the SolrCloud using &lt;code&gt;leastconn&lt;/code&gt; (least connections) algorithm. After a lot of search and using a combination of &lt;a class=&#34;link&#34; href=&#34;http://cbonte.github.io/haproxy-dconv/1.7/configuration.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;official documentation&lt;/a&gt; and articles (&lt;a class=&#34;link&#34; href=&#34;http://davehall.com.au/blog/dave/2010/03/13/solr-replication-load-balancing-haproxy-and-drupal&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;link1&lt;/a&gt;, &lt;a class=&#34;link&#34; href=&#34;https://gist.github.com/feniix/1974460&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;link2&lt;/a&gt;) and the official HAProxy &lt;a class=&#34;link&#34; href=&#34;https://hub.docker.com/_/haproxy/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Docker image&lt;/a&gt; we created a container using the following configuration:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-nginx&#34; data-lang=&#34;nginx&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;global&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;s&#34;&gt;log&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;127.0.0.1&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;local0&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;notice&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;s&#34;&gt;maxconn&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;2000&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;c1&#34;&gt;#user haproxy
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;    &lt;span class=&#34;c1&#34;&gt;#group haproxy
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s&#34;&gt;defaults&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;s&#34;&gt;log&lt;/span&gt;     &lt;span class=&#34;s&#34;&gt;global&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;s&#34;&gt;mode&lt;/span&gt;    &lt;span class=&#34;s&#34;&gt;http&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;s&#34;&gt;option&lt;/span&gt;  &lt;span class=&#34;s&#34;&gt;httplog&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;s&#34;&gt;option&lt;/span&gt;  &lt;span class=&#34;s&#34;&gt;dontlognull&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;s&#34;&gt;retries&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;3&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;s&#34;&gt;timeout&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;connect&lt;/span&gt;  &lt;span class=&#34;mi&#34;&gt;5000&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;s&#34;&gt;timeout&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;client&lt;/span&gt;  &lt;span class=&#34;mi&#34;&gt;10000&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;s&#34;&gt;timeout&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;server&lt;/span&gt;  &lt;span class=&#34;mi&#34;&gt;10000&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s&#34;&gt;listen&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;solrcloud&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;s&#34;&gt;bind&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;0.0.0.0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;8983&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;s&#34;&gt;mode&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;http&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;s&#34;&gt;stats&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;enable&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;s&#34;&gt;stats&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;uri&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;/haproxy?stats&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;s&#34;&gt;stats&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;realm&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;Strictly\&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;Private&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;s&#34;&gt;stats&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;auth&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;haproxyuser:haproxypassword&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;s&#34;&gt;balance&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;leastconn&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;s&#34;&gt;option&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;httpclose&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;s&#34;&gt;option&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;forwardfor&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;s&#34;&gt;option&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;httpchk&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;GET&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;/solr/paradise-papers/admin/ping?wt=json&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;s&#34;&gt;server&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;search1&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;192.168.1.1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;8983&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;check&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;port&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;8983&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;inter&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;20s&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;fastinter&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;2s&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;s&#34;&gt;server&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;search2&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;192.168.1.2&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;8983&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;check&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;port&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;8983&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;inter&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;20s&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;fastinter&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;2s&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;s&#34;&gt;server&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;search3&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;192.168.1.3&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;8983&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;check&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;port&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;8983&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;inter&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;20s&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;fastinter&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;2s&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;s&#34;&gt;server&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;search4&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;192.168.1.4&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;8983&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;check&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;port&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;8983&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;inter&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;20s&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;fastinter&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;2s&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;s&#34;&gt;server&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;search5&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;192.168.1.5&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;8983&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;check&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;port&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;8983&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;inter&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;20s&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;fastinter&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;2s&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id=&#34;notes-on-configuration&#34;&gt;Notes on configuration:
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;Our HAProxy runs in &lt;code&gt;192.168.1.10&lt;/code&gt; and all the queries are handled by port &lt;code&gt;8983&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;We can see statistics about the distribution of requests using HAProxy statistics page which is accessible in &lt;a class=&#34;link&#34; href=&#34;http://192.168.1.10:8983/haproxy?stats&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;http://192.168.1.10:8983/haproxy?stats&lt;/a&gt;. See:
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-nginx&#34; data-lang=&#34;nginx&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;stats&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;uri&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;/haproxy?stats&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s&#34;&gt;stats&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;realm&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;Strictly\&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;Private&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s&#34;&gt;stats&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;auth&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;haproxyuser:haproxypassword&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;We check if every Solr node is alive by pinging it (see: &lt;code&gt;option httpchk GET /solr/paradise-papers/admin/ping?wt=json&lt;/code&gt;)&lt;/li&gt;
+&lt;li&gt;Check interval is 20 seconds (see: &lt;code&gt;inter 20s&lt;/code&gt;)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Now our search queries are handled better and we have already noticed an increase in query performance, faster response times and no downtime! This is a sample output from HAProxy statistics page:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://manios.org/2017/11/15/use-haproxy-and-docker-for-solr-load-balancing/2017-11-15-haproxy-stats.png&#34;
+	width=&#34;1705&#34;
+	height=&#34;182&#34;
+	srcset=&#34;https://manios.org/2017/11/15/use-haproxy-and-docker-for-solr-load-balancing/2017-11-15-haproxy-stats_hu_dcf5c5ec5a310c36.png 480w, https://manios.org/2017/11/15/use-haproxy-and-docker-for-solr-load-balancing/2017-11-15-haproxy-stats_hu_fb342a775ee21d2.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;HAProxy as a load balancer to Solr and SolrCloud with one shard and five replicas using leastconn algorithm&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;936&#34;
+		data-flex-basis=&#34;2248px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;We hope you find this article helpful!&lt;/p&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>
